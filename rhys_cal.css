@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+input, button, select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+.calendar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.calendar button {
+    width: 13%;
+    padding: 10px;
+}
+.active-day {
+    background-color: #4CAF50;
+    color: white;
+}
+ul {
+    padding-left: 20px;
+}
+hr {
+    margin: 20px 0;
+}
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.summary-table th, .summary-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+.summary-table th {
+    background-color: #f4f4f4;
+}
+#suggestions div {
+    padding: 5px;
+    cursor: pointer;
+}
+#suggestions div:hover {
+    background-color: #eee;
+}
+canvas {
+    margin-top: 20px;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    font-family: sans-serif;
+}
+.calendar button {
+    margin: 2px;
+    padding: 5px;
+    cursor: pointer;
+}
+.active-day {
+    background-color: #4CAF50;
+    color: white;
+}
+#suggestions div {
+    padding: 5px;
+    cursor: pointer;
+}
+#suggestions div:hover {
+    background: #eee;
+}
