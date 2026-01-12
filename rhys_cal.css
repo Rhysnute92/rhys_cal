@@ -16,6 +16,9 @@ input, button, select {
     justify-content: space-between;
     margin-bottom: 10px;
 }
+.basecalories{
+
+}
 .calendar button {
     width: 13%;
     padding: 10px;
@@ -73,4 +76,39 @@ canvas {
 }
 #suggestions div:hover {
     background: #eee;
+}
+.section-summary {
+    display: flex;
+    justify-content: space-between;
+    background: #eef2f3;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    margin-bottom: 8px;
+    color: #333;
+    border-left: 4px solid #4CAF50; /* Green accent */
+}
+
+.section-summary span strong {
+    color: #2c3e50;
+}
+
+#mealLists h4 {
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    color: #666;
+}
+
+#mealLists ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+#mealLists li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed #ddd;
 }

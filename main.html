@@ -23,7 +23,7 @@
 
     <div style="margin-top:10px;">
         <label>Fat Progress (Goal: 45g)</label>
-        <div style="width: auto; background: #eee; border-radius: 10px; height: 20px;">
+        <div id="fatprog" style="width: auto; background: #eee; border-radius: 10px; height: 20px;">
             <div id="fat-bar" style="width: 0; background: #4CAF50; height: 100%; border-radius: 10px; transition: width 0.5s;"></div>
         </div>
     </div>
@@ -57,7 +57,7 @@
         <option value="Breakfast">Breakfast</option>
         <option value="Lunch">Lunch</option>
         <option value="Dinner">Dinner</option>
-        <option value="Tea">Tea</option>
+        <option value="Drinks">Drinks</option>
         <option value="Snack">Snack</option>
     </select>
     <input type="text" id="foodName" placeholder="Search food..." oninput="searchFood()">
@@ -76,8 +76,8 @@
         <h4>Breakfast</h4><ul id="BreakfastList"></ul>
         <h4>Lunch</h4><ul id="LunchList"></ul>
         <h4>Dinner</h4><ul id="DinnerList"></ul>
-        <h4>Tea</h4><ul id="TeaList"></ul>
-        <h4>Snack</h4><ul id="SnackList"></ul>
+        <h4>Drinks</h4><ul id="TeaList"></ul>
+        <h4>Snacks</h4><ul id="SnackList"></ul>
     </div>
 
     <hr>
@@ -106,7 +106,7 @@
         { name: "Egg", calories: 70, protein: 6, fat: 5, carbs: 0.6 }
     ];
 
-    let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], Tea: [], Snack: [] };
+    let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], drink: [], Snack: [] };
     let dailyGoalCals = 1800;
     let proteinGoal = 200;
     let fatGoal = 45;
@@ -148,7 +148,6 @@
     // --- CORE LOGIC ---
     function setDailyGoal() {
         const base = parseInt(document.getElementById('baseCalories').value) || 0;
-        const extra = parseInt(document.getElementById('trainingCalories').value) || 0;
         const isTraining = document.getElementById('isTraining').value;
         dailyGoalCals = base + (isTraining === 'yes' ? extra : 0);
         saveData();
@@ -194,14 +193,44 @@
     function updateMealDisplay(category) {
         const list = document.getElementById(category + 'List');
         list.innerHTML = '';
+
+        let sectionTotal = { cal: 0, p: 0, f: 0, c: 0 };
+
         mealFoods[category].forEach((food, index) => {
+            sectionTotal.cal += (food.calories || 0);
+            sectionTotal.p += (food.protein || 0);
+            sectionTotal.f += (food.fat || 0);
+            sectionTotal.c += (food.carbs || 0);
+
             const li = document.createElement('li');
-            li.innerHTML = `${food.name} (${food.calories} kcal) <button onclick="removeFood('${category}', ${index})">x</button>`;
+            li.innerHTML = `
+            <span>${food.name}</span>
+            <span>${food.calories} kcal <button onclick="removeFood('${category}', ${index})">x</button></span>
+        `;
             list.appendChild(li);
         });
+
+        // Target the header <h4>
+        const header = document.querySelector(`#${category}List`).previousElementSibling;
+
+        // Create or update the summary div
+        let summaryDiv = document.getElementById(category + '-summary');
+        if (!summaryDiv) {
+            summaryDiv = document.createElement('div');
+            summaryDiv.id = category + '-summary';
+            summaryDiv.className = 'section-summary';
+            header.after(summaryDiv); // Inserts it right between H4 and UL
+        }
+
+        summaryDiv.innerHTML = `
+        <span><strong>${sectionTotal.cal}</strong> kcal</span>
+        <span>P: <strong>${sectionTotal.p}g</strong></span>
+        <span>F: <strong>${sectionTotal.f}g</strong></span>
+        <span>C: <strong>${sectionTotal.c}g</strong></span>
+    `;
+
         updateDailyTotals();
     }
-
     function removeFood(category, index) {
         // 1. Remove the item from the array
         mealFoods[category].splice(index, 1);
@@ -227,29 +256,28 @@
             total.c += (f.carbs || 0);
         });
 
-        // 2. Update Basic Totals
-        document.getElementById('dailyGoal').innerText = `Goal: ${dailyGoalCals} kcal`;
+        // 2. Update Text UI
+        document.getElementById('dailyGoal').innerText = `Daily Goal: ${dailyGoalCals} kcal`;
         document.getElementById('remainingCalories').innerText = `Remaining: ${dailyGoalCals - total.cal} kcal`;
         document.getElementById('dailyTotals').innerText = `Total -> Cals: ${total.cal} | P: ${total.p}g | F: ${total.f}g | C: ${total.c}g`;
 
-        // 3. Update Macro Remaining (using Math.max to prevent negative numbers)
-        // We check if the element exists first to prevent "null" errors
-        const setRemaining = (id, goal, current, label) => {
-            const el = document.getElementById(id);
-            if (el) {
-                const remaining = Math.max(0, goal - current);
-                el.innerText = `${label} Remaining: ${remaining}g`;
-            }
-        };
+        document.getElementById('protein-remaining').innerText = `Protein Remaining: ${Math.max(0, proteinGoal - total.p)}g`;
+        document.getElementById('fat-remaining').innerText = `Fat Remaining: ${Math.max(0, fatGoal - total.f)}g`;
+        document.getElementById('carbs-remaining').innerText = `Carbs Remaining: ${Math.max(0, carbGoal - total.c)}g`;
 
-        setRemaining('protein-remaining', proteinGoal, total.p, 'Protein');
-        setRemaining('fat-remaining', fatGoal, total.f, 'Fat');
-        setRemaining('carbs-remaining', carbGoal, total.c, 'Carbs');
+        // 3. Update Progress Bars (Fixed to use correct macro variables)
+        const pPct = Math.min((total.p / proteinGoal) * 100, 100);
+        document.getElementById('protein-bar').style.width = pPct + "%";
 
-        // 4. Update the visual charts
+        const fPct = Math.min((total.f / fatGoal) * 100, 100);
+        document.getElementById('fat-bar').style.width = fPct + "%";
+
+        const cPct = Math.min((total.c / carbGoal) * 100, 100);
+        document.getElementById('carb-bar').style.width = cPct + "%";
+
+        // 4. Refresh Chart
         drawCharts(total.p, total.f, total.c);
-    } // <--- Added missing closing brace
-
+    }
     // --- STORAGE ---
     function saveData() {
         const dateKey = dateInput.value;
