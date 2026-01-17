@@ -8,8 +8,19 @@
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <div class="container">
+    <div class="top-actions">
+        <button onclick="document.getElementById('add-food-section').scrollIntoView()">+ Add Food</button>
+        <button onclick="startScanner()" class="scan-btn">Scan Barcode</button>
+    </div>
+
     <h2>Calorie & Macro Tracker</h2>
+
+    <div id="scanner-container" style="display: none; background: #000; padding: 10px; border-radius: 8px">
+        <div id="interactive" style="width: 100%"></div>
+        <button onclick="stopScaner()" class="stop-scanner">Close Camera</button>
+    </div>
 
     <div class="calendar" id="calendar"></div>
     <input type="date" id="date" style="display:none;">
@@ -106,7 +117,7 @@
         { name: "Egg", calories: 70, protein: 6, fat: 5, carbs: 0.6 }
     ];
 
-    let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], drink: [], Snack: [] };
+    let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], Drink: [], Snack: [] };
     let dailyGoalCals = 1800;
     let proteinGoal = 200;
     let fatGoal = 45;

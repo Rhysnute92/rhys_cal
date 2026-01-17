@@ -6,10 +6,21 @@ body {
     max-width: 900px;
     margin: auto;
 }
-input, button, select {
+input, select {
     width: 100%;
     padding: 10px;
     margin: 5px 0;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 20px;
 }
 .calendar {
     display: flex;
@@ -111,4 +122,9 @@ canvas {
     justify-content: space-between;
     padding: 5px 0;
     border-bottom: 1px dashed #ddd;
+}
+.stop-scanner {
+    background: red;
+    width: 100%;
+    margin-top: 10px;
 }
