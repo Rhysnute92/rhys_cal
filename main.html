@@ -17,9 +17,9 @@
 
     <h2>Calorie & Macro Tracker</h2>
 
-    <div id="scanner-container" style="display: none; background: #000; padding: 10px; border-radius: 8px">
-        <div id="interactive" style="width: 100%"></div>
-        <button onclick="stopScaner()" class="stop-scanner">Close Camera</button>
+    <div id="scanner-container">
+        <div id="interactive"></div>
+        <button onclick="stopScanner()" class="stop-scanner">Close Camera</button>
     </div>
 
     <div class="calendar" id="calendar"></div>
@@ -410,6 +410,38 @@
 
         drawCharts(total.p, total.f, total.c);
     }
+
+    let htmlQrCode;
+
+    async function startScanner(){
+        const scannerDiv = document.getElementById('scanner-container');
+        scannerDiv.style.display = 'block';
+
+        html5QrCode = new Html5Qrcode("interactive");
+
+        const config = {fps: 10, qrbox:{width: 250, height: 150}};
+
+        try {
+            await htmlQrCode.start(
+                {facingMode: "environment"}, //back camera
+                config,
+                onScanSuccess
+            );
+        } catch (err){
+            alert("Camera error:" + err);
+        }
+    }
+
+    function onScanSucess(decodedText, decodedResult) {
+        console.log('Code matched = ${decodedText}', dedcodedResult);
+        stopScanner();
+
+        alert("Barcode Detected:" + decodedText);
+
+        fetchFoodByBarcode(decodedText);
+    }
+
+
 </script>
 </body>
 </html>
