@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroTracker - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="nav-menu">
+        <a href="index.html" class="active">Dashboard</a>
+        <a href="log.html">Daily Log</a>
+        <a href="database.html">Database</a>
+    </nav>
+
+    <header>
+        <h1>Daily Overview</h1>
+        <div id="current-date-display"></div>
+        <div class="logo-container">
+            <a href="index.html">
+                <img src="rhys_logo.png"  alt="MacroTrackerLogo" class="site-logo">
+            </a>
+        </div>
+    </header>
+
+    <section class="summary-card">
+        <div id="remainingCalories" class="big-cal">0</div>
+        <p>Calories Remaining</p>
+
+        <div class="progress-container">
+            <label>Protein (Goal: 200g)</label>
+            <div class="bar-bg"><div id="protein-bar" class="bar"></div></div>
+
+            <label>Fats (Goal: 45g)</label>
+            <div class="bar-bg"><div id="fat-bar" class="bar" style="background: #f39c12;"></div></div>
+
+            <label>Carbs (Goal: 145g)</label>
+            <div class="bar-bg"><div id="carb-bar" class="bar" style="background: #3498db;"></div></div>
+        </div>
+    </section>
+
+    <canvas id="macroChart"></canvas>
+
+    <div class="quick-actions">
+        <button onclick="window.location.href='log.html'">+ Log a Meal</button>
+    </div>
+</div>
+<script src="app.js"></script>
+<script>
+    window.onload = () => {
+        loadData();
+        updateDailyTotals();
+    };
+</script>
+</body>
+</html>
