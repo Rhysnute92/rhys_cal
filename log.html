@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Food - MacroTracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="nav-menu">
+        <a href="index.html">Dashboard</a>
+        <a href="log.html" class="active">Daily Log</a>
+        <a href="database.html">Database</a>
+    </nav>
+
+    <header>
+        <div id="current-date-display"></div>
+        <div class="logo-container">
+            <img src="rhys_logo.png"  alt="MacroTrackerLogo" class="site-logo">
+            <h1>Add Food</h1>
+        </div>
+    </header>
+
+    <div class="scanner-section">
+        <button onclick="startScanner()" class="scan-btn">Scan Barcode</button>
+        <div id="scanner-container" style="display:none;">
+            <div id="interactive"></div>
+            <button onclick="stopScanner()">Close</button>
+        </div>
+    </div>
+
+    <div class="entry-form">
+        <select id="mealCategory">
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Snack">Snack</option>
+        </select>
+        <input type="text" id="foodName" placeholder="Food name..." oninput="searchFood()">
+        <div id="suggestions"></div>
+        <div class="grid-inputs">
+            <input type="number" id="foodCalories" placeholder="Kcal">
+            <input type="number" id="protein" placeholder="P(g)">
+            <input type="number" id="fat" placeholder="F(g)">
+            <input type="number" id="carbs" placeholder="C(g)">
+        </div>
+        <button class="add-btn" onclick="addFood()">Add to Log</button>
+    </div>
+
+    <hr>
+    <div id="mealLists">
+        <h4>Today's Entries</h4>
+        <div id="BreakfastList"></div>
+        <div id="LunchList"></div>
+        <div id="DinnerList"></div>
+        <div id="DrinksList"></div>
+        <div id="SnackList"></div>
+    </div>
+</div>
+<script src="app.js"></script>
+<script>window.onload = loadData;</script>
+</body>
+</html>
