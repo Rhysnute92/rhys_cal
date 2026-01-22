@@ -11,7 +11,7 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <div class="container">
     <div class="top-actions">
-        <button onclick="document.getElementById('add-food-section').scrollIntoView()">+ Add Food</button>
+        <button onclick="document.getElementById('add-food-section').scrollIntoView()"> +Add Food</button>
         <button onclick="startScanner()" class="scan-btn">Scan Barcode</button>
     </div>
 
@@ -440,7 +440,64 @@
 
         fetchFoodByBarcode(decodedText);
     }
+    function stopScanner(){
+        if (html5QrCode){
+            html5QrCode.stop().then(()=>{
+                document.getElementById('scanner-container').style.display = 'none';
+            })
+        }
+    }
+    function fetchFoodByBarcode(barcode) {
+        const apiURL = `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`;
 
+        fetch(apiURL)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 1) {
+                    // PRODUCT FOUND: Populate the form
+                    const p = data.product;
+                    populateForm({
+                        name: p.product_name || "",
+                        calories: Math.round(p.nutriments['energy-kcal_100g'] || 0),
+                        protein: p.nutriments.proteins_100g || 0,
+                        fat: p.nutriments.fat_100g || 0,
+                        carbs: p.nutriments.carbohydrates_100g || 0
+                    });
+                } else {
+                    // PRODUCT NOT FOUND: Reset form and focus on manual entry
+                    alert("Product not found. Please enter details manually.");
+                    resetFormForManualEntry();
+                }
+            })
+            .catch(err => {
+                console.error("API Error:", err);
+                alert("Connection error. Please try manual entry.");
+                resetFormForManualEntry();
+            });
+    }
+
+    function populateForm(details) {
+        document.getElementById('foodName').value = details.name;
+        document.getElementById('foodCalories').value = details.calories;
+        document.getElementById('protein').value = details.protein;
+        document.getElementById('fat').value = details.fat;
+        document.getElementById('carbs').value = details.carbs;
+    }
+
+    function resetFormForManualEntry() {
+        // 1. Clear any existing values
+        document.getElementById('foodName').value = "";
+        document.getElementById('foodCalories').value = "";
+        document.getElementById('protein').value = "";
+        document.getElementById('fat').value = "";
+        document.getElementById('carbs').value = "";
+
+        // 2. Focus on the first field to guide the user
+        document.getElementById('foodName').focus();
+
+        // 3. Optional: Show a hidden "Save to My Database" button if you have one
+        // document.getElementById('manualSaveBtn').style.display = 'block';
+    }
 
 </script>
 </body>
