@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacroTracker - Dashboard</title>
+    <title>Fitness Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
@@ -11,49 +11,96 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
 <div class="container">
-    <nav class="nav-menu">
-        <a href="index.html" class="active">Dashboard</a>
-        <a href="log.html">Daily Log</a>
-        <a href="database.html">Database</a>
-    </nav>
-
-    <header>
-        <div id="current-date-display"></div>
-        <div class="logo-container">
-            <img src="rhys_logo.png"  alt="MacroTrackerLogo" class="site-logo">
-            <h1>Daily Overview</h1>
-        </div>
+    <header class="app-header">
+        <img src="rhys_logo.png" alt="Fitness logo" class="header-logo">
+        <h1>My Fitness Tracker</h1>
     </header>
+</div>
 
-    <section class="summary-card">
-        <div id="remainingCalories" class="big-cal">0</div>
-        <p>Calories Remaining</p>
+<nav class="icon-nav">
+    <a href="index.html" class="nav-item" title="Dashboard">
+        <img src="dashboard-icon.png" alt="Dashboard">
+    </a>
+    <a href="log.html" class="nav-item" title="Add Food">
+        <img src="log-icon.png" alt="Log">
+    </a>
+    <a href="database.html" class="nav-item" title="History">
+        <img src="history-icon.png" alt="History">
+    </a>
+</nav>
 
-        <div class="progress-container">
-            <label>Protein (Goal: 200g)</label>
-            <div class="bar-bg"><div id="protein-bar" class="bar"></div></div>
+<div class="container">
+    <div class="card training-toggle-card">
+        <div class="flex-between">
+            <span><strong>Training Day?</strong></span>
+            <label class="switch-small">
+                <input type="checkbox" id="trainingMode" onchange="toggleTrainingMode()">
+                <span class="slider-toggle"></span>
+            </label>
+        </div>
+        <p id="trainingStatusText" class="hint">Rest Day (1500 kcal)</p>
+    </div>
 
-            <label>Fats (Goal: 45g)</label>
-            <div class="bar-bg"><div id="fat-bar" class="bar" style="background: #f39c12;"></div></div>
+    <section class="card metrics-card">
+        <div class="header-with-action">
+            <h3>Daily Progress</h3>
+            <button class="icon-btn" onclick="toggleEditMode()">⚙️ Edit Goals</button>
+        </div>
 
-            <label>Carbs (Goal: 145g)</label>
-            <div class="bar-bg"><div id="carb-bar" class="bar" style="background: #3498db;"></div></div>
+        <div class="metric-item">
+            <div class="metric-header">
+                <span class="huge-number" id="remainingCalories">1500</span>
+                <span class="label">Calories Remaining</span>
+            </div>
+            <div class="edit-box hidden">
+                <div class="input-group">
+                    <label>Rest (kcal)</label>
+                    <input type="number" id="goalRestCals" placeholder="1500">
+                </div>
+                <div class="input-group">
+                    <label>Train (kcal)</label>
+                    <input type="number" id="goalTrainCals" placeholder="1800">
+                </div>
+                <button onclick="updateCalorieGoals()">Save</button>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-row">Protein (Goal: <span id="displayGoalP">200</span>g)</div>
+            <div class="progress-bg"><div id="protein-bar" class="progress-fill"></div></div>
+            <div class="edit-box hidden">
+                <input type="number" id="goalProtein" placeholder="New Protein">
+                <button onclick="updateGoal('Protein')">Save</button>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-row">Fats (Goal: <span id="displayGoalF">45</span>g)</div>
+            <div class="progress-bg"><div id="fat-bar" class="progress-fill"></div></div>
+            <div class="edit-box hidden">
+                <input type="number" id="goalFat" placeholder="New Fat">
+                <button onclick="updateGoal('Fat')">Save</button>
+            </div>
+        </div>
+
+        <div class="metric-item">
+            <div class="metric-row">Carbs (Goal: <span id="displayGoalC">145</span>g)</div>
+            <div class="progress-bg"><div id="carb-bar" class="progress-fill"></div></div>
+            <div class="edit-box hidden">
+                <input type="number" id="goalCarbs" placeholder="New Carbs">
+                <button onclick="updateGoal('Carbs')">Save</button>
+            </div>
         </div>
     </section>
 
-    <canvas id="macroChart"></canvas>
-
-    <div class="quick-actions">
-        <button onclick="window.location.href='log.html'">+ Log a Meal</button>
-    </div>
+    <section class="card">
+        <h3>Nutrient Breakdown</h3>
+        <canvas id="macroChart"></canvas>
+    </section>
 </div>
+
 <script src="app.js"></script>
-<script>
-    window.onload = () => {
-        loadData();
-        updateDailyTotals();
-    };
-</script>
 </body>
 </html>

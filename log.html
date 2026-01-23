@@ -3,66 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log Food - MacroTracker</title>
+    <title>Log Entry - Fitness Tracker</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-icon.png">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-<div class="container">
-    <nav class="nav-menu">
-        <a href="index.html">Dashboard</a>
-        <a href="log.html" class="active">Daily Log</a>
-        <a href="database.html">Database</a>
-    </nav>
 
-    <header>
-        <div id="current-date-display"></div>
-        <div class="logo-container">
-            <img src="rhys_logo.png"  alt="MacroTrackerLogo" class="site-logo">
-            <h1>Add Food</h1>
+<div class="container">
+    <header class="app-header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo" class="header-logo">
+            <h1>Log Daily Intake</h1>
         </div>
     </header>
 
-    <div class="scanner-section">
-        <button onclick="startScanner()" class="scan-btn">Scan Barcode</button>
-        <div id="scanner-container" style="display:none;">
-            <div id="interactive"></div>
-            <button onclick="stopScanner()">Close</button>
+    <section class="card entry-card">
+        <h3>Add Item</h3>
+        <div class="form-group">
+            <input type="text" id="foodName" placeholder="Search or Enter Item..." oninput="searchFood()">
+            <div id="suggestions" class="suggestions-dropdown"></div>
         </div>
-    </div>
 
-    <div class="entry-form">
-        <select id="mealCategory">
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-            <option value="Drinks">Drinks</option>
-            <option value="Snack">Snack</option>
-        </select>
-        <input type="text" id="foodName" placeholder="Food name..." oninput="searchFood()">
-        <div id="suggestions"></div>
-        <div class="grid-inputs">
-            <input type="number" id="foodCalories" placeholder="Kcal">
-            <input type="number" id="protein" placeholder="P(g)">
-            <input type="number" id="fat" placeholder="F(g)">
-            <input type="number" id="carbs" placeholder="C(g)">
+
+            <div class="input-group">
+                <label>Meal</label>
+                <select id="mealCategory">
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Snack">Snack</option>
+                </select>
+            </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label>Kcal</label>
+                    <input type="number" id="foodCalories" placeholder="Kcal">
+            </div>
         </div>
-        <button class="add-btn" onclick="addFood()">Add to Log</button>
-    </div>
 
-    <hr>
+        <div class="form-row macros">
+            <label>Protein</label>
+            <input type="number" id="protein" placeholder="P (g)">
+            <label>Fat</label>
+            <input type="number" id="fat" placeholder="F (g)">
+            <label>Carbohydrates</label>
+            <input type="number" id="carbs" placeholder="C (g)">
+        </div>
+
+        <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
+    </section>
+
     <div id="mealLists">
-        <h4>Today's Entries</h4>
-        <div id="BreakfastList"></div>
-        <div id="LunchList"></div>
-        <div id="DinnerList"></div>
-        <div id="DrinksList"></div>
-        <div id="SnackList"></div>
+        <section class="card">
+            <h3>Breakfast</h3>
+            <div id="BreakfastList"></div>
+        </section>
+        <section class="card">
+            <h3>Lunch</h3>
+            <div id="LunchList"></div>
+        </section>
+        <section class="card">
+            <h3>Dinner</h3>
+            <div id="DinnerList"></div>
+        </section>
+        <section class="card drink-section">
+            <h3>Drinks 🥤</h3>
+            <div id="DrinksList"></div>
+        </section>
+        <section class="card">
+            <h3>Snacks</h3>
+            <div id="SnackList"></div>
+        </section>
     </div>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item" title="Dashboard">
+            <img src="dashboard-icon.png" alt="Dashboard">
+        </a>
+        <a href="log.html" class="nav-item active" title="Add Food">
+            <img src="log-icon.png" alt="Log">
+        </a>
+        <a href="database.html" class="nav-item" title="History">
+            <img src="history-icon.png" alt="History">
+        </a>
+    </nav>
 </div>
+
 <script src="app.js"></script>
-<script>window.onload = loadData;</script>
 </body>
 </html>

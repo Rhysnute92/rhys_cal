@@ -3,98 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Database - MacroTracker</title>
-    <link rel="icon" type="image/png" href="rhys_logo.png">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <title>Fitness History - Database</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-icon.png">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="container">
-    <nav class="nav-menu">
-        <a href="index.html">Dashboard</a>
-        <a href="log.html">Daily Log</a>
-        <a href="database.html" class="active">Database</a>
-    </nav>
 
-    <header class="main-header">
-        <div class="logo-container">
-            <img src="rhys_logo.png" alt="Logo" class="site-logo">
-            <h1>Food Database</h1>
+<div class="container">
+    <header class="app-header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo" class="header-logo">
+            <h1>History & Trends</h1>
         </div>
     </header>
 
     <section class="card">
-        <h3>Add Custom Food</h3>
-        <p class="hint">Save foods you eat often to find them faster in the Log.</p>
-        <input type="text" id="dbFoodName" placeholder="Food Name (e.g. Protein Shake)">
-        <div class="grid-inputs">
-            <input type="number" id="dbCalories" placeholder="Calories">
-            <input type="number" id="dbProtein" placeholder="Protein (g)">
-            <input type="number" id="dbFat" placeholder="Fat (g)">
-            <input type="number" id="dbCarbs" placeholder="Carbs (g)">
+        <div class="header-with-action">
+            <h3>7-Day Log</h3>
+            <button class="icon-btn" onclick="window.print()">Export PDF</button>
         </div>
-        <button onclick="saveToLibrary()">Save to Library</button>
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Food/Drink</th>
+                    <th>Kcal</th>
+                </tr>
+                </thead>
+                <tbody id="weeklySummaryBody">
+                </tbody>
+            </table>
+        </div>
     </section>
 
     <section class="card">
-        <h3>My Saved Foods</h3>
-        <div id="foodLibraryList" class="library-grid">
-        </div>
+        <h3>Calorie Trends</h3>
+        <canvas id="historyChart"></canvas>
     </section>
 
-    <section class="card">
-        <h3>Data Management</h3>
-        <div class="button-group">
-            <button onclick="exportToCSV()" class="secondary-btn">Export All Data (CSV)</button>
-            <button onclick="clearAllData()" class="danger-btn">Clear All Records</button>
-        </div>
-    </section>
+    <nav class="icon-nav no-print">
+        <a href="index.html" class="nav-item" title="Dashboard">
+            <img src="dashboard-icon.png" alt="Dashboard">
+        </a>
+        <a href="log.html" class="nav-item" title="Add Food">
+            <img src="log-icon.png" alt="Log">
+        </a>
+        <a href="database.html" class="nav-item active" title="History">
+            <img src="history-icon.png" alt="History">
+        </a>
+    </nav>
 </div>
 
 <script src="app.js"></script>
-<script>
-    // Specific logic for the database management page
-    window.onload = () => {
-        renderLibrary();
-    };
-
-    function saveToLibrary() {
-        const name = document.getElementById('dbFoodName').value;
-        const cals = parseInt(document.getElementById('dbCalories').value) || 0;
-        const p = parseInt(document.getElementById('dbProtein').value) || 0;
-        const f = parseInt(document.getElementById('dbFat').value) || 0;
-        const c = parseInt(document.getElementById('dbCarbs').value) || 0;
-
-        if(!name) return alert("Please enter a name");
-
-        let library = JSON.parse(localStorage.getItem('foodDatabase')) || [];
-        library.push({ name, calories: cals, protein: p, fat: f, carbs: c });
-        localStorage.setItem('foodDatabase', JSON.stringify(library));
-
-        // Reset form
-        document.querySelectorAll('.card input').forEach(i => i.value = '');
-        renderLibrary();
-    }
-
-    function renderLibrary() {
-        const list = document.getElementById('foodLibraryList');
-        const library = JSON.parse(localStorage.getItem('foodDatabase')) || [];
-
-        list.innerHTML = library.map((food, index) => `
-                <div class="library-item">
-                    <span><strong>${food.name}</strong> (${food.calories} kcal)</span>
-                    <button onclick="deleteFromLibrary(${index})" class="delete-small">×</button>
-                </div>
-            `).join('');
-    }
-
-    function deleteFromLibrary(index) {
-        let library = JSON.parse(localStorage.getItem('foodDatabase'));
-        library.splice(index, 1);
-        localStorage.setItem('foodDatabase', JSON.stringify(library));
-        renderLibrary();
-    }
-</script>
 </body>
 </html>
