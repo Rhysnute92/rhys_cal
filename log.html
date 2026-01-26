@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes=180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 </head>
 <body>
 
@@ -17,6 +18,22 @@
             <h1>Food Diary</h1>
         </div>
     </header>
+
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item" title="Dashboard">
+            <img src="dashboard.png" alt="Dashboard">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item" title="Food Diary">
+            <img src="diary.png" alt="Log">
+            <span>Food Diary</span>
+        </a>
+        <a href="database.html" class="nav-item" title="History">
+            <img src="history.png" alt="History">
+            <span>Eating Habits</span>
+        </a>
+    </nav>
 
     <section class="card entry-card">
         <h3>Add Item</h3>
@@ -54,6 +71,10 @@
         </div>
 
         <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
+        <div class="scanner-container">
+            <button class="icon-btn full-width" onclick="startScanner()">📷 Scan Barcode</button>
+            <div id="interactive" class="viewport"></div>
+        </div>
     </section>
 
     <div id="mealLists">
@@ -78,18 +99,6 @@
             <div id="SnackList"></div>
         </section>
     </div>
-
-    <nav class="icon-nav">
-        <a href="index.html" class="nav-item" title="Dashboard">
-            <img src="dashboard.png" alt="Dashboard"><h3>Dashboard</h3>
-        </a>
-        <a href="log.html" class="nav-item active" title="Add Food">
-            <img src="diary.png" alt="Food Diary">Food Diary
-        </a>
-        <a href="database.html" class="nav-item" title="History">
-            <img src="history.png" alt="History">History
-        </a>
-    </nav>
 </div>
 
 <script src="app.js"></script>

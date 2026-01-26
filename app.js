@@ -1,13 +1,22 @@
+// 1. Global State Management
 let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], Drinks: [], Snack: [] };
 let restGoal = 1500, trainGoal = 1800;
 let proteinGoal = 200, fatGoal = 45, carbGoal = 145;
 let isTrainingDay = false;
 
-document.addEventListener("DOMContentLoaded", loadData);
+// 2. Initialization
+document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+    // If on the Database page, populate the table
+    if (document.getElementById('weeklySummaryBody')) {
+        generateWeeklyTable();
+    }
+});
 
 function loadData() {
     const dateKey = new Date().toISOString().split('T')[0];
     const saved = JSON.parse(localStorage.getItem('day_' + dateKey));
+
     if (saved) {
         mealFoods = saved.mealFoods || mealFoods;
         restGoal = saved.restGoal || 1500;
@@ -17,21 +26,69 @@ function loadData() {
         carbGoal = saved.carbGoal || 145;
         isTrainingDay = saved.isTrainingDay || false;
     }
-    document.getElementById('trainingMode').checked = isTrainingDay;
+
+    // Sync UI elements if they exist on the current page
+    const trainToggle = document.getElementById('trainingMode');
+    if (trainToggle) trainToggle.checked = isTrainingDay;
+
     updateGoalDisplays();
     updateDailyTotals();
 }
 
+function saveData() {
+    const dateKey = new Date().toISOString().split('T')[0];
+    const dataToSave = {
+        mealFoods, restGoal, trainGoal, proteinGoal, fatGoal, carbGoal, isTrainingDay
+    };
+    localStorage.setItem('day_' + dateKey, JSON.stringify(dataToSave));
+}
+
+// 3. Goal & Mode Logic
 function toggleTrainingMode() {
-    isTrainingDay = document.getElementById('trainingMode').checked;
+    const trainToggle = document.getElementById('trainingMode');
+    if (!trainToggle) return;
+
+    isTrainingDay = trainToggle.checked;
     const statusText = document.getElementById('trainingStatusText');
-    statusText.innerText = isTrainingDay ? `Training Day (${trainGoal} kcal)` : `Rest Day (${restGoal} kcal)`;
+    if (statusText) {
+        statusText.innerText = isTrainingDay ? `Training Day (${trainGoal} kcal)` : `Rest Day (${restGoal} kcal)`;
+    }
+
     saveData();
     updateDailyTotals();
 }
 
+function updateCalorieGoals() {
+    const restInput = document.getElementById('goalRestCals');
+    const trainInput = document.getElementById('goalTrainCals');
+
+    if (restInput && restInput.value) restGoal = parseInt(restInput.value);
+    if (trainInput && trainInput.value) trainGoal = parseInt(trainInput.value);
+
+    saveData();
+    toggleTrainingMode(); // Refreshes text and math
+}
+
+function updateGoal(type) {
+    const input = document.getElementById(`goal${type}`);
+    if (!input || !input.value) return;
+
+    const val = parseInt(input.value);
+    if (type === 'Protein') proteinGoal = val;
+    if (type === 'Fat') fatGoal = val;
+    if (type === 'Carbs') carbGoal = val;
+
+    saveData();
+    updateGoalDisplays();
+    updateDailyTotals();
+    input.value = ''; // Clear input
+}
+
+// 4. Calculations & UI Updates
 function updateDailyTotals() {
     let totals = { cal: 0, p: 0, f: 0, c: 0 };
+
+    // Sum all categories (including Drinks)
     Object.values(mealFoods).flat().forEach(f => {
         totals.cal += (parseInt(f.calories) || 0);
         totals.p += (parseInt(f.protein) || 0);
@@ -40,75 +97,69 @@ function updateDailyTotals() {
     });
 
     const activeGoal = isTrainingDay ? trainGoal : restGoal;
-    const remEl = document.getElementById('remainingCalories');
-    const rem = activeGoal - totals.cal;
-    remEl.innerText = rem;
-    remEl.style.color = rem < 0 ? "#ff4444" : "#4CAF50";
 
+    // Update Remaining Calories
+    const remEl = document.getElementById('remainingCalories');
+    if (remEl) {
+        const rem = activeGoal - totals.cal;
+        remEl.innerText = rem;
+        remEl.style.color = rem < 0 ? "#ff4444" : "#4CAF50";
+    }
+
+    // Update Progress Bars
     setBar('protein-bar', totals.p, proteinGoal);
     setBar('fat-bar', totals.f, fatGoal);
     setBar('carb-bar', totals.c, carbGoal);
 
-    if (window.Chart) drawCharts(totals.p, totals.f, totals.c);
-}
-
-function updateCalorieGoals() {
-    const restInput = document.getElementById('goalRestCals').value;
-    const trainInput = document.getElementById('goalTrainCals').value;
-
-    if (restInput) restGoal = parseInt(restInput);
-    if (trainInput) trainGoal = parseInt(trainInput);
-
-    saveData();
-    toggleTrainingMode(); // Refreshes text and math
-}
-
-function updateGoal(type) {
-    const val = parseInt(document.getElementById(`goal${type}`).value);
-    if (!val) return;
-    if (type === 'Protein') proteinGoal = val;
-    if (type === 'Fat') fatGoal = val;
-    if (type === 'Carbs') carbGoal = val;
-    saveData();
-    updateGoalDisplays();
-    updateDailyTotals();
+    // Update Chart if on Dashboard
+    if (document.getElementById('macroChart')) {
+        drawCharts(totals.p, totals.f, totals.c);
+    }
 }
 
 function setBar(id, cur, goal) {
-    document.getElementById(id).style.width = Math.min((cur / goal) * 100, 100) + "%";
+    const el = document.getElementById(id);
+    if (el) el.style.width = Math.min((cur / goal) * 100, 100) + "%";
+}
+
+function updateGoalDisplays() {
+    const displays = {
+        'displayGoalP': proteinGoal,
+        'displayGoalF': fatGoal,
+        'displayGoalC': carbGoal
+    };
+    Object.entries(displays).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    });
 }
 
 function toggleEditMode() {
     document.querySelectorAll('.edit-box').forEach(box => box.classList.toggle('hidden'));
 }
 
-function updateGoalDisplays() {
-    document.getElementById('displayGoalP').innerText = proteinGoal;
-    document.getElementById('displayGoalF').innerText = fatGoal;
-    document.getElementById('displayGoalC').innerText = carbGoal;
-}
-
-function saveData() {
-    const dateKey = new Date().toISOString().split('T')[0];
-    localStorage.setItem('day_' + dateKey, JSON.stringify({
-        mealFoods, restGoal, trainGoal, proteinGoal, fatGoal, carbGoal, isTrainingDay
-    }));
-}
-
+// 5. Data Visualization (Chart.js)
 function drawCharts(p, f, c) {
-    const ctx = document.getElementById('macroChart')?.getContext('2d');
-    if (!ctx) return;
+    const ctx = document.getElementById('macroChart').getContext('2d');
     if (window.myChart) window.myChart.destroy();
+
     window.myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['Protein', 'Fat', 'Carbs'],
-            datasets: [{ data: [p*4, f*9, c*4], backgroundColor: ['#4CAF50', '#FF9800', '#2196F3'] }]
+            datasets: [{
+                data: [p * 4, f * 9, c * 4],
+                backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
+            }]
         },
-        options: { plugins: { legend: { position: 'bottom' } } }
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
     });
 }
 
+// 6. Database / History Generation
 function generateWeeklyTable() {
     const body = document.getElementById('weeklySummaryBody');
     if (!body) return;
@@ -123,8 +174,8 @@ function generateWeeklyTable() {
         const data = JSON.parse(localStorage.getItem('day_' + dateKey));
 
         if (data && data.mealFoods) {
-            Object.keys(data.mealFoods).forEach(cat => {
-                data.mealFoods[cat].forEach(food => {
+            Object.entries(data.mealFoods).forEach(([cat, foods]) => {
+                foods.forEach(food => {
                     const row = `<tr>
                         <td>${d.toLocaleDateString(undefined, {month:'short', day:'numeric'})}</td>
                         <td>${cat}</td>
@@ -138,26 +189,38 @@ function generateWeeklyTable() {
     }
 }
 
-function addFood() {
-    const name = document.getElementById('foodName').value;
-    const calories = parseInt(document.getElementById('foodCalories').value);
-    const cat = document.getElementById('mealCategory').value;
+function startScanner() {
+    const viewport = document.getElementById('interactive');
+    viewport.style.display = "block";
 
-    if (!name || isNaN(calories)) return alert("Please enter a name and calorie count.");
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: viewport,
+            constraints: { facingMode: "environment" } // Uses back camera
+        },
+        decoder: {
+            readers: ["ean_reader", "upc_reader"] // Standard food barcode formats
+        }
+    }, function(err) {
+        if (err) { console.error(err); return; }
+        Quagga.start();
+    });
 
-    const entry = {
-        name,
-        calories,
-        protein: parseInt(document.getElementById('protein').value) || 0,
-        fat: parseInt(document.getElementById('fat').value) || 0,
-        carbs: parseInt(document.getElementById('carbs').value) || 0
-    };
+    Quagga.onDetected((data) => {
+        const code = data.codeResult.code;
+        // 1. Stop scanning once found
+        Quagga.stop();
+        viewport.style.display = "none";
 
-    mealFoods[cat].push(entry);
-    saveData();
-    updateMealDisplay(cat);
-    updateDailyTotals();
+        // 2. Play a small beep (optional) or alert
+        alert("Barcode Detected: " + code);
 
-    // Clear inputs
-    ['foodName','foodCalories','protein','fat','carbs'].forEach(id => document.getElementById(id).value = '');
+        // 3. Auto-fill the name (In a real app, you'd fetch from an API like OpenFoodFacts)
+        document.getElementById('foodName').value = "Scanned Item (" + code + ")";
+
+        // You would typically use a fetch() here to get nutritional data
+        // fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`)
+    });
 }
