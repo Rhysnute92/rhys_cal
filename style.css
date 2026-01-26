@@ -210,3 +210,209 @@ input:checked + .slider-toggle:before { transform: translateX(18px); }
     0% { top: 0; }
     100% { top: 100%; }
 }
+
+/* Meal Category Tiles */
+.meal-tiles {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* Allows swiping on small screens */
+    padding-bottom: 10px;
+}
+
+.tile {
+    flex: 1;
+    background: #f0f2f5;
+    padding: 12px 5px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.tile.active {
+    background: white;
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.meal-list-container {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+#currentTabLabel {
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.search-container { display: flex; gap: 10px; margin-bottom: 10px; }
+.search-container input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+
+.search-results-box {
+    background: #fff;
+    border: 1px solid #eee;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.search-item {
+    padding: 10px;
+    border-bottom: 1px solid #f9f9f9;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.search-item:hover { background: #f0fdf4; }
+
+.frequent-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.freq-tag {
+    background: #e8f5e9;
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--primary);
+}
+
+.freq-tag:hover { background: var(--primary); color: white; }
+
+.multiplier-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.mult-btn {
+    flex: 1;
+    background: #e1e4e8;
+    border: none;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--dark);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.mult-btn:hover { background: #d0d7de; }
+.mult-btn.custom { background: #fdf6b2; color: #723b13; } /* Slightly different color for custom */
+
+.weight-card input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+#weightTrend {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.chart-container {
+    width: 100%;
+    position: relative;
+}
+
+/* Weight Entry Tile Styling */
+.weight-entry-tile .form-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.weight-entry-tile input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+/* Weight Chart Tile Styling */
+.trend-indicator {
+    font-weight: 800;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.trend-up { background: #ffebee; color: #c62828; }    /* Red for weight gain */
+.trend-down { background: #e8f5e9; color: #2e7d32; }  /* Green for weight loss */
+
+.chart-container {
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* Dashboard Grid System */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    gap: 15px;
+    width: 100%;
+}
+
+/* Force tiles to be same size and square-ish */
+.grid-tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px; /* Ensures vertical consistency */
+    margin-bottom: 0 !important; /* Grid handles spacing */
+    padding: 15px;
+}
+
+/* Ensure charts fit inside the fixed-size tiles */
+.chart-container {
+    flex-grow: 1;
+    position: relative;
+    height: 120px;
+    width: 100%;
+}
+
+/* Unit Toggle Buttons */
+.unit-toggle {
+    display: flex;
+    background: #eee;
+    border-radius: 8px;
+    padding: 2px;
+}
+.toggle-btn {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.7rem;
+}
+.toggle-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* Responsive: stack to 1 column on small phones */
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

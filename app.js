@@ -224,3 +224,493 @@ function startScanner() {
         // fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`)
     });
 }
+
+let currentActiveTab = 'Breakfast';
+
+function switchTab(category) {
+    currentActiveTab = category;
+
+    // ... your existing UI code ...
+
+    // Update the button text dynamically
+    const copyBtn = document.querySelector('button[onclick="copyYesterday()"]');
+    if (copyBtn) {
+        copyBtn.innerText = `📋 Copy Yesterday's ${category}`;
+    }
+
+    renderActiveList();
+}
+
+function renderActiveList() {
+    const listContainer = document.getElementById('activeMealList');
+    if (!listContainer) return;
+
+    const foods = mealFoods[currentActiveTab] || [];
+
+    if (foods.length === 0) {
+        listContainer.innerHTML = `<p class="hint" style="text-align:center">Nothing logged for ${currentActiveTab} yet.</p>`;
+        return;
+    }
+
+    listContainer.innerHTML = foods.map((food, index) => `
+        <div class="library-item">
+            <div>
+                <strong>${food.name}</strong><br>
+                <small>${food.calories} kcal | P: ${food.protein} F: ${food.fat} C: ${food.carbs}</small>
+            </div>
+            <button class="delete-small" onclick="deleteItem('${currentActiveTab}', ${index})">✕</button>
+        </div>
+    `).join('');
+}
+
+// Update the existing addFood to refresh the list automatically
+const originalAddFood = addFood;
+addFood = function() {
+    originalAddFood();
+    renderActiveList();
+};
+
+function deleteItem(cat, index) {
+    mealFoods[cat].splice(index, 1);
+    saveData();
+    renderActiveList();
+    updateDailyTotals();
+}
+
+// Call on load
+document.addEventListener("DOMContentLoaded", () => {
+    // ... existing load calls
+    renderActiveList();
+});
+
+function copyYesterday() {
+    // 1. Get yesterday's date key
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dateKey = yesterday.toISOString().split('T')[0];
+
+    // 2. Fetch data
+    const saved = JSON.parse(localStorage.getItem('day_' + dateKey));
+
+    if (!saved || !saved.mealFoods || !saved.mealFoods[currentActiveTab] || saved.mealFoods[currentActiveTab].length === 0) {
+        alert(`No ${currentActiveTab} entries found for yesterday.`);
+        return;
+    }
+
+    // 3. Confirm with user
+    const itemCount = saved.mealFoods[currentActiveTab].length;
+    if (confirm(`Add the ${itemCount} items you had for ${currentActiveTab} yesterday?`)) {
+        // Clone the items to avoid reference issues
+        const itemsToAdd = JSON.parse(JSON.stringify(saved.mealFoods[currentActiveTab]));
+
+        // Add to current state
+        mealFoods[currentActiveTab].push(...itemsToAdd);
+
+        // 4. Update and Save
+        saveData();
+        renderActiveList();
+        updateDailyTotals();
+    }
+}
+
+// 1. Global Database Search (Open Food Facts API)
+async function searchGlobalDB(event) {
+    if (event && event.key !== 'Enter') return;
+
+    const query = document.getElementById('dbSearch').value;
+    const resultsBox = document.getElementById('searchResults');
+
+    if (query.length < 3) return;
+
+    resultsBox.innerHTML = '<p class="hint">Searching...</p>';
+    resultsBox.classList.remove('hidden');
+
+    try {
+        const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
+        const data = await response.json();
+
+        resultsBox.innerHTML = data.products.map(p => {
+            const kcal = p.nutriments['energy-kcal_100g'] || 0;
+            return `
+                <div class="search-item" onclick="autoFillFromSearch('${p.product_name}', ${kcal}, ${p.nutriments.proteins_100g || 0}, ${p.nutriments.fats_100g || 0}, ${p.nutriments.carbohydrates_100g || 0})">
+                    <strong>${p.product_name}</strong> - ${kcal} kcal/100g
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        resultsBox.innerHTML = '<p class="hint">Error fetching data.</p>';
+    }
+}
+
+function autoFillFromSearch(name, cal, p, f, c) {
+    document.getElementById('foodName').value = name;
+    document.getElementById('foodCalories').value = Math.round(cal);
+    document.getElementById('protein').value = Math.round(p);
+    document.getElementById('fat').value = Math.round(f);
+    document.getElementById('carbs').value = Math.round(c);
+    document.getElementById('searchResults').classList.add('hidden');
+}
+
+// 2. Frequent Items Logic
+function updateFrequentItems() {
+    const allHistory = [];
+    // Loop through last 7 days in storage
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = 'day_' + d.toISOString().split('T')[0];
+        const dayData = JSON.parse(localStorage.getItem(key));
+        if (dayData) {
+            Object.values(dayData.mealFoods).flat().forEach(item => allHistory.push(item));
+        }
+    }
+
+    // Count occurrences
+    const counts = allHistory.reduce((acc, item) => {
+        acc[item.name] = (acc[item.name] || {count: 0, data: item});
+        acc[item.name].count++;
+        return acc;
+    }, {});
+
+    // Sort and take top 5
+    const top5 = Object.values(counts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    const freqList = document.getElementById('frequentList');
+    if (freqList) {
+        freqList.innerHTML = top5.map(item => `
+            <span class="freq-tag" onclick="quickAdd('${item.data.name}', ${item.data.calories}, ${item.data.protein}, ${item.data.fat}, ${item.data.carbs})">
+                + ${item.data.name}
+            </span>
+        `).join('');
+    }
+}
+
+function quickAdd(n, cal, p, f, c) {
+    document.getElementById('foodName').value = n;
+    document.getElementById('foodCalories').value = cal;
+    document.getElementById('protein').value = p;
+    document.getElementById('fat').value = f;
+    document.getElementById('carbs').value = c;
+}
+
+// Initialize on Load
+document.addEventListener("DOMContentLoaded", () => {
+    updateFrequentItems();
+});
+
+// 1. Global Database Search (Open Food Facts API)
+async function searchGlobalDB(event) {
+    if (event && event.key !== 'Enter') return;
+
+    const query = document.getElementById('dbSearch').value;
+    const resultsBox = document.getElementById('searchResults');
+
+    if (query.length < 3) return;
+
+    resultsBox.innerHTML = '<p class="hint">Searching...</p>';
+    resultsBox.classList.remove('hidden');
+
+    try {
+        const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=10`);
+        const data = await response.json();
+
+        resultsBox.innerHTML = data.products.map(p => {
+            const kcal = p.nutriments['energy-kcal_100g'] || 0;
+            return `
+                <div class="search-item" onclick="autoFillFromSearch('${p.product_name}', ${kcal}, ${p.nutriments.proteins_100g || 0}, ${p.nutriments.fats_100g || 0}, ${p.nutriments.carbohydrates_100g || 0})">
+                    <strong>${p.product_name}</strong> - ${kcal} kcal/100g
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        resultsBox.innerHTML = '<p class="hint">Error fetching data.</p>';
+    }
+}
+
+function autoFillFromSearch(name, cal, p, f, c) {
+    document.getElementById('foodName').value = name;
+    document.getElementById('foodCalories').value = Math.round(cal);
+    document.getElementById('protein').value = Math.round(p);
+    document.getElementById('fat').value = Math.round(f);
+    document.getElementById('carbs').value = Math.round(c);
+    document.getElementById('searchResults').classList.add('hidden');
+}
+
+// 2. Frequent Items Logic
+function updateFrequentItems() {
+    const allHistory = [];
+    // Loop through last 7 days in storage
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = 'day_' + d.toISOString().split('T')[0];
+        const dayData = JSON.parse(localStorage.getItem(key));
+        if (dayData) {
+            Object.values(dayData.mealFoods).flat().forEach(item => allHistory.push(item));
+        }
+    }
+
+    // Count occurrences
+    const counts = allHistory.reduce((acc, item) => {
+        acc[item.name] = (acc[item.name] || {count: 0, data: item});
+        acc[item.name].count++;
+        return acc;
+    }, {});
+
+    // Sort and take top 5
+    const top5 = Object.values(counts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    const freqList = document.getElementById('frequentList');
+    if (freqList) {
+        freqList.innerHTML = top5.map(item => `
+            <span class="freq-tag" onclick="quickAdd('${item.data.name}', ${item.data.calories}, ${item.data.protein}, ${item.data.fat}, ${item.data.carbs})">
+                + ${item.data.name}
+            </span>
+        `).join('');
+    }
+}
+
+function quickAdd(n, cal, p, f, c) {
+    document.getElementById('foodName').value = n;
+    document.getElementById('foodCalories').value = cal;
+    document.getElementById('protein').value = p;
+    document.getElementById('fat').value = f;
+    document.getElementById('carbs').value = c;
+}
+
+// Initialize on Load
+document.addEventListener("DOMContentLoaded", () => {
+    updateFrequentItems();
+});
+
+function multiplyQuantity(factor) {
+    const fields = ['foodCalories', 'protein', 'fat', 'carbs'];
+
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value) {
+            let newVal = parseFloat(el.value) * factor;
+            el.value = Math.round(newVal);
+        }
+    });
+}
+
+function customMultiplier() {
+    const factor = prompt("Enter multiplier (e.g., 0.75 for 75% or 1.25 for 125%):");
+    if (factor && !isNaN(factor)) {
+        multiplyQuantity(parseFloat(factor));
+    }
+}
+
+function addWater(ml) {
+    mealFoods['Drinks'].push({ name: `Water (${ml}ml)`, calories: 0, protein: 0, fat: 0, carbs: 0 });
+    saveData(); renderActiveList();
+}
+
+let weightHistory = []; // Add this to your global variables
+
+// Add this to your loadData() function
+weightHistory = saved.weightHistory || [];
+
+function logWeight() {
+    const weightVal = parseFloat(document.getElementById('weightInput').value);
+    if (!weightVal) return;
+
+    const dateKey = new Date().toISOString().split('T')[0];
+
+    // Update or Add weight for today
+    const entryIndex = weightHistory.findIndex(e => e.date === dateKey);
+    if (entryIndex > -1) {
+        weightHistory[entryIndex].weight = weightVal;
+    } else {
+        weightHistory.push({ date: dateKey, weight: weightVal });
+    }
+
+    // Keep only last 30 entries for the chart
+    weightHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (weightHistory.length > 30) weightHistory.shift();
+
+    saveData(); // Ensure weightHistory is added to your saveData() object
+    updateWeightUI();
+    document.getElementById('weightInput').value = '';
+}
+
+function updateWeightUI() {
+    if (weightHistory.length === 0) return;
+
+    const lastWeight = weightHistory[weightHistory.length - 1].weight;
+    document.getElementById('weightTrend').innerText = `${lastWeight} current`;
+
+    const ctx = document.getElementById('weightChart').getContext('2d');
+    if (window.wChart) window.wChart.destroy();
+
+    window.wChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weightHistory.map(e => e.date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Weight',
+                data: weightHistory.map(e => e.weight),
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: false }, x: { grid: { display: false } } }
+        }
+    });
+}
+
+// Call updateWeightUI() inside your DOMContentLoaded listener
+
+function updateWeightUI() {
+    if (weightHistory.length === 0) return;
+
+    const entries = weightHistory.slice(-30); // Last 30 entries
+    const currentWeight = entries[entries.length - 1].weight;
+
+    // Update Label
+    document.getElementById('lastWeightLabel').innerText = `Last: ${currentWeight} lbs`;
+
+    // Calculate Trend
+    if (entries.length > 1) {
+        const prevWeight = entries[entries.length - 2].weight;
+        const diff = (currentWeight - prevWeight).toFixed(1);
+        const indicator = document.getElementById('weightChangeIndicator');
+
+        indicator.innerText = diff > 0 ? `+${diff} lbs` : `${diff} lbs`;
+        indicator.className = 'trend-indicator ' + (diff > 0 ? 'trend-up' : 'trend-down');
+    }
+
+    // Render Chart
+    const ctx = document.getElementById('weightChart').getContext('2d');
+    if (window.wChart) window.wChart.destroy();
+
+    window.wChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: entries.map(e => e.date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Weight Progress',
+                data: entries.map(e => e.weight),
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.05)',
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: '#4CAF50',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+        }
+    });
+}
+
+// Updated Variables in app.js
+let weightHistory = [];
+let goalWeight = 170;
+
+function logWeight() {
+    const weightEl = document.getElementById('inputDailyWeight');
+    const val = parseFloat(weightEl.value);
+    if (!val) return;
+
+    const dateKey = new Date().toISOString().split('T')[0];
+
+    // Logic to update weightHistory array
+    const entryIdx = weightHistory.findIndex(e => e.date === dateKey);
+    if (entryIdx > -1) {
+        weightHistory[entryIdx].weight = val;
+    } else {
+        weightHistory.push({ date: dateKey, weight: val });
+    }
+
+    saveData();
+    updateWeightUI();
+    weightEl.value = ''; // Clear the unique ID input
+}
+
+function updateWeightUI() {
+    const canvas = document.getElementById('canvasWeightTrend');
+    const label = document.getElementById('labelLastWeight');
+    const trendIndicator = document.getElementById('statusWeightTrend');
+
+    if (!canvas || weightHistory.length === 0) return;
+
+    const lastEntry = weightHistory[weightHistory.length - 1].weight;
+    label.innerText = `Last: ${lastEntry} lbs`;
+
+    // Chart.js using the unique canvas ID
+    const ctx = canvas.getContext('2d');
+    if (window.wTrendChart) window.wTrendChart.destroy();
+
+    window.wTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weightHistory.map(e => e.date),
+            datasets: [
+                {
+                    label: 'Actual',
+                    data: weightHistory.map(e => e.weight),
+                    borderColor: '#4CAF50',
+                    tension: 0.4
+                },
+                {
+                    label: 'Goal',
+                    data: new Array(weightHistory.length).fill(goalWeight),
+                    borderColor: 'rgba(255, 99, 132, 0.5)',
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+let weightUnit = 'lbs'; // Global unit state
+
+function setUnit(unit) {
+    weightUnit = unit;
+
+    // Update UI buttons
+    document.getElementById('unitLbs').classList.toggle('active', unit === 'lbs');
+    document.getElementById('unitKg').classList.toggle('active', unit === 'kg');
+
+    // Update labels and charts
+    updateWeightUI();
+    saveData();
+}
+
+// In your logWeight function, ensure you handle the unit
+function logWeight() {
+    const val = parseFloat(document.getElementById('inputDailyWeight').value);
+    if (!val) return;
+
+    const dateKey = new Date().toISOString().split('T')[0];
+    weightHistory.push({ date: dateKey, weight: val, unit: weightUnit });
+
+    saveData();
+    updateWeightUI();
+}

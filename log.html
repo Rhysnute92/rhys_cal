@@ -36,70 +36,81 @@
     </nav>
 
     <section class="card entry-card">
-        <h3>Add Item</h3>
-        <div class="form-group">
-            <input type="text" id="foodName" placeholder="Search or Enter Item..." oninput="searchFood()">
-            <div id="suggestions" class="suggestions-dropdown"></div>
+        <div class="meal-tiles">
+            <div class="tile active" onclick="switchTab('Breakfast')">🍳<br>Breakfast</div>
+            <div class="tile" onclick="switchTab('Lunch')">🥗<br>Lunch</div>
+            <div class="tile" onclick="switchTab('Dinner')">🥩<br>Dinner</div>
+            <div class="tile" onclick="switchTab('Drinks')">🥤<br>Drinks</div>
+            <div class="tile" onclick="switchTab('Snack')">🍎<br>Snack</div>
         </div>
 
+        <h3 id="currentTabLabel">Logging Breakfast</h3>
 
-            <div class="input-group">
-                <label>Meal</label>
-                <select id="mealCategory">
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Drinks">Drinks</option>
-                    <option value="Snack">Snack</option>
-                </select>
-            </div>
+        <div id="waterTracker" class="hidden" style="text-align:center; margin-bottom:15px;">
+            <button class="icon-btn" onclick="addWater(250)">💧 +250ml Water</button>
+        </div>
 
+        <div class="form-group">
+            <input type="text" id="foodName" placeholder="Item Name...">
+        </div>
         <div class="form-row">
             <div class="input-group">
                 <label>Kcal</label>
-                    <input type="number" id="foodCalories" placeholder="Kcal">
+                <input type="number" id="foodCalories">
             </div>
+            <select id="mealCategory" style="display:none">
+                <option value="Breakfast" selected>Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Drinks">Drinks</option>
+                <option value="Snack">Snack</option>
+            </select>
+        </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <button class="icon-btn" style="background: #607d8b; font-size: 0.7rem;" onclick="copyYesterday()">
+                📋 Copy Yesterday's {Meal}
+            </button>
         </div>
 
         <div class="form-row macros">
-            <label>Protein</label>
-            <input type="number" id="protein" placeholder="P (g)">
-            <label>Fat</label>
-            <input type="number" id="fat" placeholder="F (g)">
-            <label>Carbohydrates</label>
-            <input type="number" id="carbs" placeholder="C (g)">
+            <input type="number" id="protein" placeholder="P">
+            <input type="number" id="fat" placeholder="F">
+            <input type="number" id="carbs" placeholder="C">
         </div>
-
-        <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
         <div class="scanner-container">
+            <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
             <button class="icon-btn full-width" onclick="startScanner()">📷 Scan Barcode</button>
             <div id="interactive" class="viewport"></div>
         </div>
+        <div class="tab-content">
+            <div id="activeMealList" class="meal-list-container">
+            </div>
+        </div>
     </section>
 
-    <div id="mealLists">
-        <section class="card">
-            <h3>Breakfast</h3>
-            <div id="BreakfastList"></div>
-        </section>
-        <section class="card">
-            <h3>Lunch</h3>
-            <div id="LunchList"></div>
-        </section>
-        <section class="card">
-            <h3>Dinner</h3>
-            <div id="DinnerList"></div>
-        </section>
-        <section class="card drink-section">
-            <h3>Drinks 🥤</h3>
-            <div id="DrinksList"></div>
-        </section>
-        <section class="card">
-            <h3>Snacks</h3>
-            <div id="SnackList"></div>
-        </section>
+    <div class="form-row multiplier-row">
+        <button class="mult-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
+        <button class="mult-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
+        <button class="mult-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
+        <button class="mult-btn" onclick="multiplyQuantity(3.0)">x3.0</button>
+        <button class="mult-btn custom" onclick="customMultiplier()">Custom</button>
     </div>
-</div>
+
+    <section class="card">
+        <div class="search-container">
+            <input type="text" id="dbSearch" placeholder="Search Global Database..." onkeyup="searchGlobalDB(event)">
+            <button class="icon-btn" onclick="searchGlobalDB()">🔍</button>
+        </div>
+
+        <div id="searchResults" class="search-results-box hidden">
+        </div>
+
+        <div class="frequent-items">
+            <h4>Top Logged</h4>
+            <div id="frequentList" class="frequent-tags">
+            </div>
+        </div>
+    </section>
 
 <script src="app.js"></script>
 </body>
