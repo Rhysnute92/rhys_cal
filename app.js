@@ -311,7 +311,7 @@ function copyYesterday() {
         renderActiveList();
         updateDailyTotals();
     }
-}
+
 
 // 1. Global Database Search (Open Food Facts API)
 async function searchGlobalDB(event) {
