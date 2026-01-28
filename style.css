@@ -461,3 +461,74 @@ input:checked + .slider-toggle:before { transform: translateX(18px); }
     color: #666;
     font-size: 0.75rem;
 }
+
+#manualEntryForm {
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#interactive.viewport video,
+#interactive.viewport canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This makes it fill the box without stretching */
+}
+
+/* Optional: Add a scanning line animation */
+#interactive.viewport::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 10px #2196F3;
+    animation: scanMove 2s infinite linear;
+}
+
+@keyframes scanMove {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+#recentScansList::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for a cleaner look */
+}
+
+#recentScansList {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recent-tag {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    cursor: pointer;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+    flex-shrink: 0;
+    transition: transform 0.1s ease;
+}
+
+.recent-tag:active {
+    transform: scale(0.95);
+    background-color: #f0f0f0;
+}
+
+#recentScansList {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding: 5px 2px;
+}

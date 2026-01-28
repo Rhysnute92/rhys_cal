@@ -9,56 +9,60 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+<!DOCTYPE html>
 <body>
 
 <div class="container">
-    <header class="app-header">
-        <div class="header-content">
-            <img src="rhys_logo.png" alt="Logo" class="header-logo">
-            <h1>History & Trends</h1>
-        </div>
-    </header>
-    <nav class="icon-nav">
-        <a href="index.html" class="nav-item" title="Dashboard">
-            <img src="dashboard.png" alt="Dashboard">
-            <span>Home</span>
-        </a>
-        <a href="log.html" class="nav-item" title="Food Diary">
-            <img src="diary.png" alt="Log">
-            <span>Food Diary</span>
-        </a>
-        <a href="database.html" class="nav-item" title="History">
-            <img src="history.png" alt="History">
-            <span>Eating Habits</span>
-        </a>
-    </nav>
+    <header class="app-header"><h1>Eating Habits</h1></header>
+
     <section class="card">
-        <div class="header-with-action">
-            <h3>7-Day Log</h3>
-            <button class="icon-btn" onclick="window.print()">Export PDF</button>
+        <h3>Weekly Calorie Intake</h3>
+        <div style="height: 200px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px;">
+            <div id="weeklyBars" style="display:flex; width:100%; height:100%; align-items:flex-end; gap:8px;"></div>
         </div>
-        <div class="table-responsive">
-            <table class="history-table">
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Food/Drink</th>
-                    <th>Kcal</th>
-                </tr>
-                </thead>
-                <tbody id="weeklySummaryBody">
-                </tbody>
-            </table>
+        <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#888; margin-top:5px;">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
         </div>
     </section>
 
     <section class="card">
-        <h3>Calorie Trends</h3>
-        <canvas id="historyChart"></canvas>
+        <h3>History</h3>
+        <table style="width:100%; font-size:0.8rem; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align:left; border-bottom:2px solid #eee;">
+                <th style="padding:10px 0;">Date</th>
+                <th>Cals</th>
+                <th>P / F / C</th>
+            </tr>
+            </thead>
+            <tbody id="historyBody">
+            </tbody>
+        </table>
     </section>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="Home"><span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item">
+            <img src="diary.png" alt="Log"><span>Log</span>
+        </a>
+        <a href="database.html" class="nav-item active">
+            <img src="history.png" alt="History"><span>Habits</span>
+        </a>
+    </nav>
 </div>
+
+<section class="card" style="text-align: center;">
+    <button class="icon-btn full-width" onclick="exportToCSV()" style="background: #607d8b;">
+        📥 Download History (CSV)
+    </button>
+    <p style="font-size: 0.7rem; color: #888; margin-top: 8px;">
+        Compatible with Excel, Google Sheets, and Numbers.
+    </p>
+</section>
 
 <script src="app.js"></script>
 </body>
 </html>
+
