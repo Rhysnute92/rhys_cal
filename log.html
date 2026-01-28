@@ -44,52 +44,73 @@
             <div class="tile" onclick="switchTab('Snack')">🍎<br>Snack</div>
         </div>
 
-        <h3 id="currentTabLabel">Logging Breakfast</h3>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <button class="icon-btn" style="background: #607d8b; font-size: 0.7rem;" onclick="copyYesterday()">
-                📋 Copy Yesterday's {Meal}
-            </button>
+        <section class="card entry-card">
+            <div class="meal-tiles">
+            </div>
+
+            <h3 id="currentTabLabel">Logging Breakfast</h3>
+
+            <div class="search-wrapper" style="position: relative; margin-bottom: 15px;">
+                <div class="search-container" style="display:flex; gap:8px;">
+                    <input type="text"
+                           id="dbSearch"
+                           placeholder="Start typing to search 3M+ foods..."
+                           oninput="searchGlobalDB(event)"
+                           autocomplete="off"
+                           style="flex-grow:1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+
+                    <button class="icon-btn" style="width:auto; background:#2196F3;" onclick="startScanner()">📷 Scan</button>
+                </div>
+
+                <div id="searchResults" class="search-results-box hidden"></div>
+            </div>
+
+            <div id="interactive" class="viewport" style="display:none; width:100%; height: 250px; background:#000; border-radius:8px; margin-bottom:15px;"></div>
+
+        </section>
+
+        <div class="frequent-items" style="margin-bottom:15px;">
+            <div id="frequentList" class="frequent-tags"></div>
         </div>
 
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
         <div id="waterTracker" class="hidden" style="text-align:center; margin-bottom:15px;">
-            <button class="icon-btn" onclick="addWater(250)">💧 +250ml Water</button>
+            <button class="icon-btn" style="background:#2196F3" onclick="addWater(250)">💧 +250ml Water</button>
         </div>
 
         <div class="form-group">
             <input type="text" id="foodName" placeholder="Item Name...">
         </div>
+
         <div class="form-row">
             <div class="input-group">
                 <label>Kcal</label>
                 <input type="number" id="foodCalories">
             </div>
-            <select id="mealCategory" style="display:none">
-                <option value="Breakfast" selected>Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Snack">Snack</option>
-            </select>
+            <div class="form-row macros" style="flex-grow:1">
+                <input type="number" id="protein" placeholder="P">
+                <input type="number" id="fat" placeholder="F">
+                <input type="number" id="carbs" placeholder="C">
+            </div>
         </div>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <button class="icon-btn" style="background: #607d8b; font-size: 0.7rem;" onclick="copyYesterday()">
-                📋 Copy Yesterday's {Meal}
+
+        <div class="form-row multiplier-row" style="margin: 15px 0;">
+            <button class="mult-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
+            <button class="mult-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
+            <button class="mult-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
+            <button class="mult-btn custom" onclick="customMultiplier()">Custom</button>
+        </div>
+
+        <div class="scanner-container">
+            <button class="icon-btn full-width" onclick="addFood()" style="height:50px; font-size:1.1rem;">Add to Log</button>
+            <button class="icon-btn full-width" style="background: #607d8b; margin-top:10px;" onclick="copyYesterday()">
+                📋 Copy Yesterday's Meal
             </button>
         </div>
 
-        <div class="form-row macros">
-            <input type="number" id="protein" placeholder="P">
-            <input type="number" id="fat" placeholder="F">
-            <input type="number" id="carbs" placeholder="C">
-        </div>
-        <div class="scanner-container">
-            <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
-            <button class="icon-btn full-width" onclick="startScanner()">📷 Scan Barcode</button>
-            <div id="interactive" class="viewport"></div>
-        </div>
-        <div class="tab-content">
-            <div id="activeMealList" class="meal-list-container">
-            </div>
+        <div class="tab-content" style="margin-top:20px;">
+            <div id="activeMealList" class="meal-list-container"></div>
         </div>
     </section>
 
@@ -100,22 +121,7 @@
         <button class="mult-btn" onclick="multiplyQuantity(3.0)">x3.0</button>
         <button class="mult-btn custom" onclick="customMultiplier()">Custom</button>
     </div>
-
-    <section class="card">
-        <div class="search-container">
-            <input type="text" id="dbSearch" placeholder="Search Global Database..." onkeyup="searchGlobalDB(event)">
-            <button class="icon-btn" onclick="searchGlobalDB()">🔍</button>
-        </div>
-
-        <div id="searchResults" class="search-results-box hidden">
-        </div>
-
-        <div class="frequent-items">
-            <h4>Top Logged</h4>
-            <div id="frequentList" class="frequent-tags">
-            </div>
-        </div>
-    </section>
+</div>
 
 <script src="app.js"></script>
 </body>
