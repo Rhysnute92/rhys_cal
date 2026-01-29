@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -18,7 +19,7 @@
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Habits</h1>
             <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
-                🌙
+                Dark Mode
             </button>
         </div>
     </header>
@@ -59,6 +60,13 @@
                 <tbody id="weeklySummaryBody">
                 </tbody>
             </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h4>Weight Progress</h4>
+        <div style="height: 250px; width: 100%;">
+            <canvas id="weightChart"></canvas>
         </div>
     </section>
 

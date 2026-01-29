@@ -8,6 +8,7 @@
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 </head>
 <body>
@@ -18,7 +19,7 @@
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Food Diary</h1>
             <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
-                🌙
+                Dark Mode
             </button>
         </div>
     </header>
@@ -38,6 +39,40 @@
             <span>Training</span>
         </a>
     </nav>
+
+    <section class="card">
+        <div id="dateStrip" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        </div>
+        <h3 id="selectedDateDisplay" style="text-align: center; color: var(--primary);">Today</h3>
+    </section>
+
+    <section class="card macro-summary-card">
+        <div id="macroTargetDisplay" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+        </div>
+    </section>
+
+    <section class="card">
+        <h4>Frequently Logged</h4>
+        <div id="frequentFoodsList" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        </div>
+    </section>
+
+    <section class="card">
+        <h4>Log Food</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <input type="text" id="manualName" placeholder="Item Name" style="grid-column: span 2;">
+            <input type="number" id="manualCals" placeholder="Cals">
+            <input type="number" id="manualPro" placeholder="Protein (g)">
+            <input type="number" id="manualFat" placeholder="Fat (g)">
+            <input type="number" id="manualCarb" placeholder="Carbs (g)">
+            <button class="icon-btn" onclick="addFoodManually()" style="grid-column: span 2;">Add Entry</button>
+        </div>
+    </section>
+
+    <section class="card">
+        <h4>Today's Log</h4>
+        <div id="todayFoodList"></div>
+    </section>
 
     <section class="card entry-card">
         <div class="meal-tiles">
