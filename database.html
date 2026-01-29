@@ -17,6 +17,9 @@
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Habits</h1>
+            <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+                🌙
+            </button>
         </div>
     </header>
     <nav class="icon-nav">
@@ -32,7 +35,12 @@
             <img src="history.png" alt="History">
             <span>Habits</span>
         </a>
+        <a href="training.html" class="nav-item" title="Training">
+            <img src="training.png" alt="Training">
+            <span>Training</span>
+        </a>
     </nav>
+
     <section class="card">
         <div class="header-with-action">
             <h3>7-Day Log</h3>
@@ -55,10 +63,38 @@
     </section>
 
     <section class="card">
+        <div class="header-with-action">
+            <h4 style="margin:0;">Muscle Group Focus</h4>
+            <small style="color:var(--primary);">Last 7 Days</small>
+        </div>
+
+        <div id="muscleMapContainer" style="margin-top: 20px;">
+        </div>
+
+        <p id="muscleInsight" style="font-size: 0.75rem; color: #666; margin-top: 15px; text-align: center; font-style: italic;">
+            Log a workout to see your training distribution.
+        </p>
+    </section>
+
+    <section class="card">
         <h3>Calorie Trends</h3>
         <canvas id="historyChart"></canvas>
     </section>
 </div>
+
+<section class="card">
+    <h4 style="margin-top:0;">Data Management</h4>
+    <p style="font-size: 0.75rem; color: #666; margin-bottom: 15px;">
+        Export your progress to a file or restore it from a previous backup.
+    </p>
+
+    <div style="display: flex; gap: 10px;">
+        <button class="icon-btn" onclick="exportData()" style="flex: 1; background: var(--dark);">📥 Backup</button>
+        <button class="icon-btn" onclick="document.getElementById('importFile').click()" style="flex: 1; background: var(--primary);">📤 Restore</button>
+    </div>
+
+    <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
+</section>
 
 <script src="app.js"></script>
 </body>
