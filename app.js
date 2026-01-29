@@ -464,3 +464,46 @@ window.addEventListener('online', () => {
 window.addEventListener('offline', () => {
     document.getElementById('offlineStatus').style.display = 'inline';
 });
+// --- WATER TRACKER LOGIC ---
+let waterData = JSON.parse(localStorage.getItem('waterData')) || {};
+const WATER_GOAL = 2000; // You can also add this to your 'goals' object
+
+function changeWater(amount) {
+    const dateKey = new Date().toISOString().split('T')[0];
+    let current = waterData[dateKey] || 0;
+
+    waterData[dateKey] = Math.max(0, current + amount);
+    saveWater();
+}
+
+function setWater(amount) {
+    changeWater(amount);
+}
+
+function saveWater() {
+    localStorage.setItem('waterData', JSON.stringify(waterData));
+    updateWaterUI();
+}
+
+function updateWaterUI() {
+    const dateKey = new Date().toISOString().split('T')[0];
+    const current = waterData[dateKey] || 0;
+    const percentage = Math.min((current / WATER_GOAL) * 100, 100);
+
+    // Update Dashboard
+    if (document.getElementById('dashWater')) {
+        document.getElementById('dashWater').innerText = current;
+        document.getElementById('water-bar-dash').style.width = percentage + "%";
+    }
+
+    // Update Log Tab
+    if (document.getElementById('logWaterVal')) {
+        document.getElementById('logWaterVal').innerText = current;
+    }
+}
+
+// Add 'updateWaterUI()' to your DOMContentLoaded listener
+document.addEventListener("DOMContentLoaded", () => {
+    // ... existing init functions
+    updateWaterUI();
+});

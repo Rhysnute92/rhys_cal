@@ -88,6 +88,27 @@
                 </div>
             </div>
 
+            <section class="card">
+                <div class="flex-between">
+                    <h4>Water Tracker</h4>
+                    <span id="waterGoalText" class="hint">Goal: 2000ml</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                    <button class="icon-btn" style="background:#2196F3;" onclick="changeWater(-250)">-</button>
+                    <div style="flex: 1; text-align: center;">
+                        <strong id="logWaterVal">0</strong> <small>ml</small>
+                    </div>
+                    <button class="icon-btn" style="background:#2196F3;" onclick="changeWater(250)">+</button>
+                </div>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <button class="tag-btn" onclick="setWater(250)">+250ml</button>
+                    <button class="tag-btn" onclick="setWater(500)">+500ml</button>
+                    <button class="tag-btn" onclick="setWater(1000)">1L</button>
+                    <button class="tag-btn" onclick="setWater(2000)">2L</button>
+                    <button class="tag-btn" onclick="setWater(4000)">4L</button>
+                </div>
+            </section>
+
             <div class="form-row multiplier-row" style="margin-bottom: 15px; display: flex; gap: 5px;">
                 <button class="tag-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
                 <button class="tag-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
