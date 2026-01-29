@@ -96,6 +96,15 @@
     <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
 </section>
 
+<section class="card">
+    <h4>External Imports</h4>
+    <p class="hint">Import CSV data from other fitness tracking apps.</p>
+    <button class="tag-btn" onclick="document.getElementById('mfpImport').click()">
+        🍎 Import MFP CSV
+    </button>
+    <input type="file" id="mfpImport" style="display: none;" onchange="importMFPData(event)">
+</section>
+
 <script src="app.js"></script>
 </body>
 </html>
