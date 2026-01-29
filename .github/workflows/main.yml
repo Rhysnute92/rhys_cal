@@ -1,0 +1,30 @@
+name: Project Sanity Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check for essential files
+        run: |
+          ls index.html
+          ls log.html
+          ls database.html
+          ls training.html
+          ls app.js
+          ls style.css
+          ls manifest.json
+          ls sw.js
+
+      - name: Validate JSON files
+        # This ensures your manifest doesn't have a missing comma
+        run: |
+          cat manifest.json | jq .
