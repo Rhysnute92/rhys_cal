@@ -32,7 +32,10 @@
     </a>
     <a href="database.html" class="nav-item" title="History">
         <img src="history.png" alt="History">
-        <span>Eating Habits</span>
+        <span>Habits</span>
+    </a>
+    <a href="training.html" class="nav-ite" title="Training">
+        <img src="training.png" alt="Training">
     </a>
 </nav>
 
@@ -97,6 +100,28 @@
                 <input type="number" id="goalCarbs" placeholder="New Carbs">
                 <button onclick="updateGoal('Carbs')">Save</button>
             </div>
+        </div>
+    </section>
+
+    <section class="card grid-tile">
+        <div class="header-with-action">
+            <h4 style="margin:0;">Weight Trend</h4>
+            <div class="unit-toggle">
+                <button id="btn-lbs" class="toggle-btn active" onclick="setWeightUnit('lbs')">LBS</button>
+                <button id="btn-kg" class="toggle-btn" onclick="setWeightUnit('kg')">KG</button>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="weightChart"></canvas>
+        </div>
+
+        <div class="weight-input-row" style="display: flex; gap: 8px; margin-top: 15px;">
+            <input type="number" id="inputDailyWeight" placeholder="0.0" step="0.1" style="flex: 1;">
+            <button class="icon-btn" onclick="logWeight()">Log</button>
+        </div>
+
+        <div id="weightDiff" style="text-align: center; margin-top: 10px; font-size: 0.8rem; font-weight: bold;">
         </div>
     </section>
 

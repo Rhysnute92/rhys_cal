@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Entry - Fitness Tracker</title>
-    <link rel="icon" type="image/png" href="rhys_favicon.png">
-    <link rel="apple-touch-icon" sizes=180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 </head>
 <body>
@@ -19,19 +20,15 @@
         </div>
     </header>
 
-
     <nav class="icon-nav">
-        <a href="index.html" class="nav-item" title="Dashboard">
-            <img src="dashboard.png" alt="Dashboard">
-            <span>Home</span>
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="Dashboard"><span>Home</span>
         </a>
-        <a href="log.html" class="nav-item" title="Food Diary">
-            <img src="diary.png" alt="Log">
-            <span>Food Diary</span>
+        <a href="log.html" class="nav-item active">
+            <img src="diary.png" alt="Log"><span>Food Diary</span>
         </a>
-        <a href="database.html" class="nav-item" title="History">
-            <img src="history.png" alt="History">
-            <span>Eating Habits</span>
+        <a href="database.html" class="nav-item">
+            <img src="history.png" alt="History"><span>Habits</span>
         </a>
     </nav>
 
@@ -46,71 +43,65 @@
 
         <h3 id="currentTabLabel">Logging Breakfast</h3>
 
-        <div id="waterTracker" class="hidden" style="text-align:center; margin-bottom:15px;">
-            <button class="icon-btn" onclick="addWater(250)">💧 +250ml Water</button>
+        <div class="search-wrapper" style="position: relative; margin-bottom: 15px;">
+            <div class="search-container" style="display:flex; gap:8px;">
+                <input type="text" id="dbSearch" placeholder="Search 3M+ foods..." oninput="searchGlobalDB(event)" autocomplete="off" style="flex-grow:1;">
+                <button class="icon-btn" style="width:auto; background:#2196F3;" onclick="startScanner()">📷 Scan</button>
+            </div>
+            <div id="searchResults" class="search-results-box hidden"></div>
         </div>
 
-        <div class="form-group">
-            <input type="text" id="foodName" placeholder="Item Name...">
+        <div id="interactive" class="viewport hidden" style="position: relative; width:100%; height: 250px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px;">
+            <button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">✕</button>
+            <div class="video-container"></div>
         </div>
-        <div class="form-row">
-            <div class="input-group">
-                <label>Kcal</label>
-                <input type="number" id="foodCalories">
+
+        <div id="recentScansContainer" class="hidden" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 0.8rem; color: #666; margin: 0;">Recently Scanned</h4>
+                <button onclick="clearRecents()" style="background: none; border: none; color: #ff4444; font-size: 0.7rem; cursor: pointer; text-decoration: underline;">Clear All</button>
             </div>
-            <select id="mealCategory" style="display:none">
-                <option value="Breakfast" selected>Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Snack">Snack</option>
-            </select>
+            <div id="recentScansList" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+            </div>
         </div>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <button class="icon-btn" style="background: #607d8b; font-size: 0.7rem;" onclick="copyYesterday()">
-                📋 Copy Yesterday's {Meal}
+
+        <div id="manualEntryForm" class="hidden" style="border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-top: 10px; background: #fafafa;">
+            <div class="form-group">
+                <input type="text" id="foodName" placeholder="Item Name...">
+            </div>
+            <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div class="input-group" style="flex: 1;">
+                    <label style="font-size: 0.7rem; color: #666;">Kcal</label>
+                    <input type="number" id="foodCalories" style="width: 100%;">
+                </div>
+                <div class="macros-group" style="flex: 2; display: flex; gap: 5px; align-items: flex-end;">
+                    <input type="number" id="protein" placeholder="P">
+                    <input type="number" id="fat" placeholder="F">
+                    <input type="number" id="carbs" placeholder="C">
+                </div>
+            </div>
+
+            <div class="form-row multiplier-row" style="margin-bottom: 15px; display: flex; gap: 5px;">
+                <button class="tag-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
+                <button class="tag-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
+                <button class="tag-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
+            </div>
+
+            <button class="icon-btn full-width" onclick="addFood()" style="background: #4CAF50;">Add to Log</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <button id="toggleManualBtn" style="background:none; border:none; color:#2196F3; font-size:0.8rem; text-decoration: underline; cursor:pointer;" onclick="toggleManualForm()">
+                + Add Custom Item Manually
             </button>
         </div>
 
-        <div class="form-row macros">
-            <input type="number" id="protein" placeholder="P">
-            <input type="number" id="fat" placeholder="F">
-            <input type="number" id="carbs" placeholder="C">
-        </div>
-        <div class="scanner-container">
-            <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
-            <button class="icon-btn full-width" onclick="startScanner()">📷 Scan Barcode</button>
-            <div id="interactive" class="viewport"></div>
-        </div>
-        <div class="tab-content">
-            <div id="activeMealList" class="meal-list-container">
-            </div>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+
+        <div id="activeMealList" class="meal-list-container">
         </div>
     </section>
-
-    <div class="form-row multiplier-row">
-        <button class="mult-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
-        <button class="mult-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
-        <button class="mult-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
-        <button class="mult-btn" onclick="multiplyQuantity(3.0)">x3.0</button>
-        <button class="mult-btn custom" onclick="customMultiplier()">Custom</button>
-    </div>
-
-    <section class="card">
-        <div class="search-container">
-            <input type="text" id="dbSearch" placeholder="Search Global Database..." onkeyup="searchGlobalDB(event)">
-            <button class="icon-btn" onclick="searchGlobalDB()">🔍</button>
-        </div>
-
-        <div id="searchResults" class="search-results-box hidden">
-        </div>
-
-        <div class="frequent-items">
-            <h4>Top Logged</h4>
-            <div id="frequentList" class="frequent-tags">
-            </div>
-        </div>
-    </section>
+</div>
 
 <script src="app.js"></script>
 </body>
