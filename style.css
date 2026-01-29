@@ -555,4 +555,23 @@ input, select {
 }
 
 .tile-icon { font-size: 1.5rem; }
+
 .tile-metric { font-size: 1.2rem; font-weight: 800; margin: 4px 0; }
+.hidden {
+    display: none !important;
+}
+
+.nav-item.active {
+    border-top: 3px solid var(--primary);
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--primary);
+}
+
+.tab-content {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -105,6 +105,18 @@
     <input type="file" id="mfpImport" style="display: none;" onchange="importMFPData(event)">
 </section>
 
+<section class="card">
+    <h4>Database Maintenance</h4>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+        <button class="tag-btn" onclick="cleanDuplicateFoodEntries()" style="background: var(--dark);">
+            🧹 Remove Duplicate Meals
+        </button>
+        <button class="tag-btn" onclick="confirmReset()" style="background: #ff4444; color: white;">
+            ⚠️ Reset All Data
+        </button>
+    </div>
+</section>
+
 <script src="app.js"></script>
 </body>
 </html>

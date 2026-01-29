@@ -270,3 +270,197 @@ function dismissQuickStart() {
     localStorage.setItem('quickStartDismissed', 'true');
 }
 
+function importMFPData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+        const headers = lines[0].split(',');
+
+        // Find column indexes (MFP headers usually include 'Date', 'Calories', etc.)
+        const dateIdx = headers.findIndex(h => h.includes('Date'));
+        const calIdx = headers.findIndex(h => h.includes('Calories'));
+        const proIdx = headers.findIndex(h => h.includes('Protein'));
+        const fatIdx = headers.findIndex(h => h.includes('Fat'));
+        const carbIdx = headers.findIndex(h => h.includes('Carbs'));
+
+        let importCount = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',');
+            if (row.length < headers.length) continue;
+
+            const date = row[dateIdx]; // Format: YYYY-MM-DD
+            const entry = {
+                name: "MFP Import",
+                calories: parseInt(row[calIdx]) || 0,
+                protein: parseInt(row[proIdx]) || 0,
+                fat: parseInt(row[fatIdx]) || 0,
+                carbs: parseInt(row[carbIdx]) || 0
+            };
+
+            // Initialize date array if empty and push
+            if (!foodData[date]) foodData[date] = [];
+            foodData[date].push(entry);
+            importCount++;
+            // ... inside importMFPData reader.onload ...
+            localStorage.setItem('foodData', JSON.stringify(foodData));
+// Automatically clean up after import
+            cleanDuplicateFoodEntries();
+        }
+
+        localStorage.setItem('foodData', JSON.stringify(foodData));
+        alert(`Success! Imported ${importCount} meals from MyFitnessPal.`);
+        location.reload();
+    };
+    reader.readAsText(file);
+}
+
+function cleanDuplicateFoodEntries() {
+    let removedCount = 0;
+
+    // Loop through every date in your food database
+    for (let date in foodData) {
+        const uniqueEntries = [];
+        const originalCount = foodData[date].length;
+
+        foodData[date].forEach(entry => {
+            // Check if an identical entry already exists in our unique list
+            const isDuplicate = uniqueEntries.some(u =>
+                u.name === entry.name &&
+                u.calories === entry.calories &&
+                u.protein === entry.protein &&
+                u.fat === entry.fat &&
+                u.carbs === entry.carbs
+            );
+
+            if (!isDuplicate) {
+                uniqueEntries.push(entry);
+            }
+        });
+
+        removedCount += (originalCount - uniqueEntries.length);
+        foodData[date] = uniqueEntries;
+    }
+
+    if (removedCount > 0) {
+        localStorage.setItem('foodData', JSON.stringify(foodData));
+        alert(`Cleanup complete! Removed ${removedCount} duplicate entries.`);
+        location.reload();
+    } else {
+        alert("Your database is already clean! No duplicates found.");
+    }
+}
+
+function switchTab(tabId) {
+    // 1. Hide all sections
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.add('hidden'));
+
+    // 2. Show the selected section
+    const activeSection = document.getElementById(tabId);
+    if (activeSection) {
+        activeSection.classList.remove('hidden');
+    }
+
+    // 3. Update Nav UI
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        // If the onclick contains our tabId, make it active
+        if (item.getAttribute('onclick').includes(tabId)) {
+            item.classList.add('active');
+        }
+    });
+
+    // 4. Trigger Page-Specific Refreshes
+    // This ensures data is up-to-date when you switch to that tab
+    if (tabId === 'home') updateDashboardStats();
+    if (tabId === 'log') renderFoodLog();
+    if (tabId === 'habits')
+    if (tabId === 'training') {
+        renderCalendar();
+        updateMuscleMap();
+    }
+
+    // Save current tab to remember where user was on refresh
+    localStorage.setItem('currentTab', tabId);
+}
+
+// Add this to your DOMContentLoaded to load the last tab used
+document.addEventListener('DOMContentLoaded', () => {
+    const lastTab = localStorage.getItem('currentTab') || 'home';
+    switchTab(lastTab);
+});
+
+// --- SWIPE GESTURE LOGIC ---
+let touchstartX = 0;
+let touchendX = 0;
+
+const gestureZone = document.getElementById('app-body');
+const tabs = ['home', 'log', 'habits', 'training'];
+
+gestureZone.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+});
+
+gestureZone.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleGesture();
+});
+
+function handleGesture() {
+    const currentTab = localStorage.getItem('currentTab') || 'home';
+    const currentIndex = tabs.indexOf(currentTab);
+
+    // Swipe Threshold (minimum distance in pixels)
+    const threshold = 100;
+
+    // Swipe Left (Go to next tab)
+    if (touchendX < touchstartX - threshold) {
+        if (currentIndex < tabs.length - 1) {
+            switchTab(tabs[currentIndex + 1]);
+        }
+    }
+
+    // Swipe Right (Go to previous tab)
+    if (touchendX > touchstartX + threshold) {
+        if (currentIndex > 0) {
+            switchTab(tabs[currentIndex - 1]);
+        }
+    }
+}
+
+function addFoodManually() {
+    // ... (logic to get input values) ...
+
+    // Update Global Data
+    foodData[dateKey].push(newEntry);
+    localStorage.setItem('foodData', JSON.stringify(foodData));
+
+    // REFRESH UI - The key to making it "work"
+    updateCalorieDisplay(); // Updates the bars on the 'home' tab
+    renderFoodLog();        // Updates the list on the 'log' tab
+
+    // Optional: Auto-switch back to home to see the progress
+    // switchTab('home');
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker Registered!', reg))
+            .catch(err => console.log('Service Worker Registration Failed', err));
+    });
+}
+
+window.addEventListener('online', () => {
+    document.getElementById('offlineStatus').style.display = 'none';
+});
+
+window.addEventListener('offline', () => {
+    document.getElementById('offlineStatus').style.display = 'inline';
+});
