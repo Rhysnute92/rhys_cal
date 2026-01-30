@@ -1,386 +1,509 @@
-// 1. Global State Management
-let mealFoods = { Breakfast: [], Lunch: [], Dinner: [], Drinks: [], Snack: [] };
-let weightHistory = [];
-let restGoal = 1500, trainGoal = 1800;
-let proteinGoal = 200, fatGoal = 45, carbGoal = 145, goalWeight = 170;
-let isTrainingDay = false;
-let weightUnit = 'lbs';
-let currentActiveTab = 'Breakfast';
-let searchTimer;
+/**
+ * FITNESS PRO - MASTER SCRIPT
+ * Handles: Goals, Food Logging, Gym DB, 1RM, Volume, Calendar, Muscle Map, and Backups.
+ */
 
-// 2. Initialization
+// --- 1. GLOBAL STATE & DATA ---
+const weightUnit = localStorage.getItem('weightUnit') || 'kg';
+let workoutData = JSON.parse(localStorage.getItem('workoutData')) || {};
+let foodData = JSON.parse(localStorage.getItem('foodData')) || {};
+let weightHistory = JSON.parse(localStorage.getItem('weightHistory')) || [];
+let isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || false;
+
+let goals = JSON.parse(localStorage.getItem('userGoals')) || {
+    restCals: 1500,
+    trainCals: 1800,
+    protein: 200,
+    fat: 45,
+    carbs: 145
+};
+
+const gymDB = [
+    { name: "Barbell Bench Press", equipment: "Barbell", muscle: "Chest" },
+    { name: "Incline DB Press", equipment: "Dumbbells", muscle: "Chest" },
+    { name: "Barbell Squat", equipment: "Barbell", muscle: "Legs" },
+    { name: "Leg Press", equipment: "Machine", muscle: "Legs" },
+    { name: "Deadlift", equipment: "Barbell", muscle: "Back" },
+    { name: "Lat Pulldown", equipment: "Cable", muscle: "Back" },
+    { name: "Overhead Press", equipment: "Barbell", muscle: "Shoulders" },
+    { name: "Bicep Curl", equipment: "Dumbbells", muscle: "Arms" },
+    { name: "Tricep Pushdown", equipment: "Cable", muscle: "Arms" }
+];
+
+// --- 2. INITIALIZATION ENGINE ---
 document.addEventListener("DOMContentLoaded", () => {
-    loadData();
-    // Initialize page-specific UI
-    if (document.getElementById('activeMealList')) renderActiveList();
-    if (document.getElementById('frequentList')) updateFrequentItems();
-    if (document.getElementById('canvasWeightTrend')) updateWeightUI();
-    if (document.getElementById('weeklySummaryBody')) generateWeeklyTable();
+    initTheme();
+    refreshGoalUI();
+    updateCalorieDisplay();
+
+    // Page-Specific Initialization
+    if (document.getElementById('weightChart')) initWeightChart();
+    if (document.getElementById('workoutCalendar')) renderCalendar();
+    if (document.getElementById('muscleMapContainer')) updateMuscleMap();
+    if (document.getElementById('dashWorkoutVol')) updateDashboardStats();
+
+    // Global UI Updates
+    displayLastSync();
+    checkQuickStart();
 });
 
-function loadData() {
-    const dateKey = new Date().toISOString().split('T')[0];
-    const savedDay = JSON.parse(localStorage.getItem('day_' + dateKey));
-    const savedGlobal = JSON.parse(localStorage.getItem('userSettings'));
-
-    if (savedDay) {
-        mealFoods = savedDay.mealFoods || mealFoods;
-        isTrainingDay = savedDay.isTrainingDay || false;
-    }
-
-    if (savedGlobal) {
-        weightHistory = savedGlobal.weightHistory || [];
-        restGoal = savedGlobal.restGoal || 1500;
-        trainGoal = savedGlobal.trainGoal || 1800;
-        proteinGoal = savedGlobal.proteinGoal || 200;
-        fatGoal = savedGlobal.fatGoal || 45;
-        carbGoal = savedGlobal.carbGoal || 145;
-        goalWeight = savedGlobal.goalWeight || 170;
-        weightUnit = savedGlobal.weightUnit || 'lbs';
-    }
-
-    // Sync UI elements
-    const trainToggle = document.getElementById('trainingMode');
-    if (trainToggle) {
-        trainToggle.checked = isTrainingDay;
-        // Ensure workout section visibility matches state on load
-        const workoutSection = document.getElementById('workoutInputSection');
-        if (workoutSection) workoutSection.classList.toggle('hidden', !isTrainingDay);
-        const statusText = document.getElementById('trainingStatusText');
-        if (statusText) statusText.innerText = isTrainingDay ? "Training Day" : "Rest Day";
-    }
-
-    updateGoalDisplays();
-    updateDailyTotals();
-}
-
-function saveData() {
-    const dateKey = new Date().toISOString().split('T')[0];
-    localStorage.setItem('day_' + dateKey, JSON.stringify({ mealFoods, isTrainingDay }));
-    localStorage.setItem('userSettings', JSON.stringify({
-        weightHistory, restGoal, trainGoal, proteinGoal, fatGoal, carbGoal, goalWeight, weightUnit
-    }));
-}
-
-// 3. Training & Dashboard Logic
+// --- 3. DASHBOARD & GOALS LOGIC ---
 function toggleTrainingMode() {
-    const trainToggle = document.getElementById('trainingMode');
-    const workoutSection = document.getElementById('workoutInputSection');
+    const checkbox = document.getElementById('trainingMode');
     const statusText = document.getElementById('trainingStatusText');
 
-    isTrainingDay = trainToggle.checked;
+    isTrainingDay = checkbox ? checkbox.checked : isTrainingDay;
+    localStorage.setItem('isTrainingDay', isTrainingDay);
 
-    if (statusText) statusText.innerText = isTrainingDay ? "Training Day" : "Rest Day";
-    if (workoutSection) workoutSection.classList.toggle('hidden', !isTrainingDay);
-
-    saveData();
-    updateDailyTotals();
+    if (statusText) {
+        statusText.innerText = isTrainingDay ?
+            `Training Day (${goals.trainCals} kcal)` :
+            `Rest Day (${goals.restCals} kcal)`;
+    }
+    updateCalorieDisplay();
 }
 
-function setWorkoutPreset(val) {
-    const input = document.getElementById('workoutBurn');
-    if (input) {
-        input.value = val;
-        updateDailyTotals();
-        saveData();
+function updateCalorieDisplay() {
+    const dailyGoal = isTrainingDay ? goals.trainCals : goals.restCals;
+    const dateKey = new Date().toISOString().split('T')[0];
+    const todayFood = foodData[dateKey] || [];
+
+    const consumed = todayFood.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
+    const remaining = dailyGoal - consumed;
+
+    const remainingEl = document.getElementById('remainingCalories');
+    if (remainingEl) {
+        remainingEl.innerText = remaining;
+        remainingEl.style.color = remaining < 0 ? "#e74c3c" : "var(--primary)";
+    }
+    updateProgressBars(consumed, dailyGoal);
+}
+
+function updateProgressBars(consumed, dailyGoal) {
+    // Logic for Protein/Fat/Carb bars
+    const dateKey = new Date().toISOString().split('T')[0];
+    const todayFood = foodData[dateKey] || [];
+
+    const macros = todayFood.reduce((acc, item) => {
+        acc.p += parseInt(item.protein || 0);
+        acc.f += parseInt(item.fat || 0);
+        acc.c += parseInt(item.carbs || 0);
+        return acc;
+    }, {p:0, f:0, c:0});
+
+    if(document.getElementById('protein-bar')) {
+        document.getElementById('protein-bar').style.width = Math.min((macros.p / goals.protein) * 100, 100) + "%";
+        document.getElementById('fat-bar').style.width = Math.min((macros.f / goals.fat) * 100, 100) + "%";
+        document.getElementById('carb-bar').style.width = Math.min((macros.c / goals.carbs) * 100, 100) + "%";
     }
 }
 
-// 4. Database Search & Manual Form logic
-async function searchGlobalDB(event) {
-    const query = event.target.value.trim();
-    const resultsBox = document.getElementById('searchResults');
+function toggleEditMode() {
+    document.querySelectorAll('.edit-box').forEach(box => box.classList.toggle('hidden'));
+}
 
-    clearTimeout(searchTimer);
-    if (query.length < 3) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
+function updateCalorieGoals() {
+    const rest = document.getElementById('goalRestCals').value;
+    const train = document.getElementById('goalTrainCals').value;
+    if (rest) goals.restCals = parseInt(rest);
+    if (train) goals.trainCals = parseInt(train);
+    saveAndRefresh();
+}
+
+function updateGoal(type) {
+    const val = document.getElementById(`goal${type}`).value;
+    if (val) {
+        goals[type.toLowerCase()] = parseInt(val);
+        saveAndRefresh();
+    }
+}
+
+function saveAndRefresh() {
+    localStorage.setItem('userGoals', JSON.stringify(goals));
+    toggleEditMode();
+    refreshGoalUI();
+    updateCalorieDisplay();
+}
+
+function refreshGoalUI() {
+    const ids = { p: 'displayGoalP', f: 'displayGoalF', c: 'displayGoalC' };
+    if (document.getElementById(ids.p)) {
+        document.getElementById(ids.p).innerText = goals.protein;
+        document.getElementById(ids.f).innerText = goals.fat;
+        document.getElementById(ids.c).innerText = goals.carbs;
+    }
+    const cb = document.getElementById('trainingMode');
+    if (cb) {
+        cb.checked = isTrainingDay;
+        toggleTrainingMode();
+    }
+}
+
+// --- 4. TRAINING & 1RM LOGIC ---
+function searchExercises(event) {
+    const query = event.target.value.toLowerCase();
+    const resultsBox = document.getElementById('exerciseResults');
+    if (!resultsBox) return;
+    if (query.length < 2) { resultsBox.classList.add('hidden'); return; }
+
+    const filtered = gymDB.filter(ex => ex.name.toLowerCase().includes(query));
+    resultsBox.innerHTML = filtered.map(ex => `
+        <div class="search-item" onclick="selectExercise('${ex.name.replace(/'/g, "\\'")}')">
+            <strong>${ex.name}</strong> <small>(${ex.equipment})</small>
+        </div>
+    `).join('');
+    resultsBox.classList.remove('hidden');
+}
+
+function selectExercise(name) {
+    document.getElementById('exerciseSearch').value = name;
+    document.getElementById('exerciseResults').classList.add('hidden');
+    // Check for PB
+    const allSessions = Object.values(workoutData).flat();
+    const pb = allSessions.filter(ex => ex.name === name).reduce((max, ex) => Math.max(max, ex.weight), 0);
+    const pbEl = document.getElementById('personalBestDisplay');
+    if (pbEl) pbEl.innerText = pb > 0 ? `PB: ${pb}${weightUnit}` : "No PB yet";
+}
+
+function calculate1RM(weight, reps) {
+    if (reps == 1) return weight;
+    return Math.round((weight / (1.0278 - (0.0278 * reps))) * 2) / 2;
+}
+
+function updateDashboardStats() {
+    const dateKey = new Date().toISOString().split('T')[0];
+    const todayWorkout = workoutData[dateKey] || [];
+    const volEl = document.getElementById('dashWorkoutVol');
+    const countEl = document.getElementById('dashExerciseCount');
+
+    if (todayWorkout.length > 0) {
+        const vol = todayWorkout.reduce((acc, ex) => acc + (ex.sets * ex.reps * ex.weight), 0);
+        if (volEl) volEl.innerText = vol.toLocaleString();
+        if (countEl) countEl.innerText = `${todayWorkout.length} exercises logged`;
     }
 
-    searchTimer = setTimeout(async () => {
-        resultsBox.innerHTML = '<p class="hint">Searching...</p>';
-        resultsBox.classList.remove('hidden');
-
-        try {
-            const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10`);
-            const data = await response.json();
-
-            if (!data.products || data.products.length === 0) {
-                resultsBox.innerHTML = `<div class="search-item" onclick="prepareManualEntry()"><strong>⚠️ Not found</strong><small>Tap to enter manually</small></div>`;
-                return;
-            }
-
-            resultsBox.innerHTML = data.products.map(p => {
-                const name = p.product_name ? p.product_name.replace(/'/g, "\\'") : "Unknown";
-                const kcal = p.nutriments['energy-kcal_100g'] || 0;
-                const p_g = p.nutriments.proteins_100g || 0;
-                const f_g = p.nutriments.fats_100g || 0;
-                const c_g = p.nutriments.carbohydrates_100g || 0;
-                return `<div class="search-item" onclick="autoFillFromSearch('${name}', ${kcal}, ${p_g}, ${f_g}, ${c_g})">
-                            <strong>${p.product_name}</strong><small>${kcal} kcal | P:${p_g} F:${f_g} C:${c_g}</small>
-                        </div>`;
-            }).join('');
-        } catch (e) { resultsBox.innerHTML = '<p class="hint">Connection error</p>'; }
-    }, 300);
-}
-
-function toggleManualForm() {
-    const form = document.getElementById('manualEntryForm');
-    const btn = document.getElementById('toggleManualBtn');
-    if (!form) return;
-    const isHidden = form.classList.toggle('hidden');
-    btn.innerText = isHidden ? "+ Add Custom Item Manually" : "- Hide Manual Form";
-}
-
-function prepareManualEntry() {
-    const query = document.getElementById('dbSearch').value;
-    ['foodName', 'foodCalories', 'protein', 'fat', 'carbs'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('foodName').value = query;
-    document.getElementById('manualEntryForm').classList.remove('hidden');
-    document.getElementById('toggleManualBtn').innerText = "- Hide Manual Form";
-    document.getElementById('searchResults').classList.add('hidden');
-    document.getElementById('foodName').focus();
-}
-
-function autoFillFromSearch(n, cal, p, f, c) {
-    document.getElementById('manualEntryForm').classList.remove('hidden');
-    document.getElementById('toggleManualBtn').innerText = "- Hide Manual Form";
-    document.getElementById('foodName').value = n;
-    document.getElementById('foodCalories').value = Math.round(cal);
-    document.getElementById('protein').value = Math.round(p);
-    document.getElementById('fat').value = Math.round(f);
-    document.getElementById('carbs').value = Math.round(c);
-    document.getElementById('searchResults').classList.add('hidden');
-    document.getElementById('dbSearch').value = '';
-}
-
-// 5. Logging & Totals
-function addFood() {
-    const name = document.getElementById('foodName').value;
-    const cal = document.getElementById('foodCalories').value;
-    if (!name || !cal) return;
-
-    mealFoods[currentActiveTab].push({
-        name, calories: parseInt(cal),
-        protein: parseInt(document.getElementById('protein').value) || 0,
-        fat: parseInt(document.getElementById('fat').value) || 0,
-        carbs: parseInt(document.getElementById('carbs').value) || 0
-    });
-
-    saveData();
-    renderActiveList();
-    updateDailyTotals();
-
-    ['foodName', 'foodCalories', 'protein', 'fat', 'carbs'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('manualEntryForm').classList.add('hidden');
-    document.getElementById('toggleManualBtn').innerText = "+ Add Custom Item Manually";
-}
-
-function updateDailyTotals() {
-    let totals = { cal: 0, p: 0, f: 0, c: 0 };
-    Object.values(mealFoods).flat().forEach(f => {
-        totals.cal += (parseInt(f.calories) || 0);
-        totals.p += (parseInt(f.protein) || 0);
-        totals.f += (parseInt(f.fat) || 0);
-        totals.c += (parseInt(f.carbs) || 0);
-    });
-
-    // Calorie Math: (Base Goal + Workout Burn) - Eaten
-    let activeGoal = isTrainingDay ? trainGoal : restGoal;
-    let extraBurn = 0;
-    const burnInput = document.getElementById('workoutBurn');
-    if (isTrainingDay && burnInput) extraBurn = parseInt(burnInput.value) || 0;
-
-    const totalBudget = activeGoal + extraBurn;
-    const remEl = document.getElementById('remainingCalories');
-    if (remEl) {
-        const remaining = totalBudget - totals.cal;
-        remEl.innerText = remaining;
-        remEl.style.color = remaining < 0 ? "#ff4444" : "#4CAF50";
+    // Update Weight Tile
+    if (weightHistory.length > 0) {
+        const latest = weightHistory[weightHistory.length - 1];
+        if (document.getElementById('dashCurrentWeight')) {
+            document.getElementById('dashCurrentWeight').innerText = `${latest.weight}${weightUnit}`;
+        }
     }
-
-    setBar('protein-bar', totals.p, proteinGoal);
-    setBar('fat-bar', totals.f, fatGoal);
-    setBar('carb-bar', totals.c, carbGoal);
-    if (document.getElementById('canvasMacroDist')) drawCharts(totals);
 }
 
-// 6. Utility Functions (Bars, Tabs, Charts)
-function setBar(id, cur, goal) {
-    const el = document.getElementById(id);
-    if (el) el.style.width = Math.min((cur / goal) * 100, 100) + "%";
-}
-
-function switchTab(cat) {
-    currentActiveTab = cat;
-    document.querySelectorAll('.tile').forEach(t => t.classList.toggle('active', t.innerText.includes(cat)));
-    document.getElementById('currentTabLabel').innerText = `Logging ${cat}`;
-    renderActiveList();
-}
-
-function renderActiveList() {
-    const container = document.getElementById('activeMealList');
-    if (!container) return;
-    const foods = mealFoods[currentActiveTab] || [];
-    container.innerHTML = foods.length === 0 ? '<p class="hint">Empty</p>' :
-        foods.map((f, i) => `<div class="library-item"><div><strong>${f.name}</strong><br><small>${f.calories} kcal</small></div><button class="delete-small" onclick="deleteItem('${currentActiveTab}', ${i})">✕</button></div>`).join('');
-}
-
-function deleteItem(cat, idx) {
-    mealFoods[cat].splice(idx, 1);
-    saveData(); renderActiveList(); updateDailyTotals();
-}
-
-function multiplyQuantity(factor) {
-    ['foodCalories', 'protein', 'fat', 'carbs'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.value) el.value = Math.round(parseFloat(el.value) * factor);
-    });
-}
-
-function updateGoalDisplays() {
-    const ds = { 'displayGoalP': proteinGoal, 'displayGoalF': fatGoal, 'displayGoalC': carbGoal };
-    Object.entries(ds).forEach(([id, val]) => { if (document.getElementById(id)) document.getElementById(id).innerText = val; });
-}
-
-// 7. Scanner
-function startScanner() {
-    const viewport = document.getElementById('interactive');
-    viewport.classList.remove('hidden'); // Show the camera window
-
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: viewport,
-            constraints: {
-                facingMode: "environment", // Uses back camera
-                width: { min: 640 },
-                height: { min: 480 }
-            }
-        },
-        decoder: {
-            readers: ["ean_reader", "upc_reader", "code_128_reader"]
-        }
-    }, function(err) {
-        if (err) {
-            console.error(err);
-            alert("Could not start camera. Check permissions.");
-            return;
-        }
-        Quagga.start();
-    });
-
-    // Handle detection
-    Quagga.onDetected(async (data) => {
-        const code = data.codeResult.code;
-        // Provide haptic feedback if the device supports it
-        if (navigator.vibrate) navigator.vibrate(100);
-
-        stopScanner(); // Close camera immediately after success
-
-        // Fetch from OpenFoodFacts API
-        try {
-            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
-            const res = await response.json();
-            if (res.status === 1) {
-                autoFillFromSearch(
-                    res.product.product_name || "Scanned Item",
-                    res.product.nutriments['energy-kcal_100g'] || 0,
-                    res.product.nutriments.proteins_100g || 0,
-                    res.product.nutriments.fats_100g || 0,
-                    res.product.nutriments.carbohydrates_100g || 0
-                );
-            } else {
-                alert("Barcode not in database. Opening manual entry...");
-                prepareManualEntry();
-            }
-        } catch (e) {
-            console.error("Scanner Error:", e);
-        }
-    });
-}
-
-// Function to manually close the scanner
-function stopScanner() {
-    Quagga.stop();
-    const viewport = document.getElementById('interactive');
-    viewport.classList.add('hidden');
-}
-
-function generateWeeklyTable() {
-    const table = document.getElementById('historyBody');
-    if (!table) return;
-
+// --- 5. ANALYTICS & UTILITIES ---
+function renderCalendar() {
+    const calendar = document.getElementById('workoutCalendar');
+    if (!calendar) return;
+    const now = new Date();
+    const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     let html = '';
-    for (let i = 0; i < 7; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().split('T')[0];
-        const dayData = JSON.parse(localStorage.getItem('day_' + key));
-
-        if (dayData) {
-            let t = { c: 0, p: 0, f: 0, carb: 0 };
-            Object.values(dayData.mealFoods).flat().forEach(f => {
-                t.c += f.calories; t.p += f.protein; t.f += f.fat; t.carb += f.carbs;
-            });
-
-            html += `<tr style="border-bottom:1px solid #eee;">
-                <td style="padding:10px 0;">${d.toLocaleDateString(undefined, {month:'short', day:'numeric'})}</td>
-                <td><strong>${t.c}</strong></td>
-                <td style="color:#888;">${t.p}/${t.f}/${t.carb}</td>
-            </tr>`;
-        }
+    for (let i = 1; i <= days; i++) {
+        const dateKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+        const active = workoutData[dateKey] && workoutData[dateKey].length > 0;
+        html += `<div class="cal-day ${active ? 'trained' : ''}">${i}</div>`;
     }
-    table.innerHTML = html || '<tr><td colspan="3" class="hint">No history found yet.</td></tr>';
+    calendar.innerHTML = html;
 }
 
-function exportToCSV() {
-    // 1. Setup the Header Row
-    let csvContent = "Date,Meal,Item,Calories,Protein,Fat,Carbs\n";
+function updateMuscleMap() {
+    const container = document.getElementById('muscleMapContainer');
+    if (!container) return;
+    const totals = {};
+    let grandVol = 0;
 
-    // 2. Collect all keys from localStorage
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('day_'));
-    keys.sort(); // Sort by date
+    Object.values(workoutData).flat().forEach(ex => {
+        const muscle = gymDB.find(db => db.name === ex.name)?.muscle || "Other";
+        const vol = ex.sets * ex.reps * ex.weight;
+        totals[muscle] = (totals[muscle] || 0) + vol;
+        grandVol += vol;
+    });
 
-    if (keys.length === 0) {
-        alert("No data found to export!");
-        return;
+    container.innerHTML = Object.entries(totals).map(([m, v]) => `
+        <div style="margin-bottom:10px;">
+            <small>${m}</small>
+            <div class="progress-bg"><div class="progress-fill" style="width:${(v/grandVol)*100}%"></div></div>
+        </div>
+    `).join('');
+}
+
+// --- 6. THEME, BACKUP, & UI ---
+function toggleDarkMode() {
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
+
+function initTheme() {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+}
+
+function exportData() {
+    const backup = { foodData, workoutData, weightHistory, goals, timestamp: new Date().toLocaleString() };
+    localStorage.setItem('lastSyncDate', backup.timestamp);
+    const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Fitness_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    displayLastSync();
+}
+
+function displayLastSync() {
+    const el = document.getElementById('lastSyncTime');
+    const saved = localStorage.getItem('lastSyncDate');
+    if (el && saved) el.innerText = `Last: ${saved}`;
+}
+
+function checkQuickStart() {
+    if (localStorage.getItem('quickStartDismissed') === 'true') {
+        const qs = document.getElementById('quickStartCard');
+        if (qs) qs.style.display = 'none';
+    }
+}
+
+function dismissQuickStart() {
+    const qs = document.getElementById('quickStartCard');
+    if (qs) qs.style.display = 'none';
+    localStorage.setItem('quickStartDismissed', 'true');
+}
+
+function importMFPData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+        const headers = lines[0].split(',');
+
+        // Find column indexes (MFP headers usually include 'Date', 'Calories', etc.)
+        const dateIdx = headers.findIndex(h => h.includes('Date'));
+        const calIdx = headers.findIndex(h => h.includes('Calories'));
+        const proIdx = headers.findIndex(h => h.includes('Protein'));
+        const fatIdx = headers.findIndex(h => h.includes('Fat'));
+        const carbIdx = headers.findIndex(h => h.includes('Carbs'));
+
+        let importCount = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',');
+            if (row.length < headers.length) continue;
+
+            const date = row[dateIdx]; // Format: YYYY-MM-DD
+            const entry = {
+                name: "MFP Import",
+                calories: parseInt(row[calIdx]) || 0,
+                protein: parseInt(row[proIdx]) || 0,
+                fat: parseInt(row[fatIdx]) || 0,
+                carbs: parseInt(row[carbIdx]) || 0
+            };
+
+            // Initialize date array if empty and push
+            if (!foodData[date]) foodData[date] = [];
+            foodData[date].push(entry);
+            importCount++;
+            // ... inside importMFPData reader.onload ...
+            localStorage.setItem('foodData', JSON.stringify(foodData));
+// Automatically clean up after import
+            cleanDuplicateFoodEntries();
+        }
+
+        localStorage.setItem('foodData', JSON.stringify(foodData));
+        alert(`Success! Imported ${importCount} meals from MyFitnessPal.`);
+        location.reload();
+    };
+    reader.readAsText(file);
+}
+
+function cleanDuplicateFoodEntries() {
+    let removedCount = 0;
+
+    // Loop through every date in your food database
+    for (let date in foodData) {
+        const uniqueEntries = [];
+        const originalCount = foodData[date].length;
+
+        foodData[date].forEach(entry => {
+            // Check if an identical entry already exists in our unique list
+            const isDuplicate = uniqueEntries.some(u =>
+                u.name === entry.name &&
+                u.calories === entry.calories &&
+                u.protein === entry.protein &&
+                u.fat === entry.fat &&
+                u.carbs === entry.carbs
+            );
+
+            if (!isDuplicate) {
+                uniqueEntries.push(entry);
+            }
+        });
+
+        removedCount += (originalCount - uniqueEntries.length);
+        foodData[date] = uniqueEntries;
     }
 
-    // 3. Loop through days and meals
-    keys.forEach(key => {
-        const date = key.replace('day_', '');
-        const dayData = JSON.parse(localStorage.getItem(key));
+    if (removedCount > 0) {
+        localStorage.setItem('foodData', JSON.stringify(foodData));
+        alert(`Cleanup complete! Removed ${removedCount} duplicate entries.`);
+        location.reload();
+    } else {
+        alert("Your database is already clean! No duplicates found.");
+    }
+}
 
-        if (dayData && dayData.mealFoods) {
-            Object.entries(dayData.mealFoods).forEach(([mealName, foods]) => {
-                foods.forEach(f => {
-                    const row = [
-                        date,
-                        mealName,
-                        `"${f.name.replace(/"/g, '""')}"`, // Escape quotes in food names
-                        f.calories,
-                        f.protein,
-                        f.fat,
-                        f.carbs
-                    ].join(",");
-                    csvContent += row + "\n";
-                });
-            });
+function switchTab(tabId) {
+    // 1. Hide all sections
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.add('hidden'));
+
+    // 2. Show the selected section
+    const activeSection = document.getElementById(tabId);
+    if (activeSection) {
+        activeSection.classList.remove('hidden');
+    }
+
+    // 3. Update Nav UI
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        // If the onclick contains our tabId, make it active
+        if (item.getAttribute('onclick').includes(tabId)) {
+            item.classList.add('active');
         }
     });
 
-    // 4. Create the download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `fitness_history_${new Date().toISOString().split('T')[0]}.csv`);
+    // 4. Trigger Page-Specific Refreshes
+    // This ensures data is up-to-date when you switch to that tab
+    if (tabId === 'home') updateDashboardStats();
+    if (tabId === 'log') renderFoodLog();
+    if (tabId === 'habits')
+    if (tabId === 'training') {
+        renderCalendar();
+        updateMuscleMap();
+    }
 
-    // 5. Trigger the download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Save current tab to remember where user was on refresh
+    localStorage.setItem('currentTab', tabId);
 }
+
+// Add this to your DOMContentLoaded to load the last tab used
+document.addEventListener('DOMContentLoaded', () => {
+    const lastTab = localStorage.getItem('currentTab') || 'home';
+    switchTab(lastTab);
+});
+
+// --- SWIPE GESTURE LOGIC ---
+let touchstartX = 0;
+let touchendX = 0;
+
+const gestureZone = document.getElementById('app-body');
+const tabs = ['home', 'log', 'habits', 'training'];
+
+gestureZone.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+});
+
+gestureZone.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleGesture();
+});
+
+function handleGesture() {
+    const currentTab = localStorage.getItem('currentTab') || 'home';
+    const currentIndex = tabs.indexOf(currentTab);
+
+    // Swipe Threshold (minimum distance in pixels)
+    const threshold = 100;
+
+    // Swipe Left (Go to next tab)
+    if (touchendX < touchstartX - threshold) {
+        if (currentIndex < tabs.length - 1) {
+            switchTab(tabs[currentIndex + 1]);
+        }
+    }
+
+    // Swipe Right (Go to previous tab)
+    if (touchendX > touchstartX + threshold) {
+        if (currentIndex > 0) {
+            switchTab(tabs[currentIndex - 1]);
+        }
+    }
+}
+
+function addFoodManually() {
+    // ... (logic to get input values) ...
+
+    // Update Global Data
+    foodData[dateKey].push(newEntry);
+    localStorage.setItem('foodData', JSON.stringify(foodData));
+
+    // REFRESH UI - The key to making it "work"
+    updateCalorieDisplay(); // Updates the bars on the 'home' tab
+    renderFoodLog();        // Updates the list on the 'log' tab
+
+    // Optional: Auto-switch back to home to see the progress
+    // switchTab('home');
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker Registered!', reg))
+            .catch(err => console.log('Service Worker Registration Failed', err));
+    });
+}
+
+window.addEventListener('online', () => {
+    document.getElementById('offlineStatus').style.display = 'none';
+});
+
+window.addEventListener('offline', () => {
+    document.getElementById('offlineStatus').style.display = 'inline';
+});
+// --- WATER TRACKER LOGIC ---
+let waterData = JSON.parse(localStorage.getItem('waterData')) || {};
+const WATER_GOAL = 2000; // You can also add this to your 'goals' object
+
+function changeWater(amount) {
+    const dateKey = new Date().toISOString().split('T')[0];
+    let current = waterData[dateKey] || 0;
+
+    waterData[dateKey] = Math.max(0, current + amount);
+    saveWater();
+}
+
+function setWater(amount) {
+    changeWater(amount);
+}
+
+function saveWater() {
+    localStorage.setItem('waterData', JSON.stringify(waterData));
+    updateWaterUI();
+}
+
+function updateWaterUI() {
+    const dateKey = new Date().toISOString().split('T')[0];
+    const current = waterData[dateKey] || 0;
+    const percentage = Math.min((current / WATER_GOAL) * 100, 100);
+
+    // Update Dashboard
+    if (document.getElementById('dashWater')) {
+        document.getElementById('dashWater').innerText = current;
+        document.getElementById('water-bar-dash').style.width = percentage + "%";
+    }
+
+    // Update Log Tab
+    if (document.getElementById('logWaterVal')) {
+        document.getElementById('logWaterVal').innerText = current;
+    }
+}
+
+// Add 'updateWaterUI()' to your DOMContentLoaded listener
+document.addEventListener("DOMContentLoaded", () => {
+    // ... existing init functions
+    updateWaterUI();
+});

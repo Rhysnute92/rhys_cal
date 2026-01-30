@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness History - Database</title>
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <header class="app-header">
+        <div class="header-content">
+            <img src="rhys_logo.png" alt="Logo" class="header-logo">
+            <h1>Gym Tracker</h1>
+            <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+                🌙
+            </button>
+        </div>
+    </header>
+
+    <div id="restTimerOverlay" class="hidden" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 20px; border-radius: 50px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 2000; border: 1px solid rgba(255,255,255,0.1);">
+        <div onclick="setCustomTimer()" style="cursor: pointer; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold;">⚙️ SET</div>
+        <div id="timerDisplay" style="font-size: 1.4rem; font-weight: 800; color: var(--primary); min-width: 70px; text-align: center;">01:30</div>
+        <button onclick="stopTimer()" style="background: var(--dark); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-weight: bold;">✕</button>
+    </div>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item" title="Dashboard">
+            <img src="dashboard.png" alt="Dashboard">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item" title="Food Diary">
+            <img src="diary.png" alt="Log">
+            <span>Food Diary</span>
+        </a>
+        <a href="database.html" class="nav-item" title="History">
+            <img src="history.png" alt="History">
+            <span>Habits</span>
+        </a>
+        <a href="training.html" class="nav-item" title="Training">
+            <img src="training.png" alt="Training">
+            <span>Training</span>
+        </a>
+    </nav>
+
+
+    <section class="card">
+        <div class="search-wrapper" style="position: relative; margin-bottom: 10px;">
+            <input type="text" id="exerciseSearch" placeholder="Search exercises or equipment..." oninput="searchExercises(event)" autocomplete="off">
+            <div id="exerciseResults" class="search-results-box hidden"></div>
+        </div>
+
+
+        <div id="pbDisplay" style="font-size: 0.75rem; margin-bottom: 15px; min-height: 1rem;"></div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div class="input-group" style="flex:1;">
+                <label>Sets</label>
+                <input type="number" id="sets" placeholder="0">
+            </div>
+            <div class="input-group" style="flex:1;">
+                <label>Reps</label>
+                <input type="number" id="reps" placeholder="0">
+            </div>
+            <div class="input-group" style="flex:1;">
+                <label>Weight</label>
+                <input type="number" id="weight" placeholder="0.0" step="0.1">
+            </div>
+        </div>
+
+        <button class="icon-btn" style="width:100%; padding: 12px;" onclick="addExercise()">Add to Workout</button>
+    </section>
+
+    <section class="card">
+        <h4 id="workoutDateLabel" style="margin-top:0;">Today's Session</h4>
+        <div id="workoutStats" class="hidden" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1; background: #f0f2f5; padding: 10px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Total Volume</div>
+                <div id="totalVolumeVal" style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">0</div>
+            </div>
+            <div style="flex: 1; background: #f0f2f5; padding: 10px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.6rem; color: #666; text-transform: uppercase;">Exercises</div>
+                <div id="totalExVal" style="font-size: 1.1rem; font-weight: 800; color: var(--dark);">0</div>
+            </div>
+        </div>
+        <div id="exerciseList" class="meal-list-container">
+        </div>
+        <div id="maxEffortCard" class="hidden" style="background: var(--primary); border-left: 4px solid var(--primary); padding: 10px; margin-top: 10px; border-radius: 4px;">
+            <div style="font-size: 0.7rem; color: var(--dark); font-weight: bold; text-transform: uppercase;">Estimated 1-Rep Max</div>
+            <div id="oneRepMaxVal" style="font-size: 1.2rem; font-weight: 800; color: var(--dark);">--</div>
+            <div style="font-size: 0.65rem; color: #666;">Based on your last logged set.</div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div id="calendarMonth" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
+        <div id="workoutCalendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;"></div>
+    </section>
+
+        <div id="historyDetail" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h5 id="selectedHistoryDate" style="margin: 0; color: var(--dark);"></h5>
+                <button class="tag-btn" onclick="copyWorkoutToClipboard()" style="font-size: 0.7rem;">📋 Copy Session</button>
+            </div>
+            <div id="historyExerciseList"></div>
+        </div>
+    </section>
+
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

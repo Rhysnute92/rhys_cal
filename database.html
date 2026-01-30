@@ -4,65 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness History - Database</title>
-    <link rel="icon" type="image/png" href="rhys_favicon.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<!DOCTYPE html>
 <body>
 
 <div class="container">
-    <header class="app-header"><h1>Eating Habits</h1></header>
-
-    <section class="card">
-        <h3>Weekly Calorie Intake</h3>
-        <div style="height: 200px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px;">
-            <div id="weeklyBars" style="display:flex; width:100%; height:100%; align-items:flex-end; gap:8px;"></div>
+    <header class="app-header">
+        <div class="header-content">
+            <img src="rhys_logo.png" alt="Logo" class="header-logo">
+            <h1>Habits</h1>
+            <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+                🌙
+            </button>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#888; margin-top:5px;">
-            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-        </div>
-    </section>
-
-    <section class="card">
-        <h3>History</h3>
-        <table style="width:100%; font-size:0.8rem; border-collapse: collapse;">
-            <thead>
-            <tr style="text-align:left; border-bottom:2px solid #eee;">
-                <th style="padding:10px 0;">Date</th>
-                <th>Cals</th>
-                <th>P / F / C</th>
-            </tr>
-            </thead>
-            <tbody id="historyBody">
-            </tbody>
-        </table>
-    </section>
-
+    </header>
     <nav class="icon-nav">
-        <a href="index.html" class="nav-item">
-            <img src="dashboard.png" alt="Home"><span>Home</span>
+        <a href="index.html" class="nav-item" title="Dashboard">
+            <img src="dashboard.png" alt="Dashboard">
+            <span>Home</span>
         </a>
-        <a href="log.html" class="nav-item">
-            <img src="diary.png" alt="Log"><span>Log</span>
+        <a href="log.html" class="nav-item" title="Food Diary">
+            <img src="diary.png" alt="Log">
+            <span>Food Diary</span>
         </a>
-        <a href="database.html" class="nav-item active">
-            <img src="history.png" alt="History"><span>Habits</span>
+        <a href="database.html" class="nav-item" title="History">
+            <img src="history.png" alt="History">
+            <span>Habits</span>
+        </a>
+        <a href="training.html" class="nav-item" title="Training">
+            <img src="training.png" alt="Training">
+            <span>Training</span>
         </a>
     </nav>
+
+    <section class="card">
+        <div class="header-with-action">
+            <h3>7-Day Log</h3>
+            <button class="icon-btn" onclick="window.print()">Export PDF</button>
+        </div>
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Food/Drink</th>
+                    <th>Kcal</th>
+                </tr>
+                </thead>
+                <tbody id="weeklySummaryBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="header-with-action">
+            <h4 style="margin:0;">Muscle Group Focus</h4>
+            <small style="color:var(--primary);">Last 7 Days</small>
+        </div>
+
+        <div id="muscleMapContainer" style="margin-top: 20px;">
+        </div>
+
+        <p id="muscleInsight" style="font-size: 0.75rem; color: #666; margin-top: 15px; text-align: center; font-style: italic;">
+            Log a workout to see your training distribution.
+        </p>
+    </section>
+
+    <section class="card">
+        <h3>Calorie Trends</h3>
+        <canvas id="historyChart"></canvas>
+    </section>
 </div>
 
-<section class="card" style="text-align: center;">
-    <button class="icon-btn full-width" onclick="exportToCSV()" style="background: #607d8b;">
-        📥 Download History (CSV)
-    </button>
-    <p style="font-size: 0.7rem; color: #888; margin-top: 8px;">
-        Compatible with Excel, Google Sheets, and Numbers.
+<section class="card">
+    <h4 style="margin-top:0;">Data Management</h4>
+    <p style="font-size: 0.75rem; color: #666; margin-bottom: 15px;">
+        Export your progress to a file or restore it from a previous backup.
     </p>
+
+    <div style="display: flex; gap: 10px;">
+        <button class="icon-btn" onclick="exportData()" style="flex: 1; background: var(--dark);">📥 Backup</button>
+        <button class="icon-btn" onclick="document.getElementById('importFile').click()" style="flex: 1; background: var(--primary);">📤 Restore</button>
+    </div>
+
+    <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
+</section>
+
+<section class="card">
+    <h4>External Imports</h4>
+    <p class="hint">Import CSV data from other fitness tracking apps.</p>
+    <button class="tag-btn" onclick="document.getElementById('mfpImport').click()">
+        🍎 Import MFP CSV
+    </button>
+    <input type="file" id="mfpImport" style="display: none;" onchange="importMFPData(event)">
+</section>
+
+<section class="card">
+    <h4>Database Maintenance</h4>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+        <button class="tag-btn" onclick="cleanDuplicateFoodEntries()" style="background: var(--dark);">
+            🧹 Remove Duplicate Meals
+        </button>
+        <button class="tag-btn" onclick="confirmReset()" style="background: #ff4444; color: white;">
+            ⚠️ Reset All Data
+        </button>
+    </div>
 </section>
 
 <script src="app.js"></script>
 </body>
 </html>
-
