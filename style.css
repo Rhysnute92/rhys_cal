@@ -1,3 +1,51 @@
+/* --- THEME VARIABLES --- */
+:root {
+    /* Light Mode (Default) */
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --text-hint: #666666;
+    --border-color: #eeeeee;
+    --primary: #4CAF50;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark Mode */
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-hint: #b0b0b0;
+        --border-color: #333333;
+    }
+}
+
+/* --- APPLYING VARIABLES --- */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    transition: background 0.3s ease;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+input, select {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #e0e0e0;
+    /* ... rest of dark variables ... */
+}
+
 /* 1. Global Variables & Base Styles */
 :root {
     --primary: #4CAF50;
@@ -579,4 +627,90 @@ input, select {
 #water-bar-dash {
     background-color: #2196F3 !important; /* Specific blue for water */
     transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+<<<<<<< HEAD
+=======
+}
+
+/* --- RESPONSIVE ADAPTATIONS --- */
+
+/* Base settings for mobile */
+:root {
+    --nav-height: 70px;
+}
+
+body {
+    padding-bottom: var(--nav-height); /* Prevent nav from covering content */
+    font-size: 16px; /* Prevents iOS from zooming in on inputs */
+}
+
+/* 1. Mobile-Specific Adjustments (Phones) */
+@media screen and (max-width: 600px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr; /* 2 tiles side-by-side */
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .card {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    /* Date Strip: Make it scrollable if it's too wide */
+    #dateStrip {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Stack input groups vertically */
+    .input-group-row {
+        flex-direction: column;
+    }
+
+    /* Make buttons full width for easier tapping */
+    .icon-btn, .tag-btn {
+        min-height: 44px; /* Apple's recommended minimum tap target */
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    /* Adjust Navigation for thumbs */
+    .icon-nav {
+        height: var(--nav-height);
+        padding: 0 10px;
+    }
+
+    .nav-item span {
+        font-size: 10px;
+    }
+}
+
+/* 2. Tablet Adjustments */
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.adaptive-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.adaptive-grid > * {
+    flex: 1 1 calc(50% - 10px); /* Tries to be 50% width, but shrinks/grows */
+}
+
+@media screen and (max-width: 380px) {
+    .nav-item span {
+        display: none; /* Only show icons on very small phones */
+    }
+    .nav-item img {
+        width: 28px;
+        height: 28px;
+    }
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
 }

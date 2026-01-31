@@ -8,6 +8,7 @@
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -35,13 +36,21 @@
     </div>
 </section>
 
+<<<<<<< HEAD
 <div class="container">function toggleDarkMode() {
+=======
+<div class="container">
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
     <header class="app-header">
         <div class="header-content">
             <img src="rhys_logo.png" alt="Fitness logo" class="header-logo">
             <h1>My Fitness Tracker</h1>
             <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+<<<<<<< HEAD
                 🌙
+=======
+                Dark Mode
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
             </button>
             <span id="offlineStatus" style="font-size: 0.6rem; color: #ff4444; display: none;">📴 Offline Mode</span>
         </div>
@@ -78,6 +87,16 @@
         </div>
         <p id="trainingStatusText" class="hint">Rest Day (1500 kcal)</p>
     </div>
+
+        <div id="restTimerContainer" class="hidden" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; text-align: center;">
+            <div style="font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 5px;">REST TIMER</div>
+            <div id="timerDisplay" style="font-size: 2rem; font-weight: bold;">01:30</div>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                <button class="tag-btn" onclick="startTimer()">▶ Start</button>
+                <button class="tag-btn" onclick="resetTimer()" style="background:#eee; color:#333;">🔄 Reset</button>
+            </div>
+        </div>
+    </section>
 
     <section class="card metrics-card">
         <div class="header-with-action">
@@ -140,7 +159,11 @@
                 <div class="tile-metric" id="dashCurrentWeight">0.0</div>
                 <div class="weight-input-row-mini">
                     <input type="number" id="inputDailyWeight" placeholder="0.0" step="0.1">
+<<<<<<< HEAD
                     <button onclick="logWeight()">Log</button>
+=======
+                    <button onclick="githublogWeight()">Log</button>
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
                 </div>
                 <small id="weightDiff" style="font-size: 0.6rem;"></small>
             </div>
@@ -181,7 +204,11 @@
                 <h4>Hydration</h4>
                 <div class="tile-metric"><span id="dashWater">0</span><small>ml</small></div>
                 <div class="progress-bg" style="height: 6px; margin-top: 5px;">
+<<<<<<< HEAD
                     <div id="water-bar-dash" class="progress-fill" style="width: 0%; background: #2196F3;"></div>
+=======
+                    <div id="water-bar-dash" class="progress-fill" style="width: 0; background: #2196F3;"></div>
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
                 </div>
             </div>
         </section>

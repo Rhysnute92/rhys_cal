@@ -8,6 +8,10 @@
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
+<<<<<<< HEAD
+=======
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -18,7 +22,11 @@
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Gym Tracker</h1>
             <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+<<<<<<< HEAD
                 🌙
+=======
+                Dark Mode
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
             </button>
         </div>
     </header>
@@ -50,6 +58,7 @@
 
 
     <section class="card">
+<<<<<<< HEAD
         <div class="search-wrapper" style="position: relative; margin-bottom: 10px;">
             <input type="text" id="exerciseSearch" placeholder="Search exercises or equipment..." oninput="searchExercises(event)" autocomplete="off">
             <div id="exerciseResults" class="search-results-box hidden"></div>
@@ -95,12 +104,37 @@
             <div id="oneRepMaxVal" style="font-size: 1.2rem; font-weight: 800; color: var(--dark);">--</div>
             <div style="font-size: 0.65rem; color: #666;">Based on your last logged set.</div>
         </div>
+=======
+        <h4>Log Exercise</h4>
+        <input type="text" id="exerciseSearch" onkeyup="searchExercises(event)" placeholder="Search e.g. Bench Press">
+        <div id="exerciseResults" class="search-results hidden"></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
+            <input type="number" id="inputSets" placeholder="Sets">
+            <input type="number" id="inputReps" placeholder="Reps">
+            <input type="number" id="inputWeight" placeholder="Wt (${weightUnit})">
+        </div>
+
+        <button class="icon-btn" onclick="addExercise()" style="width: 100%; margin-top: 15px;">
+            ➕ Add Set
+        </button>
+
+        <div id="pbDisplay" style="font-size: 0.75rem; margin-bottom: 15px; min-height: 1rem;"></div>
+    </section>
+
+    <section class="card">
+        <h4>Today's Session</h4>
+        <div id="trainingLogList"></div>
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
     </section>
 
     <section class="card">
         <div id="calendarMonth" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
         <div id="workoutCalendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;"></div>
+<<<<<<< HEAD
     </section>
+=======
+>>>>>>> cc830f3d90171384b7bba891c7df895e7e97bd6a
 
         <div id="historyDetail" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
