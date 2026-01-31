@@ -7,7 +7,8 @@
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="habits.css">
+    <link rel="stylesheet" href="shared.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -17,19 +18,12 @@
     <header class="app-header">
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
-            <h1>Gym Tracker</h1>
+            <h1>Habits</h1>
             <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
                 Dark Mode
             </button>
         </div>
     </header>
-
-    <div id="restTimerOverlay" class="hidden" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 20px; border-radius: 50px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 2000; border: 1px solid rgba(255,255,255,0.1);">
-        <div onclick="setCustomTimer()" style="cursor: pointer; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; font-weight: bold;">⚙️ SET</div>
-        <div id="timerDisplay" style="font-size: 1.4rem; font-weight: 800; color: var(--primary); min-width: 70px; text-align: center;">01:30</div>
-        <button onclick="stopTimer()" style="background: var(--dark); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-weight: bold;">✕</button>
-    </div>
-
     <nav class="icon-nav">
         <a href="index.html" class="nav-item" title="Dashboard">
             <img src="dashboard.png" alt="Dashboard">
@@ -49,46 +43,108 @@
         </a>
     </nav>
 
-
     <section class="card">
-        <h4>Log Exercise</h4>
-        <input type="text" id="exerciseSearch" onkeyup="searchExercises(event)" placeholder="Search e.g. Bench Press">
-        <div id="exerciseResults" class="search-results hidden"></div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
-            <input type="number" id="inputSets" placeholder="Sets">
-            <input type="number" id="inputReps" placeholder="Reps">
-            <input type="number" id="inputWeight" placeholder="Wt (${weightUnit})">
+        <div class="header-with-action">
+            <h3>7-Day Log</h3>
+            <button class="icon-btn" onclick="window.print()">Export PDF</button>
         </div>
-
-        <button class="icon-btn" onclick="addExercise()" style="width: 100%; margin-top: 15px;">
-            ➕ Add Set
-        </button>
-
-        <div id="pbDisplay" style="font-size: 0.75rem; margin-bottom: 15px; min-height: 1rem;"></div>
-    </section>
-
-    <section class="card">
-        <h4>Today's Session</h4>
-        <div id="trainingLogList"></div>
-    </section>
-
-    <section class="card">
-        <div id="calendarMonth" style="text-align: center; font-weight: bold; margin-bottom: 10px;"></div>
-        <div id="workoutCalendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;"></div>
-
-        <div id="historyDetail" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h5 id="selectedHistoryDate" style="margin: 0; color: var(--dark);"></h5>
-                <button class="tag-btn" onclick="copyWorkoutToClipboard()" style="font-size: 0.7rem;">📋 Copy Session</button>
-            </div>
-            <div id="historyExerciseList"></div>
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Food/Drink</th>
+                    <th>Kcal</th>
+                </tr>
+                </thead>
+                <tbody id="weeklySummaryBody">
+                </tbody>
+            </table>
         </div>
     </section>
 
+    <div class="card">
+        <h4>Log Weight</h4>
 
+        <div class="weight-input-row">
+            <input
+                    type="number"
+                    id="weightInput"
+                    step="0.1"
+                    placeholder="e.g. 85.5"
+                    class="weight-input"
+            >
+            <button class="primary-btn" onclick="githublogWeight()">Save</button>
+        </div>
+    </div>
+
+
+    <section class="card">
+        <h4>Weight Progress</h4>
+        <div class="weight">
+            <canvas id="weightChart"></canvas>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="header-with-action">
+            <h4 style="margin:0;">Muscle Group Focus</h4>
+            <small style="color:var(--primary);">Last 7 Days</small>
+        </div>
+
+        <div class="muscleMapContainer">
+        </div>
+
+        <p id="muscleInsight" style="font-size: 0.75rem; color: #666; margin-top: 15px; text-align: center; font-style: italic;">
+            Log a workout to see your training distribution.
+        </p>
+    </section>
+
+    <section class="card">
+        <h3>Calorie Trends</h3>
+        <canvas id="historyChart"></canvas>
+    </section>
 </div>
 
-<script src="app.js"></script>
+<section class="card">
+    <h4 style="margin-top:0;">Data Management</h4>
+    <p style="font-size: 0.75rem; color: #666; margin-bottom: 15px;">
+        Export your progress to a file or restore it from a previous backup.
+    </p>
+
+    <div style="display: flex; gap: 10px;">
+        <button class="icon-btn" onclick="exportData()" style="flex: 1; background: var(--dark);">📥 Backup</button>
+        <button class="icon-btn" onclick="document.getElementById('importFile').click()" style="flex: 1; background: var(--primary);">📤 Restore</button>
+    </div>
+
+    <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
+</section>
+
+<section class="card">
+    <h4>External Imports</h4>
+    <p class="hint">Import CSV data from other fitness tracking apps.</p>
+    <button class="tag-btn" onclick="document.getElementById('mfpImport').click()">
+        🍎 Import MFP CSV
+    </button>
+    <input type="file" id="mfpImport" style="display: none;" onchange="importMFPData(event)">
+</section>
+
+<section class="card">
+    <h4>Database Maintenance</h4>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+        <button class="tag-btn" onclick="cleanDuplicateFoodEntries()" style="background: var(--dark);">
+            🧹 Remove Duplicate Meals
+        </button>
+        <button class="tag-btn" onclick="confirmReset()" style="background: #ff4444; color: white;">
+            ⚠️ Reset All Data
+        </button>
+    </div>
+</section>
+
+<script type="module" src="state.js"></script>
+<script type="module" src="training.js"></script>
+<script type="module" src="log.js"></script>
+<script type="module" src="ui.js"></script>
 </body>
 </html>

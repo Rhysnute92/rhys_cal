@@ -1,0 +1,98 @@
+:root {
+    --primary: #4CAF50;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    --dark: #2c3e50;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #e0e0e0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Symmetrical centering */
+    margin: 0;
+    padding-bottom: 70px; /* Space for fixed nav [cite: 94] */
+}
+
+.header-logo {
+    width: 300px;
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px; /* Mobile-first limit [cite: 9] */
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* [cite: 20, 21] */
+}
+
+/* Symmetrical Oval Navigation Bar */
+.icon-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px; /* Small gap between buttons */
+    background-color: var(--primary); /* Uses your brand green */
+    padding: 6px 15px; /* Reduced height for a "smaller" look */
+    border-radius: 50px; /* Creates the oval/pill shape */
+    position: fixed;
+    bottom: 20px; /* Floats slightly above the bottom */
+    left: 50%;
+    transform: translateX(-50%); /* Centers the oval perfectly */
+    width: fit-content; /* Only as wide as the buttons inside */
+    max-width: 95%; /* Ensures it doesn't clip on small screens */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: row; /* Icon and text next to each other */
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: background 0.3s ease;
+}
+
+.nav-item img {
+    width: 18px; /* Smaller icons */
+    height: 18px;
+    filter: brightness(1) invert(1); /* Keeps icons white */
+}
+
+.nav-item span {
+    font-size: 0.8rem; /* Small, readable text */
+    font-weight: 600;
+}
+
+/* Active State */
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.2); /* Highlight current page */
+}
+
+.nav-item {
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+}

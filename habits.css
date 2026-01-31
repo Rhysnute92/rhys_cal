@@ -1,0 +1,30 @@
+/* Table Symmetry */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.history-table th, .history-table td {
+    padding: 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+/* Symmetrical Weight Entry */
+.weight-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.weight-input {
+    flex: 1; /* Symmetric expansion */
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}

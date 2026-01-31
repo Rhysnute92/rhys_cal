@@ -1,0 +1,30 @@
+/* Symmetrical Grid for Stats */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 15px;
+    width: 100%;
+}
+
+.grid-tile {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.progress-bg {
+    background: #eee;
+    border-radius: 10px;
+    height: 8px;
+    width: 100%;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: var(--primary);
+    height: 100%;
+    transition: width 0.5s ease;
+}
