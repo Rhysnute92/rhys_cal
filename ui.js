@@ -1,7 +1,37 @@
-import {
-    foodData, waterData, goals, WATER_GOAL,
-    save, todayKey, activeLogDate
-} from './state.js';
+import { isTrainingDay, save, activeLogDate } from './state.js';
+import { foodData, workoutData, weightUnit } from './state.js';
+
+// Initialize the correct page logic based on current URL
+window.addEventListener('DOMContentLoaded', () => {
+    const path = window.location.pathname;
+    if (path.includes('log.html')) {
+        initFoodPage();
+    }
+    // Apply theme on load
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+    }
+});
+
+window.toggleDarkMode = function() {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+};
+
+window.toggleTrainingMode = function() {
+    const checkbox = document.getElementById('trainingMode');
+    const statusText = document.getElementById('trainingStatusText');
+    const isTraining = checkbox.checked;
+
+    save('isTrainingDay', isTraining);
+    statusText.innerText = isTraining ? "Training Day (1800 kcal)" : "Rest Day (1500 kcal)";
+};
+
+window.dismissQuickStart = function() {
+    document.getElementById('quickStartCard').style.display = 'none';
+};
 
 /* ================================
    DASHBOARD
@@ -75,3 +105,50 @@ import { initFoodPage } from './log.js';
 function switchTab(tab) {
     if (tab === 'log') initFoodPage();
 }
+
+
+
+export function renderCharts() {
+    const weightCtx = document.getElementById('weightChart');
+    const historyCtx = document.getElementById('historyChart');
+
+    if (weightCtx) {
+        new Chart(weightCtx, {
+            type: 'line',
+            data: {
+                labels: Object.keys(workoutData).slice(-7), // Last 7 days
+                datasets: [{
+                    label: `Weight (${weightUnit})`,
+                    data: Object.values(workoutData).map(d => d.weight),
+                    borderColor: '#4CAF50',
+                    tension: 0.3,
+                    fill: true,
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)'
+                }]
+            },
+            options: {responsive: true, maintainAspectRatio: false}
+        });
+    }
+
+    if (historyCtx) {
+        const labels = Object.keys(foodData).slice(-7);
+        const dailyCals = labels.map(date =>
+            foodData[date].reduce((sum, meal) => sum + (meal.calories || 0), 0)
+        );
+
+        new Chart(historyCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Calories Consumed',
+                    data: dailyCals,
+                    backgroundColor: '#2c3e50',
+                    borderRadius: 5
+                }]
+            }
+        });
+    }
+}
+
+

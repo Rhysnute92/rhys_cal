@@ -53,7 +53,8 @@ body {
     padding: 6px 15px; /* Reduced height for a "smaller" look */
     border-radius: 50px; /* Creates the oval/pill shape */
     position: fixed;
-    bottom: 20px; /* Floats slightly above the bottom */
+    top: 20px; /* Floats slightly below the top */
+    padding-top: 80px;
     left: 50%;
     transform: translateX(-50%); /* Centers the oval perfectly */
     width: fit-content; /* Only as wide as the buttons inside */

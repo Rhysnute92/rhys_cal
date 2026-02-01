@@ -94,6 +94,13 @@
             <div id="searchResults" class="search-results-box hidden"></div>
         </div>
 
+        <div id="scannerOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
+            <div id="videoView" style="width:100%; height:80%;"></div>
+            <div style="padding: 20px; text-align: center;">
+                <button class="icon-btn" onclick="stopScanner()" style="background:#ff4444; width:80%;">Close Scanner</button>
+            </div>
+        </div>
+
         <div id="interactive" class="viewport hidden" style="position: relative; width:100%; height: 250px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px;">
             <button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">✕</button>
             <div class="video-container"></div>

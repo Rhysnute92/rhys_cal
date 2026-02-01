@@ -28,3 +28,25 @@
     height: 100%;
     transition: width 0.5s ease;
 }
+
+/* Update your existing dashboard.css */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Symmetrical two-column layout */
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.chart-container {
+    grid-column: span 2; /* Full width charts */
+    height: 250px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.tile-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary); /* Balanced green accent */
+}

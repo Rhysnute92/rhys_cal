@@ -1,7 +1,4 @@
-import {
-    workoutData, save, todayKey, gymDB,
-    isTrainingDay, goals
-} from './state.js';
+import {workoutData, save, todayKey, gymDB, isTrainingDay, goals} from './state.js';
 
 /* ================================
    TRAINING LOGIC
@@ -89,6 +86,42 @@ export function updateMuscleMap() {
             <div class="progress-bg">
                 <div class="progress-fill" style="width:${(v/totalVol)*100}%"></div>
             </div>
+        </div>
+    `).join('');
+}
+
+export function logSet(exerciseName, weight, reps) {
+    if (!workoutData[activeLogDate]) workoutData[activeLogDate] = [];
+
+    const exerciseInfo = gymDB.find(ex => ex.name === exerciseName) || { muscle: 'Other' };
+
+    workoutData[activeLogDate].push({
+        name: exerciseName,
+        muscle: exerciseInfo.muscle,
+        weight,
+        reps,
+        timestamp: new Date().getTime()
+    });
+
+    save('workoutData', workoutData);
+    renderMuscleMap();
+}
+
+export function renderMuscleMap() {
+    const container = document.querySelector('.muscleMapContainer');
+    if (!container) return;
+
+    const muscles = {};
+    Object.values(workoutData).flat().forEach(set => {
+        const info = gymDB.find(ex => ex.name === set.name);
+        const muscle = info ? info.muscle : 'Other';
+        muscles[muscle] = (muscles[muscle] || 0) + 1;
+    });
+
+    container.innerHTML = Object.entries(muscles).map(([name, count]) => `
+        <div class="muscle-stat">
+            <span>${name}</span>
+            <div class="progress-bg"><div class="progress-fill" style="width: ${count * 10}%"></div></div>
         </div>
     `).join('');
 }
