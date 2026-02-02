@@ -125,3 +125,78 @@ export function renderMuscleMap() {
         </div>
     `).join('');
 }
+
+// --- TIMER STATE MANAGEMENT ---
+let sessionInterval;
+let restInterval;
+let sessionStartTime;
+let restTimeLeft = 0;
+
+/**
+ * SESSION TIMER LOGIC
+ */
+function startSessionTimer() {
+    if (sessionInterval) return;
+    sessionStartTime = parseInt(localStorage.getItem('activeSessionStart')) || Date.now();
+    localStorage.setItem('activeSessionStart', sessionStartTime);
+
+    document.getElementById('sessionTimerDisplay').style.display = 'block';
+
+    sessionInterval = setInterval(() => {
+        const elapsed = Date.now() - sessionStartTime;
+        const mins = Math.floor(elapsed / 60000);
+        const secs = Math.floor((elapsed % 60000) / 1000);
+        document.getElementById('sessionTimerText').innerText =
+            `Session: ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function finishWorkout() {
+    if(!confirm("Finish workout and stop timer?")) return;
+    clearInterval(sessionInterval);
+    sessionInterval = null;
+    localStorage.removeItem('activeSessionStart');
+    document.getElementById('sessionTimerDisplay').style.display = 'none';
+    completeRest(); // Close rest timer too
+    alert("Workout complete! Great job.");
+}
+
+/**
+ * REST TIMER LOGIC
+ */
+function startRestTimer(seconds = 60) {
+    if (restInterval) clearInterval(restInterval);
+    restTimeLeft = seconds;
+    document.getElementById('restTimerDisplay').style.display = 'block';
+
+    updateRestUI();
+
+    restInterval = setInterval(() => {
+        restTimeLeft--;
+        updateRestUI();
+        if (restTimeLeft <= 0) completeRest();
+    }, 1000);
+}
+
+function updateRestUI() {
+    const mins = Math.floor(restTimeLeft / 60);
+    const secs = restTimeLeft % 60;
+    document.getElementById('restTimerText').innerText = `Rest: ${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function adjustRestTime(seconds) {
+    restTimeLeft += seconds;
+    if (restTimeLeft < 0) restTimeLeft = 0;
+    updateRestUI();
+}
+
+function resetRestTimer() {
+    startRestTimer(60);
+}
+
+function completeRest() {
+    clearInterval(restInterval);
+    restInterval = null;
+    document.getElementById('restTimerDisplay').style.display = 'none';
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+}

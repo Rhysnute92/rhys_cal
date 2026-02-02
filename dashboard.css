@@ -32,7 +32,7 @@
 /* Update your existing dashboard.css */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Symmetrical two-column layout */
+    grid-template-columns: 1fr 2fr; /* Symmetrical two-column layout */
     gap: 15px;
     padding: 10px 0;
 }

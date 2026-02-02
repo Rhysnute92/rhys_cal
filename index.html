@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -114,7 +115,7 @@
             <div class="tile-header"><h4>Steps</h4><span>👣</span></div>
             <div id="dashSteps" class="tile-value">0</div>
             <div class="progress-bg"><div id="steps-bar-dash" class="progress-fill"></div></div>
-            <small>Goal: 10,000</small>
+            <small>Goal: 1,000</small>
         </div>
 
         <div class="card grid-tile" onclick="switchTab('habits')">
@@ -135,9 +136,36 @@
     </div>
  </section>
 
+<section id="training" class="tab-content hidden">
+
+    <div id="sessionTimerDisplay" class="card timer-banner" style="display: none;">
+        <div class="timer-flex">
+            <span class="timer-icon">⏱️</span>
+            <h3 id="sessionTimerText">Session: 00:00</h3>
+            <button class="stop-btn" onclick="finishWorkout()">Finish</button>
+        </div>
+    </div>
+
+    <div id="restTimerDisplay" class="card rest-timer-overlay" style="display: none;">
+        <div class="timer-controls">
+            <button class="adjust-btn" onclick="adjustRestTime(-30)">-30s</button>
+            <div class="timer-main">
+                <h2 id="restTimerText">Rest: 1:00</h2>
+                <small>Next Set Soon</small>
+            </div>
+            <button class="adjust-btn" onclick="adjustRestTime(30)">+30s</button>
+        </div>
+        <div class="timer-actions">
+            <button class="reset-btn" onclick="resetRestTimer()">Reset (60s)</button>
+            <button class="skip-btn" onclick="completeRest()">Skip Rest</button>
+        </div>
+    </div>
+
+    <div class="card">
+    </div>
+</section>
+
 <script type="module" src="state.js"></script>
-<script type="module" src="training.js"></script>
-<script type="module" src="log.js"></script>
 <script type="module" src="ui.js"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@
     --card-bg: #ffffff;
     --text-main: #333333;
     --dark: #2c3e50;
+    --border: #C0C0C0
 }
 
 [data-theme="dark"] {
@@ -96,4 +97,66 @@ body {
     color: white;
     text-decoration: none;
     font-size: 0.9rem;
+}
+
+.app-header {
+    display: flex;
+    flex-direction: column; /* Forces Nav to sit UNDER the Picture */
+    width: 100%;
+}
+
+.header-pic {
+    width: 100%;
+    height: auto;
+    display: block; /* Removes the tiny gap Chrome adds at the bottom of images */
+    object-fit: cover;
+}
+
+.main-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+
+    /* Optional: Sticky Navigation */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.fixed-header-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the 300px picture */
+}
+
+.header-fixed-pic {
+    width: 300px;
+    height: auto;
+    display: block;
+    margin: 10px 0; /* Adds a little breathing room */
+}
+
+.main-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+/* THE FIX FOR CHROME:
+   Adjust this height to match the total height of your pic + nav
+   so your dashboard starts exactly where the header ends. */
+.header-spacer {
+    height: 180px;
 }
