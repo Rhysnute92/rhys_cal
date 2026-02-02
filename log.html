@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Entry - Fitness Tracker</title>
-    <link rel="stylesheet" href="log.css">
     <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="log.css">
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -19,7 +19,7 @@
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Food Diary</h1>
-            <button id="themeToggle" onclick="toggleDarkMode()" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">
+            <button id="themeToggle" onclick="toggleDarkMode()">
                 Dark Mode
             </button>
         </div>
@@ -42,31 +42,31 @@
     </nav>
 
     <section class="card">
-        <div id="dateStrip" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <div id="dateStrip">
         </div>
-        <h3 id="selectedDateDisplay" style="text-align: center; color: var(--primary);">Today</h3>
+        <h3 id="selectedDateDisplay">Today</h3>
     </section>
 
     <section class="card macro-summary-card">
-        <div id="macroTargetDisplay" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+        <div id="macroTargetDisplay">
         </div>
     </section>
 
     <section class="card">
         <h4>Frequently Logged</h4>
-        <div id="frequentFoodsList" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        <div id="frequentFoodsList">
         </div>
     </section>
 
     <section class="card">
         <h4>Log Food</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input type="text" id="manualName" placeholder="Item Name" style="grid-column: span 2;">
+        <div>
+            <input type="text" id="manualName" placeholder="Item Name">
             <input type="number" id="manualCals" placeholder="Cals">
             <input type="number" id="manualPro" placeholder="Protein (g)">
             <input type="number" id="manualFat" placeholder="Fat (g)">
             <input type="number" id="manualCarb" placeholder="Carbs (g)">
-            <button class="icon-btn" onclick="addFoodManually()" style="grid-column: span 2;">Add Entry</button>
+            <button class="icon-btn" onclick="addFoodManually()">Add Entry</button>
         </div>
     </section>
 
@@ -86,45 +86,38 @@
 
         <h3 id="currentTabLabel">Logging Breakfast</h3>
 
-        <div class="search-wrapper" style="position: relative; margin-bottom: 15px;">
-            <div class="search-container" style="display:flex; gap:8px;">
-                <input type="text" id="dbSearch" placeholder="Search 3M+ foods..." oninput="searchGlobalDB(event)" autocomplete="off" style="flex-grow:1;">
-                <button class="icon-btn" style="width:auto; background:#2196F3;" onclick="startScanner()">📷 Scan</button>
+        <div class="search-wrapper">
+            <div class="search-container">
+                <input type="text" id="dbSearch" placeholder="Search 3M+ foods..." oninput="searchGlobalDB(event)" autocomplete="off">
+                <button class="icon-btn" onclick="startScanner()">📷 Scan</button>
             </div>
             <div id="searchResults" class="search-results-box hidden"></div>
         </div>
 
-        <div id="scannerOverlay" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
-            <div id="videoView" style="width:100%; height:80%;"></div>
-            <div style="padding: 20px; text-align: center;">
-                <button class="icon-btn" onclick="stopScanner()" style="background:#ff4444; width:80%;">Close Scanner</button>
-            </div>
-        </div>
-
-        <div id="interactive" class="viewport hidden" style="position: relative; width:100%; height: 250px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px;">
-            <button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold;">✕</button>
+        <div id="interactive" class="viewport hidden">
+            <button onclick="stopScanner()">✕</button>
             <div class="video-container"></div>
         </div>
 
-        <div id="recentScansContainer" class="hidden" style="margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h4 style="font-size: 0.8rem; color: #666; margin: 0;">Recently Scanned</h4>
-                <button onclick="clearRecents()" style="background: none; border: none; color: #ff4444; font-size: 0.7rem; cursor: pointer; text-decoration: underline;">Clear All</button>
+        <div id="recentScansContainer" class="hidden">
+            <div>
+                <h4>Recently Scanned</h4>
+                <button onclick="clearRecents()">Clear All</button>
             </div>
-            <div id="recentScansList" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+            <div id="recentScansList">
             </div>
         </div>
 
-        <div id="manualEntryForm" class="hidden" style="border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-top: 10px; background: #fafafa;">
+        <div id="manualEntryForm" class="hidden">
             <div class="form-group">
                 <input type="text" id="foodName" placeholder="Item Name...">
             </div>
-            <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <div class="input-group" style="flex: 1;">
-                    <label style="font-size: 0.7rem; color: #666;">Kcal</label>
-                    <input type="number" id="foodCalories" style="width: 100%;">
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Kcal</label>
+                    <input type="number" id="foodCalories">
                 </div>
-                <div class="macros-group" style="flex: 2; display: flex; gap: 5px; align-items: flex-end;">
+                <div class="macros-group">
                     <input type="number" id="protein" placeholder="P">
                     <input type="number" id="fat" placeholder="F">
                     <input type="number" id="carbs" placeholder="C">
@@ -136,14 +129,14 @@
                     <h4>Water Tracker</h4>
                     <span id="waterGoalText" class="hint">Goal: 2000ml</span>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
-                    <button class="icon-btn" style="background:#2196F3;" onclick="changeWater(-250)">-</button>
-                    <div style="flex: 1; text-align: center;">
+                <div>
+                    <button class="icon-btn" onclick="changeWater(-250)">-</button>
+                    <div>
                         <strong id="logWaterVal">0</strong> <small>ml</small>
                     </div>
-                    <button class="icon-btn" style="background:#2196F3;" onclick="changeWater(250)">+</button>
+                    <button class="icon-btn">+</button>
                 </div>
-                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                <div>
                     <button class="tag-btn" onclick="setWater(250)">+250ml</button>
                     <button class="tag-btn" onclick="setWater(500)">+500ml</button>
                     <button class="tag-btn" onclick="setWater(1000)">1L</button>
@@ -152,22 +145,22 @@
                 </div>
             </section>
 
-            <div class="form-row multiplier-row" style="margin-bottom: 15px; display: flex; gap: 5px;">
+            <div class="form-row multiplier-row">
                 <button class="tag-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
                 <button class="tag-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
                 <button class="tag-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
             </div>
 
-            <button class="icon-btn full-width" onclick="addFood()" style="background: #4CAF50;">Add to Log</button>
+            <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
         </div>
 
-        <div style="text-align: center; margin-top: 10px;">
-            <button id="toggleManualBtn" style="background:none; border:none; color:#2196F3; font-size:0.8rem; text-decoration: underline; cursor:pointer;" onclick="toggleManualForm()">
+        <div>
+            <button id="toggleManualBtn" onclick="toggleManualForm()">
                 + Add Custom Item Manually
             </button>
         </div>
 
-        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        <hr>
 
         <div id="activeMealList" class="meal-list-container">
         </div>
@@ -180,3 +173,4 @@
 <script type="module" src="ui.js"></script>
 </body>
 </html>
+
