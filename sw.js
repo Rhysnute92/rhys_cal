@@ -2,6 +2,9 @@ const CACHE_NAME = 'fitness-pro-v1';
 const ASSETS = [
     './',
     './index.html',
+    './log.html',
+    './database.html',
+    './training.html',
     './shared.css',
     './dashboard.css',
     './log.css',

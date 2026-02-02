@@ -49,14 +49,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px; /* Small gap between buttons */
     background-color: var(--primary); /* Uses your brand green */
-    padding: 6px 15px; /* Reduced height for a "smaller" look */
     border-radius: 50px; /* Creates the oval/pill shape */
     position: sticky;
     top: 20px; /* Floats slightly below the top */
-    left: 50%;
-    transform: translateX(-50%); /* Centers the oval perfectly */
     width: fit-content; /* Only as wide as the buttons inside */
     max-width: 95%; /* Ensures it doesn't clip on small screens */
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -102,6 +98,7 @@ body {
     display: flex;
     flex-direction: column; /* Forces Nav to sit UNDER the Picture */
     width: 100%;
+    align-items: center;
 }
 
 .header-pic {
@@ -160,7 +157,7 @@ body {
     height: 180px;
 }
 
-.header-logo h1 {
+.header-contzent h1 {
     text-align: center;
 }
 
