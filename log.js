@@ -315,22 +315,7 @@ window.stopScanner = function() {
     document.getElementById('scannerOverlay').classList.add('hidden');
 };
 
-// --- API Search Logic ---
-async function fetchFoodByBarcode(barcode) {
-    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-    const data = await res.json();
-    if (data.status === 1) {
-        fillManualForm({
-            name: data.product.product_name,
-            cals: data.product.nutriments['energy-kcal_100g'],
-            pro: data.product.nutriments.proteins_100g,
-            fat: data.product.nutriments.fat_100g,
-            carb: data.product.nutriments.carbohydrates_100g
-        });
-    } else {
-        alert("Product not found. Try manual entry.");
-    }
-}
+
 
 window.searchFoodDatabase = async function() {
     const query = document.getElementById('foodSearchInput').value;
@@ -383,23 +368,6 @@ window.stopScanner = function() {
     Quagga.stop();
     document.getElementById('scannerOverlay').classList.add('hidden');
 };
-
-// --- API Search Logic ---
-async function fetchFoodByBarcode(barcode) {
-    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-    const data = await res.json();
-    if (data.status === 1) {
-        fillManualForm({
-            name: data.product.product_name,
-            cals: data.product.nutriments['energy-kcal_100g'],
-            pro: data.product.nutriments.proteins_100g,
-            fat: data.product.nutriments.fat_100g,
-            carb: data.product.nutriments.carbohydrates_100g
-        });
-    } else {
-        alert("Product not found. Try manual entry.");
-    }
-}
 
 window.cleanDuplicateFoodEntries = function() {
     let removedCount = 0;

@@ -37,7 +37,7 @@ body {
 }
 
 .card {
-    background: var(--card-bg);
+    background: var(--primary);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
@@ -52,9 +52,8 @@ body {
     background-color: var(--primary); /* Uses your brand green */
     border-radius: 50px; /* Creates the oval/pill shape */
     position: sticky;
-    top: 20px; /* Floats slightly below the top */
-    width: fit-content; /* Only as wide as the buttons inside */
-    max-width: 95%; /* Ensures it doesn't clip on small screens */
+    margin-top: 10px;
+    margin-bottom: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 1000;
 }
@@ -157,10 +156,10 @@ body {
     height: 180px;
 }
 
-.header-contzent h1 {
+h1.header-content {
     text-align: center;
 }
 
-.tab-content h2 {
+h2.tab-content {
     text-align: center;
 }
