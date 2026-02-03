@@ -90,13 +90,33 @@
     <p id="trainingStatusText" class="hint">Rest Day (1500 kcal)</p>
 </section>
 
-<section id="restTimerContainer" class="card rest-timer hidden">
-    <div class="rest-title">REST TIMER</div>
-    <div id="timerDisplay" class="timer-display">01:30</div>
 
-    <div class="timer-controls">
-        <button class="tag-btn" onclick="startTimer()">▶ Start</button>
-        <button class="tag-btn reset-btn" onclick="resetTimer()">🔄 Reset</button>
+<section id="training" class="tab-content hidden">
+
+    <div id="sessionTimerDisplay" class="card timer-banner">
+        <div class="timer-flex">
+            <span class="timer-icon">⏱️</span>
+            <h3 id="sessionTimerText">Session: 00:00</h3>
+            <button class="stop-btn" onclick="finishWorkout()">Finish</button>
+        </div>
+    </div>
+
+    <div id="restTimerDisplay" class="card rest-timer-overlay">
+        <div class="timer-controls">
+            <button class="adjust-btn" onclick="adjustRestTime(-30)">-30s</button>
+            <div class="timer-main">
+                <h2 id="restTimerText">Rest: 1:00</h2>
+                <small>Next Set Soon</small>
+            </div>
+            <button class="adjust-btn" onclick="adjustRestTime(30)">+30s</button>
+        </div>
+        <div class="timer-actions">
+            <button class="reset-btn" onclick="resetRestTimer()">Reset (60s)</button>
+            <button class="skip-btn" onclick="completeRest()">Skip Rest</button>
+        </div>
+    </div>
+
+    <div class="card">
     </div>
 </section>
 
@@ -135,35 +155,6 @@
         <canvas id="weightChart"></canvas>
     </div>
  </section>
-
-<section id="training" class="tab-content hidden">
-
-    <div id="sessionTimerDisplay" class="card timer-banner">
-        <div class="timer-flex">
-            <span class="timer-icon">⏱️</span>
-            <h3 id="sessionTimerText">Session: 00:00</h3>
-            <button class="stop-btn" onclick="finishWorkout()">Finish</button>
-        </div>
-    </div>
-
-    <div id="restTimerDisplay" class="card rest-timer-overlay">
-        <div class="timer-controls">
-            <button class="adjust-btn" onclick="adjustRestTime(-30)">-30s</button>
-            <div class="timer-main">
-                <h2 id="restTimerText">Rest: 1:00</h2>
-                <small>Next Set Soon</small>
-            </div>
-            <button class="adjust-btn" onclick="adjustRestTime(30)">+30s</button>
-        </div>
-        <div class="timer-actions">
-            <button class="reset-btn" onclick="resetRestTimer()">Reset (60s)</button>
-            <button class="skip-btn" onclick="completeRest()">Skip Rest</button>
-        </div>
-    </div>
-
-    <div class="card">
-    </div>
-</section>
 
 <script type="module" src="state.js"></script>
 <script type="module" src="ui.js"></script>
