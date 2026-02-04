@@ -4,7 +4,8 @@
     --card-bg: #ffffff;
     --text-main: #333333;
     --dark: #2c3e50;
-    --border: #C0C0C0
+    --border: #C0C0C0;
+    --text-hint: #664F4F;
 }
 
 [data-theme="dark"] {
@@ -24,7 +25,8 @@ body {
 }
 
 .header-logo {
-    width: 300px;
+    width: 200px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
 }
@@ -51,7 +53,7 @@ body {
     align-items: center;
     background-color: var(--primary); /* Uses your brand green */
     border-radius: 50px; /* Creates the oval/pill shape */
-    position: sticky;
+    position: fixed;
     margin-top: 10px;
     margin-bottom: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -156,10 +158,43 @@ body {
     height: 180px;
 }
 
-h1.header-content {
-    text-align: center;
+.header-content {
+    display: flex;
+    justify-content: center;
 }
 
+h1.header-content {
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.tab-content {
+    display: flex;
+    justify-content: center;
+}
 h2.tab-content {
-    text-align: center;
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 5000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
 }

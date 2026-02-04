@@ -48,3 +48,24 @@ export function getDisplayWeight(kg) {
         ? (kg * 2.20462).toFixed(1)
         : kg.toFixed(1);
 }
+
+// --- GOAL STATE MANAGEMENT ---
+state.goals = JSON.parse(localStorage.getItem('userGoals')) || {
+    cals: 2500,
+    p: 180,
+    c: 250,
+    f: 80,
+    steps: 10000
+};
+
+function saveGoals(newGoals) {
+    state.goals = newGoals;
+    localStorage.setItem('userGoals', JSON.stringify(newGoals));
+    // Check if ui.js is loaded before calling
+    if (typeof updateDashboardStats === "function") {
+        updateDashboardStats();
+    }
+}
+
+
+

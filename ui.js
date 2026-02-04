@@ -151,4 +151,65 @@ export function renderCharts() {
     }
 }
 
+function updateDashboardStats() {
+    const today = getTodayKey();
+    const meals = state.foodData[today] || [];
+
+    // 1. Calculate Totals
+    let totals = { cals: 0, p: 0, c: 0, f: 0 };
+    meals.forEach(m => {
+        totals.cals += m.calories || 0;
+        totals.p += m.protein || 0;
+        totals.c += m.carbs || 0;
+        totals.f += m.fats || 0;
+    });
+
+    // 2. Define Goals (You can move these to state.js later)
+    const goals = { cals: 2500, p: 180, c: 250, f: 80 };
+
+    // 3. Update Text and Bars
+    document.getElementById('dashCals').innerText = totals.cals;
+    document.getElementById('cals-bar-dash').style.width = Math.min((totals.cals / goals.cals) * 100, 100) + "%";
+
+    updateMacroBar('p', totals.p, goals.p);
+    updateMacroBar('c', totals.c, goals.c);
+    updateMacroBar('f', totals.f, goals.f);
+}
+
+// Helper to update individual macro UI
+function updateMacroBar(id, current, goal) {
+    const percent = Math.min((current / goal) * 100, 100);
+    document.getElementById(`${id}-val`).innerText = `${current}g`;
+    document.getElementById(`${id}-bar`).style.width = percent + "%";
+}
+
+// --- GOAL MODAL UI ---
+function toggleGoalModal(show) {
+    const modal = document.getElementById('goalModal');
+    if (!modal) return;
+
+    modal.style.display = show ? 'flex' : 'none';
+
+    if (show) {
+        // Fill the inputs with current values from state.js
+        document.getElementById('goalCals').value = state.goals.cals;
+        document.getElementById('goalP').value = state.goals.p;
+        document.getElementById('goalC').value = state.goals.c;
+        document.getElementById('goalF').value = state.goals.f;
+        document.getElementById('goalSteps').value = state.goals.steps;
+    }
+}
+
+function applyGoals() {
+    const newGoals = {
+        cals: parseInt(document.getElementById('goalCals').value) || 0,
+        p: parseInt(document.getElementById('goalP').value) || 0,
+        c: parseInt(document.getElementById('goalC').value) || 0,
+        f: parseInt(document.getElementById('goalF').value) || 0,
+        steps: parseInt(document.getElementById('goalSteps').value) || 10000
+    };
+
+    saveGoals(newGoals); // Calls the function in state.js
+    toggleGoalModal(false);
+}
 

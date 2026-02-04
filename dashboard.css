@@ -50,3 +50,27 @@
     font-weight: bold;
     color: var(--primary); /* Balanced green accent */
 }
+
+.macro-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.progress-bg.mini {
+    height: 4px; /* Thinner than the main calorie bar */
+    margin: 2px 0;
+}
+
+/* Macro specific colors */
+.protein { background: #ff4757 !important; } /* Reddish */
+.carbs   { background: #2ed573 !important; } /* Greenish */
+.fats    { background: #ffa502 !important; } /* Orange/Yellow */
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-hint);
+}

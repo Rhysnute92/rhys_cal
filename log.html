@@ -19,9 +19,6 @@
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Food Diary</h1>
-            <button id="themeToggle" onclick="toggleDarkMode()">
-                Dark Mode
-            </button>
         </div>
     </header>
 
@@ -58,17 +55,29 @@
         </div>
     </section>
 
-    <section class="card">
-        <h4>Log Food</h4>
-        <div>
-            <input type="text" id="manualName" placeholder="Item Name">
-            <input type="number" id="manualCals" placeholder="Cals">
-            <input type="number" id="manualPro" placeholder="Protein (g)">
-            <input type="number" id="manualFat" placeholder="Fat (g)">
-            <input type="number" id="manualCarb" placeholder="Carbs (g)">
-            <button class="icon-btn" onclick="addFoodManually()">Add Entry</button>
+    <div class="card">
+        <h3>Log Meal</h3>
+        <div class="log-input-group">
+            <input type="text" id="manualName" placeholder="Meal Name (e.g. Chicken & Rice)">
+            <input type="number" id="manualCals" placeholder="Total kcal">
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <small>Protein (g)</small>
+                    <input type="number" id="manualP" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <small>Carbs (g)</small>
+                    <input type="number" id="manualC" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <small>Fats (g)</small>
+                    <input type="number" id="manualF" placeholder="0">
+                </div>
+            </div>
+            <button class="primary-btn full-width-btn" onclick="addFoodManually()">Add to Diary</button>
         </div>
-    </section>
+    </div>
 
     <section class="card">
         <h4>Today's Log</h4>

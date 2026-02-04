@@ -13,68 +13,28 @@
 </head>
 <body>
 
-<section id="quickStartCard" class="card quickstart-card">
-    <div class="quickstart-header">
-        <h3>Welcome, Rhys! 🚀</h3>
-        <button class="close-btn" onclick="dismissQuickStart()">✕</button>
-    </div>
-
-    <p class="quickstart-text">
-        Let's get you set up for success. Follow these steps:
-    </p>
-
-    <div class="step-list">
-        <div class="step-item">
-            <span class="step-num">1</span>
-            <div>
-                <strong>Log a Meal:</strong>
-                Go to the <a href="log.html">Food</a> tab and search for your breakfast.
-            </div>
-        </div>
-
-        <div class="step-item">
-            <span class="step-num">2</span>
-            <div>
-                <strong>Hit the Gym:</strong>
-                Go to <a href="training.html">Gym</a> and log your first set.
-            </div>
-        </div>
-
-        <div class="step-item">
-            <span class="step-num">3</span>
-            <div>
-                <strong>Check Progress:</strong>
-                Visit <a href="database.html">Habits</a> to see your Muscle Map.
-            </div>
-        </div>
-    </div>
-</section>
-
 <header class="app-header">
     <div class="header-content">
-        <img src="rhys_logo.png" class="header-logo">
+        <img src="rhys_logo.png" class="header-logo" alt="nutrition">
         <h1>My Fitness Tracker</h1>
-
-        <button id="themeToggle" onclick="toggleDarkMode()">Dark Mode</button>
-        <span id="offlineStatus">📴 Offline Mode</span>
     </div>
 </header>
 
 <nav class="icon-nav">
     <a href="index.html" class="nav-item">
-        <img src="dashboard.png">
+        <img src="dashboard.png" alt="dash">
         <span>Home</span>
     </a>
     <a href="log.html" class="nav-item">
-        <img src="diary.png">
+        <img src="diary.png" alt="diary">
         <span>Food Diary</span>
     </a>
     <a href="database.html" class="nav-item">
-        <img src="history.png">
+        <img src="history.png" alt="habits">
         <span>Habits</span>
     </a>
     <a href="training.html" class="nav-item">
-        <img src="training.png">
+        <img src="training.png" alt="gym">
         <span>Training</span>
     </a>
 </nav>
@@ -116,6 +76,44 @@
         </div>
     </div>
 
+    <div id="goalModal" class="modal-overlay" style="display: none;">
+        <div class="card modal-content">
+            <h3>Edit Daily Goals</h3>
+            <div class="log-input-group">
+                <label><small>Calories (kcal)</small></label>
+                <input type="number" id="goalCals" placeholder="2500">
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <small>Protein (g)</small>
+                        <input type="number" id="goalP">
+                    </div>
+                    <div class="input-group">
+                        <small>Carbs (g)</small>
+                        <input type="number" id="goalC">
+                    </div>
+                    <div class="input-group">
+                        <small>Fats (g)</small>
+                        <input type="number" id="goalF">
+                    </div>
+                </div>
+
+                <label><small>Steps Goal</small></label>
+                <input type="number" id="goalSteps">
+
+                <div class="timer-actions" style="margin-top: 20px;">
+                    <button class="primary-btn" onclick="applyGoals()">Save Goals</button>
+                    <button class="skip-btn" onclick="toggleGoalModal(false)">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h4>Target Settings</h4>
+        <button class="tag-btn" onclick="toggleGoalModal(true)">✏️ Edit Daily Goals</button>
+    </div>
+
     <div class="card">
     </div>
 </section>
@@ -130,6 +128,22 @@
             <div class="progress-bg"><div id="cals-bar-dash" class="progress-fill"></div></div>
             <small id="calGoalText">Remaining: --</small>
         </div>
+
+        <div class="macro-container">
+            <div class="macro-item">
+                <div class="flex-between"><small>P</small><small id="p-val">0g</small></div>
+                <div class="progress-bg mini"><div id="p-bar" class="progress-fill protein"></div></div>
+            </div>
+            <div class="macro-item">
+                <div class="flex-between"><small>C</small><small id="c-val">0g</small></div>
+                <div class="progress-bg mini"><div id="c-bar" class="progress-fill carbs"></div></div>
+            </div>
+            <div class="macro-item">
+                <div class="flex-between"><small>F</small><small id="f-val">0g</small></div>
+                <div class="progress-bg mini"><div id="f-bar" class="progress-fill fats"></div></div>
+            </div>
+        </div>
+    </div>
 
         <div class="card grid-tile" onclick="switchTab('training')">
             <div class="tile-header"><h4>Steps</h4><span>👣</span></div>
@@ -150,13 +164,15 @@
             <button class="toggle-btn" onclick="setWeightUnit('kg')">KG</button>
         </div>
     </div>
-    </div>
+
     <div class="chart-container">
         <canvas id="weightChart"></canvas>
     </div>
  </section>
 
 <script type="module" src="state.js"></script>
+<script type="module" src="training.js"></script>
+<script type="module" src="log.js"></script>
 <script type="module" src="ui.js"></script>
 </body>
 </html>

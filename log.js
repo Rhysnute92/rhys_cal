@@ -1,5 +1,6 @@
 import {foodData, goals, activeLogDate, save, todayKey} from './state.js';
 import {renderFoodLog} from "./ui";
+import * as state from "./state";
 
 /* ================================
    FOOD LOG INITIALIZATION
@@ -52,30 +53,38 @@ export function selectLogDate(date) {
    FOOD CRUD
 ================================ */
 
-export function addFoodManually({ name, calories, protein, fat, carbs }) {
-    if (!name || calories <= 0) return alert("Invalid food entry");
+function addFoodManually() {
+    // 1. Capture all values
+    const name = document.getElementById('manualName').value || "Unnamed Meal";
+    const cals = parseInt(document.getElementById('manualCals').value) || 0;
+    const p = parseInt(document.getElementById('manualP').value) || 0;
+    const c = parseInt(document.getElementById('manualC').value) || 0;
+    const f = parseInt(document.getElementById('manualF').value) || 0;
 
-    if (!foodData[activeLogDate]) foodData[activeLogDate] = [];
+    const today = getTodayKey();
 
-    foodData[activeLogDate].push({
-        name,
-        calories,
-        protein,
-        fat,
-        carbs,
-        time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+    // 2. Add to state
+    if (!state.foodData[today]) state.foodData[today] = [];
+
+    state.foodData[today].push({
+        name: name,
+        calories: cals,
+        protein: p,
+        carbs: c,
+        fats: f,
+        timestamp: new Date().getTime()
     });
 
-    save('foodData', foodData);
-    renderFoodLog();
-    renderMacroTargets();
-}
+    // 3. Persist and Update UI
+    saveData('foodData', state.foodData);
+    updateDashboardStats(); // This triggers the new bars you added
 
-export function deleteMeal(index) {
-    foodData[activeLogDate].splice(index, 1);
-    save('foodData', foodData);
-    renderFoodLog();
-    renderMacroTargets();
+    // 4. Reset Form
+    document.getElementById('manualName').value = '';
+    document.getElementById('manualCals').value = '';
+    document.getElementById('manualP').value = '';
+    document.getElementById('manualC').value = '';
+    document.getElementById('manualF').value = '';
 }
 
 /* ================================
