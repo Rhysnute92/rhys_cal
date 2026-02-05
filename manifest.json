@@ -1,8 +1,7 @@
 {
-  "name": "Fitness Pro Dashboard",
-  "short_name": "FitnessPro",
-  "description": "Rhys's Ultimate Fitness & Nutrition Tracker",
-  "start_url": "./index.html",
+  "name": "Fitness Tracker Pro",
+  "short_name": "Fitness",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f4f7f6",
   "theme_color": "#4CAF50",

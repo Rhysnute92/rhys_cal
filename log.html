@@ -2,184 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log Entry - Fitness Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Food Diary</title>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="log.css">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 </head>
 <body>
+<header class="app-header">
+    <img src="rhys_logo.png" class="header-logo" alt="Logo">
+    <h1>My Fitness Tracker</h1>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="home">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item">
+            <img src="diary.png" alt="diary">
+            <span>Food</span>
+        </a>
+        <a href="training.html" class="nav-item">
+            <img src="training.png" alt="gym">
+            <span>Gym</span>
+        </a>
+    </nav>
+</header>
+
+<div class="header-spacer"></div>
 
 <div class="container">
     <header class="app-header">
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
             <h1>Food Diary</h1>
+            <section class="card no-print">
+                <button class="icon-btn full-width" onclick="startScanner()" style="background: var(--dark);">
+                    📷 Scan Barcode
+                </button>
+            </section>
+
+            <div id="scannerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
+                <div id="interactive" class="viewport" style="width:100%; height:80vh;"></div>
+                <div style="padding: 20px; text-align: center;">
+                    <button class="icon-btn" onclick="stopScanner()" style="background:red;">Cancel Scan</button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <nav class="icon-nav">
-        <a href="index.html" class="nav-item">
-            <img src="dashboard.png" alt="Dashboard"><span>Home</span>
-        </a>
-        <a href="log.html" class="nav-item active">
-            <img src="diary.png" alt="Log"><span>Food Diary</span>
-        </a>
-        <a href="database.html" class="nav-item">
-            <img src="history.png" alt="History"><span>Habits</span>
-        </a>
-        <a href="training.html" class="nav-item" title="Training">
-            <img src="training.png" alt="Training">
-            <span>Training</span>
-        </a>
-    </nav>
-
-    <section class="card">
-        <div id="dateStrip">
-        </div>
-        <h3 id="selectedDateDisplay">Today</h3>
+    <section class="card no-print">
+        <div id="dateStrip" class="date-strip"></div>
+        <input type="text" id="foodSearch" placeholder="Search food database..." oninput="handleSearch(event)">
+        <div id="searchResults"></div>
     </section>
 
-    <section class="card macro-summary-card">
-        <div id="macroTargetDisplay">
-        </div>
-    </section>
-
-    <section class="card">
-        <h4>Frequently Logged</h4>
-        <div id="frequentFoodsList">
-        </div>
-    </section>
-
-    <div class="card">
-        <h3>Log Meal</h3>
-        <div class="log-input-group">
-            <input type="text" id="manualName" placeholder="Meal Name (e.g. Chicken & Rice)">
-            <input type="number" id="manualCals" placeholder="Total kcal">
-
-            <div class="input-grid">
-                <div class="input-group">
-                    <small>Protein (g)</small>
-                    <input type="number" id="manualP" placeholder="0">
-                </div>
-                <div class="input-group">
-                    <small>Carbs (g)</small>
-                    <input type="number" id="manualC" placeholder="0">
-                </div>
-                <div class="input-group">
-                    <small>Fats (g)</small>
-                    <input type="number" id="manualF" placeholder="0">
-                </div>
-            </div>
-            <button class="primary-btn full-width-btn" onclick="addFoodManually()">Add to Diary</button>
-        </div>
-    </div>
-
-    <section class="card">
-        <h4>Today's Log</h4>
-        <div id="todayFoodList"></div>
-    </section>
-
-    <section class="card entry-card">
-        <div class="meal-tiles">
-            <div class="tile active" onclick="switchTab('Breakfast')">🍳<br>Breakfast</div>
-            <div class="tile" onclick="switchTab('Lunch')">🥗<br>Lunch</div>
-            <div class="tile" onclick="switchTab('Dinner')">🥩<br>Dinner</div>
-            <div class="tile" onclick="switchTab('Drinks')">🥤<br>Drinks</div>
-            <div class="tile" onclick="switchTab('Snack')">🍎<br>Snack</div>
-        </div>
-
-        <h3 id="currentTabLabel">Logging Breakfast</h3>
-
-        <div class="search-wrapper">
-            <div class="search-container">
-                <input type="text" id="dbSearch" placeholder="Search 3M+ foods..." oninput="searchGlobalDB(event)" autocomplete="off">
-                <button class="icon-btn" onclick="startScanner()">📷 Scan</button>
-            </div>
-            <div id="searchResults" class="search-results-box hidden"></div>
-        </div>
-
-        <div id="interactive" class="viewport hidden">
-            <button onclick="stopScanner()">✕</button>
-            <div class="video-container"></div>
-        </div>
-
-        <div id="recentScansContainer" class="hidden">
-            <div>
-                <h4>Recently Scanned</h4>
-                <button onclick="clearRecents()">Clear All</button>
-            </div>
-            <div id="recentScansList">
-            </div>
-        </div>
-
-        <div id="manualEntryForm" class="hidden">
-            <div class="form-group">
-                <input type="text" id="foodName" placeholder="Item Name...">
-            </div>
-            <div class="form-row">
-                <div class="input-group">
-                    <label>Kcal</label>
-                    <input type="number" id="foodCalories">
-                </div>
-                <div class="macros-group">
-                    <input type="number" id="protein" placeholder="P">
-                    <input type="number" id="fat" placeholder="F">
-                    <input type="number" id="carbs" placeholder="C">
-                </div>
-            </div>
-
-            <section class="card">
-                <div class="flex-between">
-                    <h4>Water Tracker</h4>
-                    <span id="waterGoalText" class="hint">Goal: 2000ml</span>
-                </div>
-                <div>
-                    <button class="icon-btn" onclick="changeWater(-250)">-</button>
-                    <div>
-                        <strong id="logWaterVal">0</strong> <small>ml</small>
-                    </div>
-                    <button class="icon-btn">+</button>
-                </div>
-                <div>
-                    <button class="tag-btn" onclick="setWater(250)">+250ml</button>
-                    <button class="tag-btn" onclick="setWater(500)">+500ml</button>
-                    <button class="tag-btn" onclick="setWater(1000)">1L</button>
-                    <button class="tag-btn" onclick="setWater(2000)">2L</button>
-                    <button class="tag-btn" onclick="setWater(4000)">4L</button>
-                </div>
-            </section>
-
-            <div class="form-row multiplier-row">
-                <button class="tag-btn" onclick="multiplyQuantity(0.5)">x0.5</button>
-                <button class="tag-btn" onclick="multiplyQuantity(1.5)">x1.5</button>
-                <button class="tag-btn" onclick="multiplyQuantity(2.0)">x2.0</button>
-            </div>
-
-            <button class="icon-btn full-width" onclick="addFood()">Add to Log</button>
-        </div>
-
-        <div>
-            <button id="toggleManualBtn" onclick="toggleManualForm()">
-                + Add Custom Item Manually
-            </button>
-        </div>
-
-        <hr>
-
+    <section class="card" id="diaryExportSection">
+        <h3>Daily Log</h3>
         <div id="activeMealList" class="meal-list-container">
+        </div>
+        <div class="totals-summary" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+            <strong>Total: </strong> <span id="totalLogCals">0</span> kcal
         </div>
     </section>
 </div>
 
-<script type="module" src="state.js"></script>
-<script type="module" src="training.js"></script>
 <script type="module" src="log.js"></script>
-<script type="module" src="ui.js"></script>
 </body>
 </html>
-

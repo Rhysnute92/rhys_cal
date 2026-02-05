@@ -1,9 +1,8 @@
-/* Symmetrical Grid for Stats */
-.grid-container {
+.dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr; /* Two equal columns */
     gap: 15px;
-    width: 100%;
+    padding: 10px 0;
 }
 
 .grid-tile {
@@ -12,6 +11,15 @@
     flex-direction: column;
     justify-content: center;
     min-height: 120px;
+}
+
+.chart-container {
+    grid-column: span 2; /* Full width for charts */
+    height: 250px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .progress-bg {
@@ -27,50 +35,4 @@
     background: var(--primary);
     height: 100%;
     transition: width 0.5s ease;
-}
-
-/* Update your existing dashboard.css */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr; /* Symmetrical two-column layout */
-    gap: 15px;
-    padding: 10px 0;
-}
-
-.chart-container {
-    grid-column: span 2; /* Full width charts */
-    height: 250px;
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 10px;
-}
-
-.tile-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary); /* Balanced green accent */
-}
-
-.macro-container {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.progress-bg.mini {
-    height: 4px; /* Thinner than the main calorie bar */
-    margin: 2px 0;
-}
-
-/* Macro specific colors */
-.protein { background: #ff4757 !important; } /* Reddish */
-.carbs   { background: #2ed573 !important; } /* Greenish */
-.fats    { background: #ffa502 !important; } /* Orange/Yellow */
-
-.flex-between {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: var(--text-hint);
 }

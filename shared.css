@@ -5,7 +5,6 @@
     --text-main: #333333;
     --dark: #2c3e50;
     --border: #C0C0C0;
-    --text-hint: #664F4F;
 }
 
 [data-theme="dark"] {
@@ -19,21 +18,14 @@ body {
     color: var(--text-main);
     display: flex;
     flex-direction: column;
-    align-items: center; /* Symmetrical centering */
-    margin: 0;
-    padding-bottom: 70px; /* Space for fixed nav [cite: 94] */
-}
-
-.header-logo {
-    width: 200px;
-    margin-top: 10px;
-    display: flex;
     align-items: center;
+    margin: 0;
+    padding-bottom: 70px;
 }
 
 .container {
     width: 100%;
-    max-width: 600px; /* Mobile-first limit [cite: 9] */
+    max-width: 600px;
     padding: 15px;
     box-sizing: border-box;
 }
@@ -42,159 +34,112 @@ body {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* [cite: 20, 21] */
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Symmetrical Oval Navigation Bar */
-.icon-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--primary); /* Uses your brand green */
-    border-radius: 50px; /* Creates the oval/pill shape */
+/* --- Header Layout --- */
+.app-header {
     position: fixed;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-color);
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the logo and h1 */
+    padding-top: 10px;
 }
 
+.header-logo {
+    max-width: 200px; /* Constrained as requested */
+    height: auto;
+    display: block;
+}
+
+h1 {
+    width: 100%;
+    text-align: center; /* Centered underneath picture */
+    margin: 10px 0;
+    font-size: 1.5rem;
+    color: var(--text-main);
+}
+
+/* --- Fixed Navigation Bar --- */
+.icon-nav {
+    position: fixed;
+    top: 140px; /* Adjust this value based on your logo+h1 height */
+    left: 50%;
+    transform: translateX(-50%); /* Centers the 95% width bar */
+    width: 95%; /* Max width 95% */
+    max-width: 570px; /* 95% of a 600px container */
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 999;
+}
+
+/* --- Spacer --- */
+/* This pushes your dashboard content down so it's not hidden behind the fixed header */
+.header-spacer {
+    height: 220px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 15px;
+    box-sizing: border-box;
+    margin-top: 220px; /* Matches spacer to prevent overlap */
+}
+
+/* --- Navigation Items --- */
 .nav-item {
     display: flex;
-    flex-direction: row; /* Icon and text next to each other */
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
     text-decoration: none;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
-    transition: background 0.3s ease;
+    color: var(--text-main);
+    font-size: 0.8rem;
 }
 
 .nav-item img {
-    width: 18px; /* Smaller icons */
-    height: 18px;
-    filter: brightness(1) invert(1); /* Keeps icons white */
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
 }
 
-.nav-item span {
-    font-size: 0.8rem; /* Small, readable text */
-    font-weight: 600;
+/* Add to shared.css */
+* {
+    -webkit-tap-highlight-color: transparent; /* Removes the blue box when tapping buttons */
+    touch-action: manipulation; /* Improves responsiveness of taps */
 }
 
-/* Active State */
-.nav-item.active {
-    background: rgba(255, 255, 255, 0.2); /* Highlight current page */
+body {
+    overscroll-behavior-y: contain; /* Prevents the whole page from "bouncing" when scrolling */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.nav-item {
-    text-align: center;
-    color: white;
-    text-decoration: none;
-    font-size: 0.9rem;
+/* Ensure images don't break the layout */
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 .app-header {
-    display: flex;
-    flex-direction: column; /* Forces Nav to sit UNDER the Picture */
-    width: 100%;
-    align-items: center;
+    padding-top: env(safe-area-inset-top);
 }
 
-.header-pic {
-    width: 100%;
-    height: auto;
-    display: block; /* Removes the tiny gap Chrome adds at the bottom of images */
-    object-fit: cover;
-}
-
-.main-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 0;
-
-    /* Optional: Sticky Navigation */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.fixed-header-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background-color: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers the 300px picture */
-}
-
-.header-fixed-pic {
-    width: 300px;
-    height: auto;
-    display: block;
-    margin: 10px 0; /* Adds a little breathing room */
-}
-
-.main-nav {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-}
-
-/* THE FIX FOR CHROME:
-   Adjust this height to match the total height of your pic + nav
-   so your dashboard starts exactly where the header ends. */
-.header-spacer {
-    height: 180px;
-}
-
-.header-content {
-    display: flex;
-    justify-content: center;
-}
-
-h1.header-content {
-    display: block !important;
-    text-align: center !important;
-    width: 100% !important;
-}
-
-.tab-content {
-    display: flex;
-    justify-content: center;
-}
-h2.tab-content {
-    display: block !important;
-    text-align: center !important;
-    width: 100% !important;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 5000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    width: 90%;
-    max-width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
+/* PDF Export Logic */
+@media print {
+    .icon-nav, .app-header, button, .no-print {
+        display: none !important;
+    }
+    body { background: white; padding: 0; }
+    .container { max-width: 100%; }
+    .card { box-shadow: none; border: 1px solid #eee; }
 }

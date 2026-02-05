@@ -3,146 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness History - Database</title>
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-    <link rel="icon" type="image/png" href="rhys_logo.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <title>Training & History</title>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="habits.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<header class="app-header">
+    <img src="rhys_logo.png" class="header-logo" alt="Logo">
+    <h1>My Fitness Tracker</h1>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="home">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item">
+            <img src="diary.png" alt="diary">
+            <span>Food</span>
+        </a>
+        <a href="training.html" class="nav-item">
+            <img src="training.png" alt="gym">
+            <span>Gym</span>
+        </a>
+    </nav>
+</header>
+
+<div class="header-spacer"></div>
 
 <div class="container">
     <header class="app-header">
         <div class="header-content">
             <img src="rhys_logo.png" alt="Logo" class="header-logo">
-            <h1>Training</h1>
+            <h1>Training & Trends</h1>
         </div>
     </header>
-    <nav class="icon-nav">
-        <a href="index.html" class="nav-item" title="Dashboard">
-            <img src="dashboard.png" alt="Dashboard">
-            <span>Home</span>
-        </a>
-        <a href="log.html" class="nav-item" title="Food Diary">
-            <img src="diary.png" alt="Log">
-            <span>Food Diary</span>
-        </a>
-        <a href="database.html" class="nav-item" title="History">
-            <img src="history.png" alt="History">
-            <span>Habits</span>
-        </a>
-        <a href="training.html" class="nav-item" title="Training">
-            <img src="training.png" alt="Training">
-            <span>Training</span>
-        </a>
-    </nav>
 
     <section class="card">
-        <div class="header-with-action">
-            <h3>7-Day Log</h3>
-            <button class="icon-btn" onclick="window.print()">Export PDF</button>
-        </div>
-        <div class="table-responsive">
-            <table class="history-table">
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Food/Drink</th>
-                    <th>Kcal</th>
-                </tr>
-                </thead>
-                <tbody id="weeklySummaryBody">
-                </tbody>
-            </table>
+        <h3>7-Day Weight Comparison</h3>
+        <p class="hint">Target: <span id="targetWeightDisplay">75</span>kg</p>
+        <div class="chart-container">
+            <canvas id="historyChart"></canvas>
         </div>
     </section>
 
-    <div class="card">
-        <h4>Log Weight</h4>
+    <section class="card no-print">
+        <h4>Log Workout</h4>
+        <input type="text" id="exerciseSearch" placeholder="Search exercises (e.g. Swimming, Walking)...">
+        <div id="exerciseResults"></div>
+    </section>
 
+    <section class="card">
+        <h4>Weight Management</h4>
         <div class="weight-input-row">
-            <input
-                    type="number"
-                    id="weightInput"
-                    step="0.1"
-                    placeholder="e.g. 85.5"
-                    class="weight-input"
-            >
-            <button class="primary-btn" onclick="githublogWeight()">Save</button>
+            <input type="number" id="weightInput" class="weight-input" placeholder="Enter Weight">
+            <button class="icon-btn" onclick="saveWeight()">Save</button>
         </div>
-    </div>
-
-
-    <section class="card">
-        <h4>Weight Progress</h4>
-        <div class="weight">
-            <canvas id="weightChart"></canvas>
-        </div>
-    </section>
-
-    <section class="card">
-        <div class="header-with-action">
-            <h4 >Muscle Group Focus</h4>
-            <small>Last 7 Days</small>
-        </div>
-
-        <div class="muscleMapContainer">
-        </div>
-
-        <p id="muscleInsight">
-            Log a workout to see your training distribution.
-        </p>
-    </section>
-
-    <section class="card">
-        <h3>Calorie Trends</h3>
-        <canvas id="historyChart"></canvas>
     </section>
 </div>
 
-<section class="card">
-    <h4 >Data Management</h4>
-    <p>
-        Export your progress to a file or restore it from a previous backup.
-    </p>
-
-    <div>
-        <button class="icon-btn" onclick="exportData()">📥 Backup</button>
-        <button class="icon-btn" onclick="document.getElementById('importFile').click()">📤 Restore</button>
-    </div>
-
-    <input type="file" id="importFile" onchange="importData(event)">
-</section>
-
-<section class="card">
-    <h4>External Imports</h4>
-    <p class="hint">Import CSV data from other fitness tracking apps.</p>
-    <button class="tag-btn" onclick="document.getElementById('mfpImport').click()">
-        🍎 Import MFP CSV
-    </button>
-    <input type="file" id="mfpImport" onchange="importMFPData(event)">
-</section>
-
-<section class="card">
-    <h4>Database Maintenance</h4>
-    <div>
-        <button class="tag-btn" onclick="cleanDuplicateFoodEntries()">
-            🧹 Remove Duplicate Meals
-        </button>
-        <button class="tag-btn" onclick="confirmReset()">
-            ⚠️ Reset All Data
-        </button>
-    </div>
-</section>
-
-<script type="module" src="state.js"></script>
-<script type="module" src="training.js"></script>
-<script type="module" src="log.js"></script>
 <script type="module" src="ui.js"></script>
 </body>
 </html>
-

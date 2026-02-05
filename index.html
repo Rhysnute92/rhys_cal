@@ -2,177 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fitness Dashboard</title>
+    <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet"  href="shared.css">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <header class="app-header">
-    <div class="header-content">
-        <img src="rhys_logo.png" class="header-logo" alt="nutrition">
-        <h1>My Fitness Tracker</h1>
-    </div>
+    <img src="rhys_logo.png" class="header-logo" alt="Logo">
+    <h1>My Fitness Tracker</h1>
+
+    <nav class="icon-nav">
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="home">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item">
+            <img src="diary.png" alt="diary">
+            <span>Food</span>
+        </a>
+        <a href="training.html" class="nav-item">
+            <img src="training.png" alt="gym">
+            <span>Gym</span>
+        </a>
+    </nav>
 </header>
 
-<nav class="icon-nav">
-    <a href="index.html" class="nav-item">
-        <img src="dashboard.png" alt="dash">
-        <span>Home</span>
-    </a>
-    <a href="log.html" class="nav-item">
-        <img src="diary.png" alt="diary">
-        <span>Food Diary</span>
-    </a>
-    <a href="database.html" class="nav-item">
-        <img src="history.png" alt="habits">
-        <span>Habits</span>
-    </a>
-    <a href="training.html" class="nav-item">
-        <img src="training.png" alt="gym">
-        <span>Training</span>
-    </a>
-</nav>
-
-<section class="card training-toggle-card">
-    <div class="flex-between">
-        <strong>Training Day?</strong>
-        <label class="switch-small">
-            <input type="checkbox" id="trainingMode" onchange="toggleTrainingMode()">
-            <span class="slider-toggle"></span>
-        </label>
-    </div>
-    <p id="trainingStatusText" class="hint">Rest Day (1500 kcal)</p>
-</section>
+<div class="header-spacer"></div>
 
 
-<section id="training" class="tab-content hidden">
+<div class="container">
+    <section class="card">
+        <button id="trainModeBtn" class="full-width" onclick="toggleTrainingMode()" style="background: var(--primary); color: white; padding: 15px; border-radius: 8px; border: none; font-weight: bold;">
+            Mode: Rest Day (1500 kcal)
+        </button>
+    </section>
 
-    <div id="sessionTimerDisplay" class="card timer-banner">
-        <div class="timer-flex">
-            <span class="timer-icon">⏱️</span>
-            <h3 id="sessionTimerText">Session: 00:00</h3>
-            <button class="stop-btn" onclick="finishWorkout()">Finish</button>
-        </div>
-    </div>
-
-    <div id="restTimerDisplay" class="card rest-timer-overlay">
-        <div class="timer-controls">
-            <button class="adjust-btn" onclick="adjustRestTime(-30)">-30s</button>
-            <div class="timer-main">
-                <h2 id="restTimerText">Rest: 1:00</h2>
-                <small>Next Set Soon</small>
-            </div>
-            <button class="adjust-btn" onclick="adjustRestTime(30)">+30s</button>
-        </div>
-        <div class="timer-actions">
-            <button class="reset-btn" onclick="resetRestTimer()">Reset (60s)</button>
-            <button class="skip-btn" onclick="completeRest()">Skip Rest</button>
-        </div>
-    </div>
-
-    <div id="goalModal" class="modal-overlay" style="display: none;">
-        <div class="card modal-content">
-            <h3>Edit Daily Goals</h3>
-            <div class="log-input-group">
-                <label><small>Calories (kcal)</small></label>
-                <input type="number" id="goalCals" placeholder="2500">
-
-                <div class="input-grid">
-                    <div class="input-group">
-                        <small>Protein (g)</small>
-                        <input type="number" id="goalP">
-                    </div>
-                    <div class="input-group">
-                        <small>Carbs (g)</small>
-                        <input type="number" id="goalC">
-                    </div>
-                    <div class="input-group">
-                        <small>Fats (g)</small>
-                        <input type="number" id="goalF">
-                    </div>
-                </div>
-
-                <label><small>Steps Goal</small></label>
-                <input type="number" id="goalSteps">
-
-                <div class="timer-actions" style="margin-top: 20px;">
-                    <button class="primary-btn" onclick="applyGoals()">Save Goals</button>
-                    <button class="skip-btn" onclick="toggleGoalModal(false)">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h4>Target Settings</h4>
-        <button class="tag-btn" onclick="toggleGoalModal(true)">✏️ Edit Daily Goals</button>
-    </div>
-
-    <div class="card">
-    </div>
-</section>
-
-<section id="home" class="tab-content">
-    <h2 class="section-title">Today's Overview</h2>
-
-    <div class="dashboard-grid">
-        <div class="card grid-tile" onclick="switchTab('log')">
+    <section class="dashboard-grid">
+        <div class="card grid-tile">
             <div class="tile-header"><h4>Calories</h4><span>🔥</span></div>
-            <div id="dashCals" class="tile-value">0</div>
-            <div class="progress-bg"><div id="cals-bar-dash" class="progress-fill"></div></div>
-            <small id="calGoalText">Remaining: --</small>
+            <div class="tile-value"><span id="dashCals">0</span> / <span id="calGoal">1500</span></div>
+            <div class="progress-bg"><div id="cal-bar" class="progress-fill"></div></div>
         </div>
 
-        <div class="macro-container">
-            <div class="macro-item">
-                <div class="flex-between"><small>P</small><small id="p-val">0g</small></div>
-                <div class="progress-bg mini"><div id="p-bar" class="progress-fill protein"></div></div>
+        <div class="card grid-tile">
+            <h4>Daily Macros</h4>
+            <div class="macro-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 0.8rem;">
+                <div>P: <span id="p-val">0</span>/200g</div>
+                <div>C: <span id="c-val">0</span>/145g</div>
+                <div>F: <span id="f-val">0</span>/45g</div>
             </div>
-            <div class="macro-item">
-                <div class="flex-between"><small>C</small><small id="c-val">0g</small></div>
-                <div class="progress-bg mini"><div id="c-bar" class="progress-fill carbs"></div></div>
-            </div>
-            <div class="macro-item">
-                <div class="flex-between"><small>F</small><small id="f-val">0g</small></div>
-                <div class="progress-bg mini"><div id="f-bar" class="progress-fill fats"></div></div>
+            <div class="chart-container" style="height: 150px; margin-top: 10px;">
+                <canvas id="macroPieChart"></canvas>
             </div>
         </div>
-    </div>
 
-        <div class="card grid-tile" onclick="switchTab('training')">
-            <div class="tile-header"><h4>Steps</h4><span>👣</span></div>
-            <div id="dashSteps" class="tile-value">0</div>
-            <div class="progress-bg"><div id="steps-bar-dash" class="progress-fill"></div></div>
-            <small>Goal: 1,000</small>
-        </div>
-
-        <div class="card grid-tile" onclick="switchTab('habits')">
-            <div class="tile-header"><h4>Weight</h4><span>⚖️</span></div>
+        <div class="card grid-tile" style="grid-column: span 2;">
+            <div class="tile-header"><h4>Weight Comparison (7-Day)</h4><span>⚖️</span></div>
             <div id="dashWeightDisplay" class="tile-value">-- kg</div>
-            <div id="weightTrend" class="trend-text">Trend: Stable</div>
+            <div class="chart-container">
+                <canvas id="weightComparisonChart"></canvas>
+            </div>
         </div>
+    </section>
 
-    <div class="card grid-tile">
-        <h4>Weight History</h4>
-        <div class="unit-toggle">
-            <button class="toggle-btn" onclick="setWeightUnit('kg')">KG</button>
-        </div>
-    </div>
+    <button class="icon-btn full-width" onclick="window.print()" style="margin-top: 20px;">📑 Export PDF Report</button>
+</div>
 
-    <div class="chart-container">
-        <canvas id="weightChart"></canvas>
-    </div>
- </section>
-
-<script type="module" src="state.js"></script>
-<script type="module" src="training.js"></script>
-<script type="module" src="log.js"></script>
 <script type="module" src="ui.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('Service Worker Failed', err));
+        });
+    }
+</script>
 </body>
 </html>

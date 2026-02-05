@@ -1,26 +1,23 @@
-const CACHE_NAME = 'fitness-pro-v1';
+const CACHE_NAME = 'fitness-v1';
 const ASSETS = [
-    './',
-    './index.html',
-    './log.html',
-    './database.html',
-    './training.html',
-    './shared.css',
-    './dashboard.css',
-    './log.css',
-    './habits.css',
-    './state.js',
-    './log.js',
-    './training.js',
-    './ui.js',
-    './rhys_logo.png',
-    './dashboard.png',
-    './diary.png',
-    './history.png',
-    './training.png'
+    '/',
+    '/index.html',
+    '/log.html',
+    '/training.html',
+    '/shared.css',
+    '/dashboard.css',
+    '/log.css',
+    '/habits.css',
+    '/state.js',
+    '/ui.js',
+    '/log.js',
+    '/training.js',
+    '/rhys_logo.png',
+    '/rhys_favicon.png',
+    '/apple-touch-icon.png'
 ];
 
-// Install Service Worker and cache assets
+// Install Service Worker
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -29,7 +26,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Serve cached content when offline
+// Fetching assets from cache
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {

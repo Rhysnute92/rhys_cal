@@ -1,92 +1,22 @@
-/* Table Symmetry */
-.table-responsive {
-    overflow-x: auto;
-    width: 100%;
-}
-
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
-
-.history-table th, .history-table td {
-    padding: 12px 8px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-
-/* Symmetrical Weight Entry */
 .weight-input-row {
     display: flex;
     gap: 10px;
 }
 
 .weight-input {
-    flex: 1; /* Symmetric expansion */
+    flex: 1;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #ddd;
 }
 
-/* Session Banner at top of Training Tab */
-.timer-banner {
-    background: var(--primary) !important;
-    color: white;
-    margin: 10px;
-    padding: 10px 20px;
-}
-.timer-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.stop-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid white;
-    color: white;
-    border-radius: 5px;
-    padding: 5px 10px;
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Floating Rest Timer Overlay */
-.rest-timer-overlay {
-    position: fixed;
-    top: 15%;
-    left: 10px;
-    right: 10px;
-    z-index: 2000;
-    background: var(--card-bg);
-    border: 2px solid var(--primary);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.timer-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.adjust-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 1.2rem;
-}
-
-.timer-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.reset-btn, .skip-btn {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-color);
-    color: var(--text-main);
+.history-table th, .history-table td {
+    padding: 12px 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
 }
