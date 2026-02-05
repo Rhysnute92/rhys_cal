@@ -52,10 +52,16 @@ body {
     padding-top: 10px;
 }
 
+.header-content {
+    text-align: center;
+    width: 100%;
+}
+
 .header-logo {
     max-width: 200px; /* Constrained as requested */
     height: auto;
     display: block;
+    margin-top: 20px;
 }
 
 h1 {
@@ -67,20 +73,17 @@ h1 {
 }
 
 /* --- Fixed Navigation Bar --- */
+/* The Nav Bar - Fixed 95% width underneath H1 */
 .icon-nav {
-    position: fixed;
-    top: 140px; /* Adjust this value based on your logo+h1 height */
-    left: 50%;
-    transform: translateX(-50%); /* Centers the 95% width bar */
-    width: 95%; /* Max width 95% */
-    max-width: 570px; /* 95% of a 600px container */
-    background: var(--card-bg);
+    width: 95%;
+    max-width: 500px;
+    background: var(--primary);
     display: flex;
     justify-content: space-around;
     padding: 10px 0;
-    border-radius: 12px;
+    border-radius: 15px;
+    margin-bottom: 10px; /* Space before content starts */
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 999;
 }
 
 /* --- Spacer --- */
@@ -103,7 +106,7 @@ h1 {
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    color: var(--text-main);
+    color: var(--dark);
     font-size: 0.8rem;
 }
 
