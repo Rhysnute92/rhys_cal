@@ -1,74 +1,85 @@
 /* log.js */
-import { foodData, todayKey, saveState } from './state.js';
+import {foodData, todayKey, saveState, gymDB} from './state.js';
 
-async function fetchFoodByBarcode(code) {
-    try {
-        const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
-        const data = await response.json();
+window.fetchProductByBarcode = function(barcode) {
+    // 1. Start the fetch request
+    fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            // 2. Check if product exists in the Open Food Facts database
+            if (data.status === 1) {
+                const product = data.product;
 
-        if (data.status === 1) {
-            const p = data.product;
-            const scannedItem = {
-                name: p.product_name || "Unknown",
-                protein: p.nutriments.proteins_100g || 0,
-                carbs: p.nutriments.carbohydrates_100g || 0,
-                fats: p.nutriments.fat_100g || 0,
-                calories: Math.round(p.nutriments['energy-kcal_100g'] || 0)
-            };
+                // 3. Map the API data to our app's format
+                const newItem = {
+                    name: product.product_name || "Unknown Product",
+                    calories: Math.round(product.nutriments['energy-kcal_100g'] || 0),
+                    protein: product.nutriments.proteins_100g || 0,
+                    carbs: product.nutriments.carbohydrates_100g || 0,
+                    fats: product.nutriments.fat_100g || 0
+                };
 
-            // TRIGGER THE FORM UPDATE
-            fillManualForm(scannedItem);
+                // 4. Send the data to the manual form
+                fillManualForm(newItem);
 
-            // Haptic Feedback for success
-            if (window.navigator.vibrate) window.navigator.vibrate(200);
-        }
-    } catch (err) {
-        console.error("Scanner Error:", err);
-    }
-}
+                // 5. Success feedback
+                if (window.navigator.vibrate) window.navigator.vibrate(200);
+            } else {
+                alert("Product not found. Please enter details manually.");
+            }
+        })
+        .catch(error => {
+            console.error("Barcode Fetch Error:", error);
+            alert("Could not connect to food database.");
+        });
+};
 
-// This listens for a successful barcode scan
-Quagga.onDetected(function(data) {
-    const code = data.codeResult.code;
+/* --- Live Search Logic --- */
 
-    // 1. Give haptic feedback (vibrate)
-    if (window.navigator.vibrate) window.navigator.vibrate(200);
-
-    // 2. Turn off the camera
-    stopScanner();
-
-    // 3. Search for the product
-    fetchFoodByBarcode(code);
-});
-
-/* --- handleSearch Logic --- */
 window.handleSearch = function(event) {
-    const query = event.target.value.toLowerCase();
+    const query = event.target.value.toLowerCase().trim();
     const resultsContainer = document.getElementById('searchResults');
 
-    // 1. Clear results if the search bar is empty
-    if (!query) {
+    // 1. If search is empty, hide suggestions
+    if (query.length < 1) {
         resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'none';
         return;
     }
 
-    // 2. Filter the database (assuming gymDB or a foodDB is imported)
-    // Here we filter by name or muscle/category
+    // 2. Filter the database (using gymDB from state.js for now)
     const matches = gymDB.filter(item =>
-        item.name.toLowerCase().includes(query) ||
-        (item.muscle && item.muscle.toLowerCase().includes(query))
-    );
+        item.name.toLowerCase().includes(query)
+    ).slice(0, 5); // Limit to top 5 results for mobile speed
 
-    // 3. Generate the HTML for the dropdown
-    resultsContainer.innerHTML = matches.map(item => `
-        <div class="search-item" onclick="selectSearchItem('${item.name}')">
-            <div>
-                <strong>${item.name}</strong><br>
+    // 3. Render suggestions
+    if (matches.length > 0) {
+        resultsContainer.style.display = 'block';
+        resultsContainer.innerHTML = matches.map(item => `
+            <div class="suggestion-item" onclick="selectSearchItem('${item.name}')">
+                <strong>${item.name}</strong>
                 <small>${item.muscle || 'Food'}</small>
             </div>
-            <span class="plus-icon">+</span>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        resultsContainer.innerHTML = '<div class="suggestion-item">No results found</div>';
+    }
+};
+
+// This function fires when you tap a suggestion
+window.selectSearchItem = function(name) {
+    const nameField = document.getElementById('foodSearch');
+    nameField.value = name;
+
+    // Clear suggestions
+    document.getElementById('searchResults').innerHTML = '';
+    document.getElementById('searchResults').style.display = 'none';
+
+    // Optional: If you have macro data for this item, fill the form
+    // findItemAndPopulate(name);
 };
 
 window.selectSearchItem = function(name) {
@@ -136,41 +147,281 @@ window.startScanner = function() {
         document.getElementById('scannerOverlay').style.display = 'none';
     };
 
-    async function fetchProductByBarcode(barcode) {
-        try {
-            const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-            const data = await response.json();
+// 1. The Scanner Listener
+    Quagga.onDetected(function(data) {
+        const code = data.codeResult.code;
 
-            if (data.status === 1) {
-                const product = data.product;
-                const newItem = {
-                    name: product.product_name || "Unknown Product",
-                    calories: Math.round(product.nutriments['energy-kcal_100g'] || 0),
-                    protein: product.nutriments.proteins_100g || 0,
-                    carbs: product.nutriments.carbohydrates_100g || 0,
-                    fats: product.nutriments.fat_100g || 0
-                };
+        // Stop scanner immediately to freeze the frame
+        Quagga.stop();
+        document.getElementById('scannerOverlay').style.display = 'none';
 
-                // Pass the data to the form
-                fillManualForm(newItem);
-            } else {
-                alert("Product not found. Try manual entry.");
-            }
-        } catch (error) {
-            console.error("API Error:", error);
-        }
-    }
+        // Call the function that uses .then()
+        fetchProductByBarcode(code);
+    });
+
+// 2. The Fetch Function using .then()
+    window.fetchProductByBarcode = function(barcode) {
+        // We return the fetch promise so we can chain .then()
+        return fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`)
+            .then(function(response) {
+                if (!response.ok) throw new Error('API unreachable');
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.status === 1) {
+                    const p = data.product;
+                    const item = {
+                        name: p.product_name || "Unknown",
+                        protein: p.nutriments.proteins_100g || 0,
+                        carbs: p.nutriments.carbohydrates_100g || 0,
+                        fats: p.nutriments.fat_100g || 0,
+                        calories: Math.round(p.nutriments['energy-kcal_100g'] || 0)
+                    };
+
+                    // Call the form filler
+                    fillManualForm(item);
+                } else {
+                    alert("Barcode not recognized.");
+                }
+            })
+            .catch(function(err) {
+                console.error("Fetch error:", err);
+            });
+    };
 
     function fillManualForm(item) {
+        // Show the form first
+        const form = document.getElementById('manualEntryForm');
+        form.style.display = 'block';
+
+        // Map the scanned data to the HTML fields
         document.getElementById('foodSearch').value = item.name;
-        // Assuming you have input IDs for these:
-        if (document.getElementById('manualP')) document.getElementById('manualP').value = item.protein;
-        if (document.getElementById('manualC')) document.getElementById('manualC').value = item.carbs;
-        if (document.getElementById('manualF')) document.getElementById('manualF').value = item.fats;
-        if (document.getElementById('manualCal')) document.getElementById('manualCal').value = item.calories;
+        document.getElementById('manualP').value = item.protein;
+        document.getElementById('manualC').value = item.carbs;
+        document.getElementById('manualF').value = item.fats;
+        document.getElementById('manualCal').value = item.calories;
+
+        // Smooth scroll to the form so the user sees it on their phone
+        form.scrollIntoView({ behavior: 'smooth' });
     }
 
     function hapticFeedback() {
         if (window.navigator.vibrate) window.navigator.vibrate(200);
     }
 }
+
+window.saveScannedFood = function() {
+    const foodName = document.getElementById('foodSearch').value;
+    const p = parseFloat(document.getElementById('manualP').value) || 0;
+    const c = parseFloat(document.getElementById('manualC').value) || 0;
+    const f = parseFloat(document.getElementById('manualF').value) || 0;
+    const kcal = parseInt(document.getElementById('manualCal').value) || 0;
+
+    if (!foodName) return alert("Enter a name");
+
+    const today = getTodayString();
+
+    // 1. Get the full history object or create a new one
+    // Structure: { "2026-02-09": [...items], "2026-02-10": [...] }
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+
+    // 2. Initialize the array for today if it doesn't exist
+    if (!history[today]) {
+        history[today] = [];
+    }
+
+    // 3. Add the new entry
+    history[today].push({
+        id: Date.now(),
+        name: foodName,
+        protein: p,
+        carbs: c,
+        fats: f,
+        calories: kcal
+    });
+
+    // 4. Save back to localStorage
+    localStorage.setItem('foodHistory', JSON.stringify(history));
+
+    // UI Reset
+    alert("Saved for today!");
+    document.getElementById('manualEntryForm').style.display = 'none';
+    displayDailyLog(); // Refresh the list
+};
+
+function displayDailyLog() {
+    const logContainer = document.getElementById('dailyLogList');
+    if (!logContainer) return;
+
+    const today = getTodayString();
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+    const entries = history[today] || []; // Only get today's items
+
+    if (entries.length === 0) {
+        logContainer.innerHTML = '<p style="text-align:center; padding:20px; color:#888;">No food logged for today.</p>';
+        return;
+    }
+
+    logContainer.innerHTML = entries.map(item => `
+        <div class="log-item">
+            <div>
+                <strong>${item.name}</strong><br>
+                <small>P: ${item.protein}g | C: ${item.carbs}g | F: ${item.fats}g</small>
+            </div>
+            <div style="font-weight:bold;">${item.calories} kcal</div>
+        </div>
+    `).reverse().join('');
+}
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+    const picker = document.getElementById('logDatePicker');
+    if (picker) {
+        // Set the calendar to today's date by default
+        picker.value = new Date().toISOString().split('T')[0];
+    }
+    displayDailyLog();
+});
+
+function displayDailyLog() {
+    const logContainer = document.getElementById('dailyLogList');
+    const picker = document.getElementById('logDatePicker');
+    if (!logContainer || !picker) return;
+
+    const selectedDate = picker.value; // Get date from the UI
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+    const entries = history[selectedDate] || [];
+
+    if (entries.length === 0) {
+        logContainer.innerHTML = `
+            <div class="empty-state">
+                <p>No entries for ${selectedDate === new Date().toISOString().split('T')[0] ? 'today' : selectedDate}</p>
+            </div>`;
+        return;
+    }
+
+    logContainer.innerHTML = entries.map(item => `
+        <div class="log-item">
+            <div>
+                <strong>${item.name}</strong><br>
+                <small>P: ${item.protein}g | C: ${item.carbs}g | F: ${item.fats}g</small>
+            </div>
+            <div class="log-kcal">${item.calories} kcal</div>
+        </div>
+    `).reverse().join('');
+}
+
+/* --- Tab Selection Logic --- */
+window.selectTab = function(element, category) {
+    // 1. Remove 'active' class from all buttons in this group
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    // 2. Add 'active' class to the clicked button
+    element.classList.add('active');
+
+    // 3. Update the hidden input value
+    document.getElementById('mealType').value = category;
+
+    // 4. Haptic feedback for mobile
+    if (window.navigator.vibrate) window.navigator.vibrate(10);
+};
+
+/* --- Summary Card Logic --- */
+window.updateDailySummary = function(entries) {
+    const summaryDiv = document.getElementById('daySummary');
+    if (!summaryDiv) return;
+
+    const totals = entries.reduce((acc, item) => {
+        acc.p += item.protein;
+        acc.c += item.carbs;
+        acc.f += item.fats;
+        acc.kcal += item.calories;
+        return acc;
+    }, { p: 0, c: 0, f: 0, kcal: 0 });
+
+    summaryDiv.innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-item"><strong>${totals.kcal}</strong><span>Kcal</span></div>
+            <div class="summary-item"><strong>${totals.p.toFixed(1)}g</strong><span>Prot</span></div>
+            <div class="summary-item"><strong>${totals.c.toFixed(1)}g</strong><span>Carb</span></div>
+            <div class="summary-item"><strong>${totals.f.toFixed(1)}g</strong><span>Fat</span></div>
+        </div>
+    `;
+};
+
+/* --- Clear Daily Log Function --- */
+window.clearDailyLog = function() {
+    const selectedDate = document.getElementById('logDatePicker').value;
+    if (confirm(`Delete all entries for ${selectedDate}?`)) {
+        const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+        delete history[selectedDate];
+        localStorage.setItem('foodHistory', JSON.stringify(history));
+        displayDailyLog();
+    }
+};
+
+/* --- Updated Display Logic with Delete Button --- */
+window.displayDailyLog = function() {
+    const logContainer = document.getElementById('dailyLogList');
+    const selectedDate = document.getElementById('logDatePicker').value;
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+    const entries = history[selectedDate] || [];
+
+    // Update the Summary Card
+    updateDailySummary(entries);
+
+    if (entries.length === 0) {
+        logContainer.innerHTML = '<p class="empty-state">No entries for this date.</p>';
+        return;
+    }
+
+    const categories = ["Breakfast", "Dinner", "Tea", "Snacks", "Drinks"];
+    let html = '';
+
+    categories.forEach(cat => {
+        const catItems = entries.filter(item => item.category === cat);
+        if (catItems.length > 0) {
+            html += `<h4 class="meal-title">${cat}</h4>`;
+            catItems.forEach(item => {
+                html += `
+                <div class="log-item">
+                    <div class="log-info">
+                        <strong>${item.name}</strong><br>
+                        <small>P:${item.protein} C:${item.carbs} F:${item.fats}</small>
+                    </div>
+                    <div class="log-actions">
+                        <span class="log-kcal">${item.calories} kcal</span>
+                        <button class="delete-btn" onclick="deleteLogItem(${item.id})">×</button>
+                    </div>
+                </div>`;
+            });
+        }
+    });
+    logContainer.innerHTML = html;
+};
+
+/* --- Delete Individual Item --- */
+window.deleteLogItem = function(itemId) {
+    const selectedDate = document.getElementById('logDatePicker').value;
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+
+    if (history[selectedDate]) {
+        // Filter out the item with the matching ID
+        history[selectedDate] = history[selectedDate].filter(item => item.id !== itemId);
+
+        // If the day is now empty, you can choose to delete the date key entirely
+        if (history[selectedDate].length === 0) delete history[selectedDate];
+
+        localStorage.setItem('foodHistory', JSON.stringify(history));
+
+        // Refresh the UI
+        displayDailyLog();
+
+        // Subtle haptic feedback
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
+    }
+};
+
+// Run this when the page loads
+document.addEventListener('DOMContentLoaded', displayDailyLog);

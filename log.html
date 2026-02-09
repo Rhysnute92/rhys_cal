@@ -46,19 +46,51 @@
             <button class="icon-btn" onclick="stopScanner()" style="background:red;">Cancel Scan</button>
         </div>
     </div>
-    </div>
 </header>
 
 <div class="header-spacer"></div>
 
+<div id="daySummary" class="card summary-container">
+</div>
+
 <div class="container">
+    <div id="manualEntryForm" class="card" style="display:none;">
+        <div class="meal-tabs-container">
+            <label>Select Meal</label>
+            <div class="meal-tabs">
+                <button type="button" class="tab-btn active" onclick="selectTab(this, 'Breakfast')">Breakfast</button>
+                <button type="button" class="tab-btn" onclick="selectTab(this, 'Dinner')">Dinner</button>
+                <button type="button" class="tab-btn" onclick="selectTab(this, 'Tea')">Tea</button>
+                <button type="button" class="tab-btn" onclick="selectTab(this, 'Snacks')">Snacks</button>
+                <button type="button" class="tab-btn" onclick="selectTab(this, 'Drinks')">Drinks</button>
+            </div>
+            <input type="hidden" id="mealType" value="Breakfast">
+        </div>
+        <h3>Scanned Item Details</h3>
 
+        <label>Food Name</label>
+        <input type="text" id="foodSearch" placeholder="Product Name">
 
-    <section class="card no-print">
-        <div id="dateStrip" class="date-strip"></div>
-        <input type="text" id="foodSearch" placeholder="Search food database..." oninput="handleSearch(event)">
-        <div id="searchResults"></div>
-    </section>
+        <div class="macro-grid">
+            <div>
+                <label>Protein (g)</label>
+                <input type="number" id="manualP" step="0.1">
+            </div>
+            <div>
+                <label>Carbs (g)</label>
+                <input type="number" id="manualC" step="0.1">
+            </div>
+            <div>
+                <label>Fat (g)</label>
+                <input type="number" id="manualF" step="0.1">
+            </div>
+        </div>
+
+        <label>Calories (kcal)</label>
+        <input type="number" id="manualCal">
+
+        <button onclick="saveScannedFood()" class="btn-primary">Add to Log</button>
+    </div>
 
     <section class="card" id="diaryExportSection">
         <h3>Daily Log</h3>
@@ -66,6 +98,20 @@
         </div>
         <div class="totals-summary" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
             <strong>Total: </strong> <span id="totalLogCals">0</span> kcal
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="log-header">
+            <h3>Food Diary</h3>
+            <input type="date" id="logDatePicker" onchange="displayDailyLog()">
+        </div>
+
+        <div id="dailyLogList">
+        </div>
+
+        <div class="log-footer">
+            <button onclick="clearDailyLog()" class="btn-clear">Clear Selected Day</button>
         </div>
     </section>
 </div>

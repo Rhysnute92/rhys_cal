@@ -1,5 +1,4 @@
-/* ui.js */
-import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
+ import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
@@ -73,3 +72,55 @@ function renderCharts(totals) {
         });
     }
 }
+
+// index.js
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const totals = getTotalsForDate(today);
+
+    const nutritionTile = document.getElementById('nutritionTile');
+    if (nutritionTile) {
+        nutritionTile.innerHTML = `
+            <h3>Today's Nutrition</h3>
+            <div class="tile-stats">
+                <p><strong>${totals.kcal}</strong> Calories</p>
+                <div class="mini-macro-bar">
+                    <span>P: ${totals.p.toFixed(0)}g</span>
+                    <span>C: ${totals.c.toFixed(0)}g</span>
+                    <span>F: ${totals.f.toFixed(0)}g</span>
+                </div>
+            </div>
+        `;
+    }
+});
+
+// index.js
+document.addEventListener('DOMContentLoaded', () => {
+    const calorieGoal = 1800; // You can change this or pull from localStorage
+    const today = new Date().toISOString().split('T')[0];
+
+    // Use the function we created earlier
+    const totals = getTotalsForDate(today);
+
+    // Calculate percentage (capped at 100%)
+    const percentage = Math.min((totals.kcal / calorieGoal) * 100, 100);
+    const remaining = calorieGoal - totals.kcal;
+
+    // Update Progress Bar
+    const bar = document.getElementById('kcalProgressBar');
+    if (bar) {
+        bar.style.width = percentage + '%';
+        // Change color to red if over goal
+        if (totals.kcal > calorieGoal) {
+            bar.style.background = '#ff4444';
+        }
+    }
+
+    // Update Text
+    const remainingText = document.getElementById('kcalRemaining');
+    if (remainingText) {
+        remainingText.innerText = remaining >= 0
+            ? `${remaining} kcal remaining`
+            : `${Math.abs(remaining)} kcal over goal`;
+    }
+});

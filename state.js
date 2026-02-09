@@ -65,3 +65,77 @@ export function getDisplayWeight(kg) {
         ? (kg * 2.20462).toFixed(1)
         : kg.toFixed(1);
 }
+
+function getTodayString() {
+    const today = new Date();
+    // Returns YYYY-MM-DD
+    return today.toISOString().split('T')[0];
+}
+
+// Calculates totals for any given date
+window.getTotalsForDate = function(dateString) {
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+    const entries = history[dateString] || [];
+
+    return entries.reduce((acc, item) => {
+        acc.p += parseFloat(item.protein) || 0;
+        acc.c += parseFloat(item.carbs) || 0;
+        acc.f += parseFloat(item.fats) || 0;
+        acc.kcal += parseInt(item.calories) || 0;
+        return acc;
+    }, { p: 0, c: 0, f: 0, kcal: 0 });
+};
+
+// Specifically updates the card on the Log page
+window.updateLogSummaryUI = function() {
+    const selectedDate = document.getElementById('logDatePicker').value;
+    const totals = getTotalsForDate(selectedDate);
+    const summaryDiv = document.getElementById('daySummary');
+
+    if (!summaryDiv) return;
+
+    summaryDiv.innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-item"><span class="label">Kcal</span><strong>${totals.kcal}</strong></div>
+            <div class="summary-item"><span class="label">Prot</span><strong>${totals.p.toFixed(0)}g</strong></div>
+            <div class="summary-item"><span class="label">Carb</span><strong>${totals.c.toFixed(0)}g</strong></div>
+            <div class="summary-item"><span class="label">Fat</span><strong>${totals.f.toFixed(0)}g</strong></div>
+        </div>
+    `;
+};
+
+/* --- Settings & Goals --- */
+window.saveGoals = function() {
+    const goals = {
+        calories: parseInt(document.getElementById('goalKcal').value) || 2000,
+        protein: parseInt(document.getElementById('goalP').value) || 150,
+        carbs: parseInt(document.getElementById('goalC').value) || 200,
+        fats: parseInt(document.getElementById('goalF').value) || 60
+    };
+    localStorage.setItem('userGoals', JSON.stringify(goals));
+    alert("Goals updated!");
+};
+
+/* --- Dynamic Tile Management --- */
+window.renderDashboard = function() {
+    const grid = document.getElementById('mainGrid');
+    const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
+
+    grid.innerHTML = activeTiles.map(tile => {
+        if (tile === 'nutrition') return createNutritionTile();
+        if (tile === 'gym') return createGymTile();
+        if (tile === 'settings') return createSettingsTile();
+        // Add more logic here for custom tiles
+        return `<div class="card"><h3>${tile}</h3><p>Custom Tracker</p></div>`;
+    }).join('') + `<div class="card add-tile" onclick="openModal()">+ Add Tile</div>`;
+};
+
+function createSettingsTile() {
+    return `
+        <div class="card settings-tile" onclick="window.location.href='settings.html'">
+            <h3>Settings</h3>
+            <p>Update Goals & Profile</p>
+            <div class="icon-circle">⚙️</div>
+        </div>
+    `;
+}

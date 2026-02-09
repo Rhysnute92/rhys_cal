@@ -9,7 +9,7 @@ const ASSETS = [
     '/log.css',
     '/habits.css',
     '/state.js',
-    '/ui.js',
+    '/index.js',
     '/log.js',
     '/training.js',
     '/rhys_logo.png',

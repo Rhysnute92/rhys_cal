@@ -38,6 +38,21 @@
 
 <div class="header-spacer"></div>
 
+<div id="mainGrid" class="dashboard-grid">
+</div>
+
+<div id="addTileModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Add New Tile</h3>
+        <select id="tileType">
+            <option value="water">Water Tracker</option>
+            <option value="steps">Step Counter</option>
+            <option value="sleep">Sleep Log</option>
+        </select>
+        <button onclick="addNewTile()" class="btn-primary">Add to Dashboard</button>
+        <button onclick="closeModal()" class="btn-text">Cancel</button>
+    </div>
+</div>
 
 <div class="container">
     <section class="card">
@@ -65,6 +80,16 @@
             </div>
         </div>
 
+        <div class="card grid-tile" onclick="window.location.href='log.html'">
+            <div id="nutritionTile">
+                <h3>Daily Nutrition</h3>
+                <div class="progress-container">
+                    <div id="kcalProgressBar" class="progress-fill"></div>
+                </div>
+                <p id="kcalRemaining" class="remaining-text"></p>
+            </div>
+        </div>
+
         <div class="card grid-tile" style="grid-column: span 2;">
             <div class="tile-header"><h4>Weight Comparison (7-Day)</h4><span>⚖️</span></div>
             <div id="dashWeightDisplay" class="tile-value">-- kg</div>
@@ -77,7 +102,7 @@
     <button class="icon-btn full-width" onclick="window.print()" style="margin-top: 20px;">📑 Export PDF Report</button>
 </div>
 
-<script type="module" src="ui.js"></script>
+<script type="module" src="index.js"></script>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

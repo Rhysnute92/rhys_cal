@@ -80,3 +80,202 @@ input, select {
 .search-item:hover {
     background: #f9f9f9;
 }
+
+.suggestions-box {
+    position: absolute;
+    top: 100%; /* Sits directly under the input */
+    left: 0;
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid #ddd;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    z-index: 3000; /* High z-index to stay above everything */
+    display: none; /* Hidden by default */
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:active {
+    background-color: #f4f7f6; /* Mobile tap feedback */
+}
+
+.suggestion-item strong {
+    font-size: 0.95rem;
+    color: var(--dark);
+}
+
+.suggestion-item small {
+    color: #888;
+}
+
+.macro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.macro-grid input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#logDatePicker {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+}
+
+.log-kcal {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.meal-tabs-container {
+    margin: 15px 0;
+}
+
+.meal-tabs {
+    display: flex;
+    background: #eee;
+    padding: 4px;
+    border-radius: 12px;
+    gap: 2px;
+    overflow-x: auto; /* Allows swiping if screen is narrow */
+}
+
+.meal-title {
+    background: #f4f7f6;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: var(--primary);
+    margin: 15px 0 5px 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.log-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.log-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.delete-btn {
+    background: #ffebeb;
+    color: #ff4444;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.delete-btn:active {
+    background: #ff4444;
+    color: white;
+}
+
+.log-info small {
+    color: #666;
+    font-size: 0.75rem;
+}
+.tab-btn {
+    flex: 1;
+    border: none;
+    padding: 10px 5px;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Summary Grid Styling */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.summary-item span {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #888;
+}
