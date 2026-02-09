@@ -124,3 +124,64 @@ document.addEventListener('DOMContentLoaded', () => {
             : `${Math.abs(remaining)} kcal over goal`;
     }
 });
+
+ /* --- Inside your renderDashboard function --- */
+ // Add this to your existing switch or if/else block:
+ if (tile === 'water') return createWaterTile();
+
+ /* --- The Water Tile Function --- */
+ function createWaterTile() {
+     const today = new Date().toISOString().split('T')[0];
+     const waterHistory = JSON.parse(localStorage.getItem('waterLog')) || {};
+     const intake = waterHistory[today] || 0;
+     const goal = 8; // Default 8 glasses
+
+     return `
+        <div class="card water-tile">
+            <div class="water-header">
+                <h3>Water</h3>
+                <span class="water-count">${intake}/${goal}</span>
+            </div>
+            <div class="water-grid">
+                ${generateWaterIcons(intake)}
+            </div>
+            <button class="btn-water-add" onclick="addWater()">+ Add Glass</button>
+        </div>
+    `;
+ }
+
+ function generateWaterIcons(count) {
+     let icons = '';
+     for (let i = 1; i <= 8; i++) {
+         icons += `<span class="drop ${i <= count ? 'filled' : ''}">💧</span>`;
+     }
+     return icons;
+ }
+
+ window.addWater = function() {
+     const today = new Date().toISOString().split('T')[0];
+     const waterHistory = JSON.parse(localStorage.getItem('waterLog')) || {};
+
+     // Increment count for today
+     waterHistory[today] = (waterHistory[today] || 0) + 1;
+
+     localStorage.setItem('waterLog', JSON.stringify(waterHistory));
+
+     // Refresh only the dashboard to show the new drop
+     renderDashboard();
+
+     // Haptic feedback (vibes when you add water)
+     if (window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+ };
+
+ window.addNewTile = function() {
+     const type = document.getElementById('tileType').value;
+     const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
+
+     if (!activeTiles.includes(type)) {
+         activeTiles.push(type);
+         localStorage.setItem('activeTiles', JSON.stringify(activeTiles));
+         renderDashboard();
+     }
+     closeModal();
+ };

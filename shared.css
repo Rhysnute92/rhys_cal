@@ -247,3 +247,46 @@ img {
     margin-top: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+.water-tile {
+    background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+    color: #006064;
+}
+
+.water-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.water-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin: 10px 0;
+    font-size: 1.2rem;
+}
+
+.drop {
+    opacity: 0.3;
+    filter: grayscale(1);
+    transition: all 0.3s ease;
+}
+
+.drop.filled {
+    opacity: 1;
+    filter: grayscale(0);
+    transform: scale(1.1);
+}
+
+.btn-water-add {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #00acc1;
+    padding: 8px;
+    border-radius: 8px;
+    color: #006064;
+    font-weight: bold;
+    cursor: pointer;
+}
+
