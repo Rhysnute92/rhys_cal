@@ -1,18 +1,31 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
-    branches: ["main"] # Ensure your branch is named main, not master
+    branches: ["main"]
+
+# Add this specific block here
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# The rest of your file continues as normal...
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # This means "upload everything in this folder"
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
