@@ -16,7 +16,7 @@
 <header class="app-header">
     <div class="header-content">
         <img src="rhys_logo.png" class="header-logo" alt="Logo">
-        <h1>My Fitness Tracker</h1>
+        <h1>Food Diary</h1>
     </div>
 
     <nav class="icon-nav">
@@ -33,29 +33,26 @@
             <span>Gym</span>
         </a>
     </nav>
+
+    <section class="card no-print">
+        <button class="icon-btn full-width" onclick="startScanner()" style="background: var(--dark);">
+            📷 Scan Barcode
+        </button>
+    </section>
+
+    <div id="scannerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
+        <div id="interactive" class="viewport" style="width:100%; height:80vh;"></div>
+        <div style="padding: 20px; text-align: center;">
+            <button class="icon-btn" onclick="stopScanner()" style="background:red;">Cancel Scan</button>
+        </div>
+    </div>
+    </div>
 </header>
 
 <div class="header-spacer"></div>
 
 <div class="container">
-    <header class="app-header">
-        <div class="header-content">
-            <img src="rhys_logo.png" alt="Logo" class="header-logo">
-            <h1>Food Diary</h1>
-            <section class="card no-print">
-                <button class="icon-btn full-width" onclick="startScanner()" style="background: var(--dark);">
-                    📷 Scan Barcode
-                </button>
-            </section>
 
-            <div id="scannerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
-                <div id="interactive" class="viewport" style="width:100%; height:80vh;"></div>
-                <div style="padding: 20px; text-align: center;">
-                    <button class="icon-btn" onclick="stopScanner()" style="background:red;">Cancel Scan</button>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <section class="card no-print">
         <div id="dateStrip" class="date-strip"></div>
