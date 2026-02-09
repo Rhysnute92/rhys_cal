@@ -139,3 +139,40 @@ function createSettingsTile() {
         </div>
     `;
 }
+
+/* state.js - Shared logic for all pages */
+const getToday = () => new Date().toISOString().split('T')[0];
+
+// Universal Update for Dashboard Trackers
+window.updateTracker = function(type, val = null) {
+    const today = getToday();
+    let storageKey = type === 'water' ? 'waterLog' : type === 'steps' ? 'stepsLog' : 'sleepLog';
+    let data = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+    if (type === 'water') {
+        data[today] = (data[today] || 0) + 1;
+    } else if (type === 'steps') {
+        const input = prompt("Total steps for today:", data[today] || "");
+        if (input === null) return;
+        data[today] = parseInt(input) || 0;
+    } else if (type === 'sleep') {
+        data[today] = parseFloat(val);
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify(data));
+    if (typeof renderDashboard === "function") renderDashboard();
+    if (window.navigator.vibrate) window.navigator.vibrate(20);
+};
+
+// Global totals for the Index and Log summaries
+window.getTotalsForDate = function(dateString) {
+    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
+    const entries = history[dateString] || [];
+    return entries.reduce((acc, item) => {
+        acc.p += parseFloat(item.protein) || 0;
+        acc.c += parseFloat(item.carbs) || 0;
+        acc.f += parseFloat(item.fats) || 0;
+        acc.kcal += parseInt(item.calories) || 0;
+        return acc;
+    }, { p: 0, c: 0, f: 0, kcal: 0 });
+};

@@ -6,6 +6,7 @@
   <title>Fitness Dashboard</title>
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="dashboard.css">
+  <script src="settings.js"></script>
   <link rel="icon" type="image/png" href="rhys_logo.png">
   <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -37,6 +38,12 @@
   <section class="card">
     <h3>Manage Dashboard</h3>
     <button onclick="resetTiles()" class="btn-clear">Reset Tiles to Default</button>
+  </section>
+
+  <section class="card">
+    <h3>Data Management</h3>
+    <p>Download your history as a spreadsheet file.</p>
+    <button onclick="exportDataToCSV()" class="btn-primary">Export All Data (CSV)</button>
   </section>
 </div>
 </body>

@@ -127,3 +127,26 @@ window.deleteWorkout = function(index) {
     save('workoutData', workoutData);
     renderWorkoutLog();
 };
+
+/* training.js - Gym & Weight History */
+window.saveExercise = function() {
+    const log = JSON.parse(localStorage.getItem('exerciseLog')) || [];
+    log.push({
+        date: getToday(),
+        name: document.getElementById('exerciseName').value,
+        weight: document.getElementById('weightLifted').value,
+        reps: document.getElementById('repsDone').value
+    });
+    localStorage.setItem('exerciseLog', JSON.stringify(log));
+    renderExerciseHistory();
+};
+
+window.saveBodyWeight = function() {
+    const history = JSON.parse(localStorage.getItem('weightHistory')) || [];
+    history.push({
+        date: getToday(),
+        weight: parseFloat(document.getElementById('bodyWeight').value)
+    });
+    localStorage.setItem('weightHistory', JSON.stringify(history));
+    renderWeightChart(); // Updates the graph
+};

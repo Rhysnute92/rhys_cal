@@ -4,13 +4,12 @@ on:
   push:
     branches: ["main"]
 
-# Add this specific block here
+# This block is essential to fix the "id-token: write" permission error
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# The rest of your file continues as normal...
 jobs:
   deploy:
     environment:

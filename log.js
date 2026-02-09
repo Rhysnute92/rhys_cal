@@ -120,32 +120,56 @@ function renderFoodLog() {
     `).join('');
 }
 
-/* --- Barcode Scanner Logic --- */
+/* log.js - Scanner and Food Entry */
+let baseMacros = { p: 0, c: 0, f: 0, kcal: 0 };
 
-window.startScanner = function() {
-    document.getElementById('scannerOverlay').style.display = 'block';
+// 1. Camera Control
+async function startCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    document.getElementById('video').srcObject = stream;
+    document.getElementById('camera-container').style.display = 'block';
+    // Logic for Quagga/Barcode scanning would trigger here
+}
 
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#interactive'),
-            constraints: {facingMode: "environment"}
-        },
-        decoder: {readers: ["ean_reader", "ean_8_reader", "upc_reader"]}
-    }, function (err) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        Quagga.start();
-    });
+function stopCamera() {
+    const video = document.getElementById('video');
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById('camera-container').style.display = 'none';
+}
 
-    window.stopScanner = function () {
-        let Quagga;
-        Quagga.stop();
-        document.getElementById('scannerOverlay').style.display = 'none';
-    };
+// 2. Barcode Handling & Auto-Form Fill
+window.handleBarcodeScan = async function(barcode) {
+    const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await response.json();
+
+    if (data.status === 1) {
+        const p = data.product;
+        baseMacros = {
+            p: p.nutriments.proteins_100g || 0,
+            c: p.nutriments.carbohydrates_100g || 0,
+            f: p.nutriments.fat_100g || 0,
+            kcal: p.nutriments['energy-kcal_100g'] || 0
+        };
+
+        document.getElementById('foodSearch').value = p.product_name || "Unknown";
+        recalculateMacros(); // Fill fields based on default 100g
+
+        stopCamera(); // Auto-close camera
+        document.getElementById('manualEntryForm').style.display = 'block';
+    }
+};
+
+window.recalculateMacros = function() {
+    const qty = parseFloat(document.getElementById('servingSize').value) || 100;
+    const factor = qty / 100;
+
+    document.getElementById('manualP').value = (baseMacros.p * factor).toFixed(1);
+    document.getElementById('manualC').value = (baseMacros.c * factor).toFixed(1);
+    document.getElementById('manualF').value = (baseMacros.f * factor).toFixed(1);
+    document.getElementById('manualCal').value = Math.round(baseMacros.kcal * factor);
+};
 
 // 1. The Scanner Listener
     Quagga.onDetected(function(data) {
@@ -189,25 +213,25 @@ window.startScanner = function() {
             });
     };
 
-    function fillManualForm(item) {
-        // Show the form first
-        const form = document.getElementById('manualEntryForm');
-        form.style.display = 'block';
 
-        // Map the scanned data to the HTML fields
-        document.getElementById('foodSearch').value = item.name;
-        document.getElementById('manualP').value = item.protein;
-        document.getElementById('manualC').value = item.carbs;
-        document.getElementById('manualF').value = item.fats;
-        document.getElementById('manualCal').value = item.calories;
+function fillManualForm(item) {
+    // Show the form first
+    const form = document.getElementById('manualEntryForm');
+    form.style.display = 'block';
 
-        // Smooth scroll to the form so the user sees it on their phone
-        form.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Map the scanned data to the HTML fields
+    document.getElementById('foodSearch').value = item.name;
+    document.getElementById('manualP').value = item.protein;
+    document.getElementById('manualC').value = item.carbs;
+    document.getElementById('manualF').value = item.fats;
+    document.getElementById('manualCal').value = item.calories;
 
-    function hapticFeedback() {
-        if (window.navigator.vibrate) window.navigator.vibrate(200);
-    }
+    // Smooth scroll to the form so the user sees it on their phone
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function hapticFeedback() {
+    if (window.navigator.vibrate) window.navigator.vibrate(200);
 }
 
 window.saveScannedFood = function() {

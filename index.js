@@ -185,3 +185,124 @@ document.addEventListener('DOMContentLoaded', () => {
      }
      closeModal();
  };
+
+ /* index.js - Dashboard Controller */
+
+ document.addEventListener('DOMContentLoaded', () => {
+     // Display today's date in the header
+     const options = { weekday: 'long', day: 'numeric', month: 'long' };
+     document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString(undefined, options);
+     renderDashboard();
+ });
+
+ window.renderDashboard = function() {
+     const grid = document.getElementById('mainGrid');
+     if (!grid) return;
+
+     // Default tiles if none are set
+     const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
+
+     grid.innerHTML = activeTiles.map(tile => {
+         switch(tile) {
+             case 'nutrition': return createNutritionTile();
+             case 'water':     return createWaterTile();
+             case 'steps':     return createStepsTile();
+             case 'sleep':     return createSleepTile();
+             case 'gym':       return createGymTile();
+             case 'settings':  return createSettingsTile();
+             default: return '';
+         }
+     }).join('') + `<div class="card add-tile" onclick="openModal()">+ Add Tracker</div>`;
+ };
+
+ // --- Tile Creators ---
+
+ function createNutritionTile() {
+     const today = new Date().toISOString().split('T')[0];
+     const totals = getTotalsForDate(today);
+     const goals = JSON.parse(localStorage.getItem('userGoals')) || { calories: 2000 };
+     const progress = Math.min((totals.kcal / goals.calories) * 100, 100);
+
+     return `
+        <div class="card nutrition-tile" onclick="window.location.href='log.html'">
+            <h3>Nutrition</h3>
+            <div class="stat-main"><strong>${totals.kcal}</strong> <small>/ ${goals.calories} kcal</small></div>
+            <div class="progress-container">
+                <div class="progress-fill" style="width: ${progress}%; background: ${totals.kcal > goals.calories ? '#ff4444' : 'var(--primary-color)'}"></div>
+            </div>
+            <div class="mini-macros">
+                <span>P: ${totals.p.toFixed(0)}g</span>
+                <span>C: ${totals.c.toFixed(0)}g</span>
+                <span>F: ${totals.f.toFixed(0)}g</span>
+            </div>
+        </div>
+    `;
+ }
+
+ function createGymTile() {
+     const log = JSON.parse(localStorage.getItem('exerciseLog')) || [];
+     const lastWorkout = log.length > 0 ? log[log.length - 1].name : "No workouts yet";
+     return `
+        <div class="card gym-tile" onclick="window.location.href='training.html'">
+            <h3>Training</h3>
+            <p>Last: ${lastWorkout}</p>
+            <div class="icon-circle">🏋️</div>
+        </div>
+    `;
+ }
+
+ function createSettingsTile() {
+     return `
+        <div class="card settings-tile" onclick="window.location.href='settings.html'">
+            <h3>Settings</h3>
+            <p>Goals & Layout</p>
+            <div class="icon-circle">⚙️</div>
+        </div>
+    `;
+ }
+
+ // --- Modal Controls ---
+ window.openModal = () => document.getElementById('addTileModal').style.display = 'flex';
+ window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
+
+ /* --- Steps Tile Function --- */
+ function createStepsTile() {
+     const today = new Date().toISOString().split('T')[0];
+     const stepsData = JSON.parse(localStorage.getItem('stepsLog')) || {};
+     const count = stepsData[today] || 0;
+     const goal = 10000;
+     const progress = Math.min((count / goal) * 100, 100);
+
+     return `
+        <div class="card steps-tile">
+            <h3>Steps</h3>
+            <div class="stat-main">
+                <strong>${count.toLocaleString()}</strong> 
+                <small>/ ${goal.toLocaleString()}</small>
+            </div>
+            <div class="progress-container">
+                <div class="progress-fill" style="width: ${progress}%; background: #4caf50;"></div>
+            </div>
+            <button class="btn-tile-action" onclick="updateTracker('steps')">Log Steps</button>
+        </div>
+    `;
+ }
+
+ /* --- Sleep Tile Function --- */
+ function createSleepTile() {
+     const today = new Date().toISOString().split('T')[0];
+     const sleepData = JSON.parse(localStorage.getItem('sleepLog')) || {};
+     const hours = sleepData[today] || 0;
+
+     return `
+        <div class="card sleep-tile">
+            <h3>Sleep</h3>
+            <div class="stat-main">
+                <strong>${hours}</strong> <small>hrs</small>
+            </div>
+            <input type="range" min="0" max="12" step="0.5" value="${hours}" 
+                   onchange="updateTracker('sleep', this.value)" class="sleep-slider">
+            <p class="label">Last Night</p>
+        </div>
+    `;
+ }
