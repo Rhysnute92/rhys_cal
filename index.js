@@ -306,3 +306,52 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
  }
+
+ /* index.js - Dashboard Display */
+ document.addEventListener('DOMContentLoaded', () => {
+     renderDashboard();
+     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString();
+ });
+
+ function renderDashboard() {
+     const grid = document.getElementById('mainGrid');
+     const today = getToday(); // From state.js
+
+     // Get Data
+     const totals = getTotalsForDate(today);
+     const water = (JSON.parse(localStorage.getItem('waterLog')) || {})[today] || 0;
+     const steps = (JSON.parse(localStorage.getItem('stepsLog')) || {})[today] || 0;
+     const sleep = (JSON.parse(localStorage.getItem('sleepLog')) || {})[today] || 0;
+
+     grid.innerHTML = `
+        <div class="card" onclick="location.href='log.html'">
+            <h3>Nutrition</h3>
+            <p><strong>${totals.kcal}</strong> kcal</p>
+            <div class="progress-bar"><div style="width:${Math.min(totals.kcal/20, 100)}%"></div></div>
+        </div>
+
+        <div class="card">
+            <h3>Water</h3>
+            <p>${water} Cups</p>
+            <button class="btn-tile" onclick="updateTracker('water')">+ Add Cup</button>
+        </div>
+
+        <div class="card">
+            <h3>Steps</h3>
+            <p>${steps.toLocaleString()}</p>
+            <button class="btn-tile" onclick="updateTracker('steps')">Log Steps</button>
+        </div>
+
+        <div class="card">
+            <h3>Sleep</h3>
+            <p>${sleep} hrs</p>
+            <input type="range" min="0" max="12" step="0.5" value="${sleep}" 
+                   onchange="updateTracker('sleep', this.value)">
+        </div>
+
+        <div class="card" onclick="location.href='training.html'">
+            <h3>Training</h3>
+            <p>View Progress →</p>
+        </div>
+    `;
+ }
