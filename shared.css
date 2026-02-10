@@ -78,34 +78,58 @@ body {
     z-index: 1000;
 }
 
-.nav-bar {
-    background-color: var(--secondary);
-    width: 90%;            /* Fits within page margins */
-    max-width: 400px;      /* Keeps it from getting too wide on tablets */
-    height: 60px;
-    border-radius: 50px;   /* Creates the oval/pill shape */
+/* Navigation Wrapper */
+.nav-wrapper {
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    z-index: 1000;
 }
 
-/* Nav Link Styling */
+/* The Oval/Pill Shape */
+.nav-bar {
+    background-color: var(--secondary);
+    width: 95%;            /* Widened to fit text */
+    max-width: 450px;      /* Prevents stretching on tablets */
+    height: 55px;
+    border-radius: 50px;   /* Oval ends */
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Nav Item (Icon + Word) */
 .nav-item {
     color: white;
     text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    width: 20px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.2s;
+    align-items: center;    /* Center vertically */
+    justify-content: center;
+    gap: 6px;               /* Space between icon and word */
+    padding: 8px 12px;
+    border-radius: 30px;    /* Individual pill highlight on tap */
+    transition: background 0.2s;
 }
 
+.nav-item span:first-child {
+    font-size: 1.2rem;      /* Icon size */
+}
+
+.nav-text {
+    font-size: 0.75rem;     /* Small font to fit everything */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Tap Feedback */
 .nav-item:active {
-    transform: scale(0.9);
+    background-color: rgba(255, 255, 255, 0.15);
 }
     /* Nutrition Hero Tile spans 2 columns */
 
