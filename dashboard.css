@@ -16,7 +16,7 @@
 .chart-container {
     grid-column: span 2; /* Full width for charts */
     height: 250px;
-    background: var(--card-bg);
+    background: var(--card);
     border-radius: 12px;
     padding: 10px;
     margin-top: 10px;
