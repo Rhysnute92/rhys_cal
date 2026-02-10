@@ -1,8 +1,8 @@
 /* --- Root Variables & Reset --- */
 :root {
-    --primary: #4dbdff;
+    --primary: #4caf50;
     --secondary: #6c757d;
-    --success: #4caf50;
+    --success: #4dbdff;
     --danger: #ff4444;
     --bg: #f8f9fa;
     --card: #ffffff;
@@ -47,7 +47,7 @@ body {
     height: auto;
     display: block; /* Ensures margin: auto works */
     margin: 0 auto; /* Perfect horizontal centering */
-
+}
     /* --- Dashboard Grid (2 Columns) --- */
 
     .dashboard-grid {
@@ -66,7 +66,46 @@ body {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         border: 1px solid rgba(0, 0, 0, 0.03);
     }
+/* Navigation Container */
+.nav-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 20px; /* Floating at the bottom */
+    left: 0;
+    z-index: 1000;
+}
 
+.nav-bar {
+    background-color: var(--secondary);
+    width: 90%;            /* Fits within page margins */
+    max-width: 400px;      /* Keeps it from getting too wide on tablets */
+    height: 60px;
+    border-radius: 50px;   /* Creates the oval/pill shape */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Nav Link Styling */
+.nav-item {
+    color: white;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
     /* Nutrition Hero Tile spans 2 columns */
 
     .nutrition-tile {
@@ -181,4 +220,3 @@ body {
         overflow: hidden;
         background: #000;
     }
-}
