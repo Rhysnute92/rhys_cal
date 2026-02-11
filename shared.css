@@ -127,6 +127,13 @@ body {
     letter-spacing: 0.5px;
 }
 
+.nav-item img {
+    width: 100px;
+    height: 100px;
+    object-fit:  contain;
+    display: block;
+}
+
 /* Tap Feedback */
 .nav-item:active {
     background-color: rgba(255, 255, 255, 0.15);
