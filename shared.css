@@ -71,34 +71,27 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 10px;
+    padding: 0 10px;
     position: fixed;
     bottom: 20px; /* Floating at the bottom */
     left: 0;
-    z-index: 1000;
+    z-index: 2000;
 }
 
-/* Navigation Wrapper */
-.nav-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    position: static;
-    z-index: 1000;
-}
+
 
 /* The Oval/Pill Shape */
 .nav-bar {
     background-color: var(--secondary);
-    width: 95%;            /* Widened to fit text */
-    max-width: 520px;      /* Prevents stretching on tablets */
-    height: 75px;
+    width: 100%;            /* Widened to fit text */
+    max-width: 450px;      /* Prevents stretching on tablets */
+    height: 90px;
     border-radius: 50px;   /* Oval ends */
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    padding: 0 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    padding: 0 5px;
+    overflow: hidden;
 }
 
 /* Nav Item (Icon + Word) */
@@ -106,12 +99,10 @@ body {
     color: white;
     text-decoration: none;
     display: flex;
+    flex-direction: column;
     align-items: center;    /* Center vertically */
-    justify-content: center;
-    gap: 6px;               /* Space between icon and word */
-    padding: 8px 12px;
-    border-radius: 30px;    /* Individual pill highlight on tap */
-    transition: background 0.2s;
+    flex: 1;
+    min-width: 0;
 }
 
 .nav-item span:first-child {
@@ -119,17 +110,18 @@ body {
 }
 
 .nav-text {
-    font-size: 0.75rem;     /* Small font to fit everything */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 10px;     /* Small font to fit everything */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .nav-item img {
     width: 100px;
-    height: 100px;
+    max-width: 60px;
+    height: auto;
+    max-height: 50px;
     object-fit:  contain;
-    display: block;
 }
 
 /* Tap Feedback */
