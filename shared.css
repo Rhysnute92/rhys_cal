@@ -72,9 +72,7 @@ body {
     display: flex;
     justify-content: center;
     padding: 0 10px;
-    position: fixed;
-    bottom: 20px; /* Floating at the bottom */
-    left: 0;
+    position: static;
     z-index: 2000;
 }
 
