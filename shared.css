@@ -83,9 +83,7 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
-    position: fixed;
-    bottom: 20px;
-    left: 0;
+    position: static;
     z-index: 1000;
 }
 
@@ -93,8 +91,8 @@ body {
 .nav-bar {
     background-color: var(--secondary);
     width: 95%;            /* Widened to fit text */
-    max-width: 450px;      /* Prevents stretching on tablets */
-    height: 55px;
+    max-width: 520px;      /* Prevents stretching on tablets */
+    height: 75px;
     border-radius: 50px;   /* Oval ends */
     display: flex;
     align-items: center;
