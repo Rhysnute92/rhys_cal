@@ -40,18 +40,6 @@
 
 <div class="header-spacer"></div>
 
-<div class="card settings-container">
-    <label>Dashboard Layout</label>
-    <div class="slider-controls">
-        <input type="range" id="sizeSlider" min="120" max="250" value="160"
-               oninput="changeTileSize(this.value)">
-        <span id="sizeValue">160px</span>
-    </div>
-    <button class="btn-tile" onclick="resetTileSize()" style="margin-top: 10px; background: var(--border); color: var(--dark);">
-        Reset to Default
-    </button>
-</div>
-
 <div class="container">
     <section class="card">
         <button id="trainModeBtn" class="full-width" onclick="toggleTrainingMode()" style="background: var(--primary); color: white; padding: 15px; border-radius: 8px; border: none; font-weight: bold;">

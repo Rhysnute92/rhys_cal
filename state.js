@@ -177,45 +177,6 @@ window.getTotalsForDate = function(dateString) {
     }, { p: 0, c: 0, f: 0, kcal: 0 });
 };
 
-window.changeTileSize = function(newSize) {
-    // 1. Update the CSS variable globally
-    document.documentElement.style.setProperty('--tile-size', newSize + 'px');
-
-    // 2. Update the text label next to the slider
-    const label = document.getElementById('sizeValue');
-    if (label) label.innerText = newSize + 'px';
-
-    // 3. Save the preference so it stays that way when they come back
-    localStorage.setItem('userTileSize', newSize);
-};
-
-// On Page Load: Check if they have a saved preference
-window.addEventListener('DOMContentLoaded', () => {
-    const savedSize = localStorage.getItem('userTileSize');
-    if (savedSize) {
-        changeTileSize(savedSize);
-        // Also update the slider position if it exists on the page
-        const slider = document.getElementById('sizeSlider');
-        if (slider) slider.value = savedSize;
-    }
-});
-
-/* Add this to your state.js */
-
-window.resetTileSize = function() {
-    const defaultSize = 160;
-
-    // 1. Update the UI
-    changeTileSize(defaultSize);
-
-    // 2. Update the slider position
-    const slider = document.getElementById('sizeSlider');
-    if (slider) slider.value = defaultSize;
-
-    // 3. Clear the saved setting
-    localStorage.removeItem('userTileSize');
-};
-
 window.toggleDarkMode = function() {
     // If the body has dark-theme, remove it and force light-theme
     // If it doesn't, add dark-theme and remove light-theme
@@ -250,3 +211,74 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     updateDarkModeButton();
 });
+
+/* Standardized Date Fetcher */
+window.getToday = function() {
+    const now = new Date();
+    const year = now.getFullYear();
+    // Month is 0-indexed, so we add 1 and pad with a leading zero if needed
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`; // Returns format: "2026-02-11"
+};
+
+// Global variable to track what date the user is LOOKING at
+window.currentViewDate = getToday();
+
+// Navigate dates
+window.changeDate = function(offset) {
+    const d = new Date(window.currentViewDate);
+    d.setDate(d.getDate() + offset);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    window.currentViewDate = `${year}-${month}-${day}`;
+
+    // Update UI
+    if (typeof renderDashboard === "function") renderDashboard();
+    updateDateDisplay();
+};
+
+// Copy Data Function
+window.copyTodayToDate = function() {
+    const today = getToday();
+    const target = window.currentViewDate;
+
+    if (today === target) {
+        alert("You are already looking at today!");
+        return;
+    }
+
+    // List of keys you want to copy (e.g., water, calories, steps)
+    const trackers = ['water', 'calories', 'steps', 'protein'];
+
+    trackers.forEach(key => {
+        const todayData = localStorage.getItem(`${key}_${today}`);
+        if (todayData) {
+            localStorage.setItem(`${key}_${target}`, todayData);
+        }
+    });
+
+    alert(`Copied today's stats to ${target}!`);
+    renderDashboard();
+};
+
+window.copyTodayToDate = function() {
+    const today = getToday();
+    const target = window.currentViewDate;
+
+    if (today === target) return alert("You are already on Today!");
+
+    const todayData = localStorage.getItem(`logs_${today}`);
+
+    if (todayData) {
+        localStorage.setItem(`logs_${target}`, todayData);
+        loadDiaryEntries(); // Refresh the UI
+        alert("Logs copied successfully!");
+    } else {
+        alert("Nothing found in Today's log to copy.");
+    }
+};

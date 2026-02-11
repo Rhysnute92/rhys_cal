@@ -324,3 +324,22 @@ body {
         --secondary: #2c2c2e;
     }
 }
+
+/* shared.css */
+.add-tile {
+    border: 2px dashed var(--primary); /* Dashed border for the "Add" action */
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-tile:active {
+    background: rgba(77, 189, 255, 0.1);
+    transform: scale(0.95);
+}
+
+/* Ensure icons inside tiles look good */
+.card span {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}

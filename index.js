@@ -313,9 +313,10 @@ document.addEventListener('DOMContentLoaded', () => {
      document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString();
  });
 
+ /* index.js - Updated renderDashboard */
  function renderDashboard() {
      const grid = document.getElementById('mainGrid');
-     const today = getToday(); // From state.js
+     const today = getToday();
 
      // Get Data
      const totals = getTotalsForDate(today);
@@ -323,35 +324,78 @@ document.addEventListener('DOMContentLoaded', () => {
      const steps = (JSON.parse(localStorage.getItem('stepsLog')) || {})[today] || 0;
      const sleep = (JSON.parse(localStorage.getItem('sleepLog')) || {})[today] || 0;
 
-     grid.innerHTML = `
-        <div class="card" onclick="location.href='log.html'">
-            <h3>Nutrition</h3>
-            <p><strong>${totals.kcal}</strong> kcal</p>
-            <div class="progress-bar"><div style="width:${Math.min(totals.kcal/20, 100)}%"></div></div>
-        </div>
 
-        <div class="card">
-            <h3>Water</h3>
-            <p>${water} Cups</p>
-            <button class="btn-tile" onclick="updateTracker('water')">+ Add Cup</button>
-        </div>
 
-        <div class="card">
-            <h3>Steps</h3>
-            <p>${steps.toLocaleString()}</p>
-            <button class="btn-tile" onclick="updateTracker('steps')">Log Steps</button>
-        </div>
+         // 1. Get custom tiles from storage (or an empty array if none exist)
+         const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
 
-        <div class="card">
-            <h3>Sleep</h3>
-            <p>${sleep} hrs</p>
-            <input type="range" min="0" max="12" step="0.5" value="${sleep}" 
-                   onchange="updateTracker('sleep', this.value)">
-        </div>
-
+         // 2. Build the Grid HTML
+         let gridHTML = `
         <div class="card" onclick="location.href='training.html'">
+            <span>💪</span>
             <h3>Training</h3>
             <p>View Progress →</p>
         </div>
+
+        <div class="card" onclick="location.href='settings.html'">
+            <span>⚙️</span>
+            <h3>Settings</h3>
+            <p>Customize</p>
+        </div>
     `;
+
+         // 3. Add Custom User Tiles to the HTML
+         customTiles.forEach((tile, index) => {
+             gridHTML += `
+            <div class="card">
+                <span>stats</span>
+                <h3>${tile.name}</h3>
+                <p>Tracked</p>
+                <button onclick="deleteTile(${index})" style="font-size: 10px; background: none; border: none; color: var(--danger); cursor: pointer;">Remove</button>
+            </div>
+        `;
+         });
+
+         // 4. Add the "Add New Tile" button at the very end
+         gridHTML += `
+        <div class="card add-tile" onclick="addNewTilePrompt()">
+            <span style="font-size: 2.5rem; color: var(--primary);">+</span>
+            <h3>Add Tile</h3>
+            <p>New Tracker</p>
+        </div>
+    `;
+
+         grid.innerHTML = gridHTML;
+     }
+
+// Function to save a new tile to LocalStorage
+     window.addNewTilePrompt = function() {
+         const name = prompt("What would you like to track? (e.g., Caffeine, Stretching)");
+         if (name && name.trim() !== "") {
+             const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+             customTiles.push({ name: name });
+             localStorage.setItem('customTiles', JSON.stringify(customTiles));
+             renderDashboard(); // Re-render to show the new tile immediately
+         }
+     };
+
+// Function to remove a tile
+     window.deleteTile = function(index) {
+         if(confirm("Delete this tracker?")) {
+             const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+             customTiles.splice(index, 1);
+             localStorage.setItem('customTiles', JSON.stringify(customTiles));
+             renderDashboard();
+         }
+     };
+
+// Initial Render
+     document.addEventListener('DOMContentLoaded', renderDashboard);
+
+ function loadDashboard() {
+     const today = getToday();
+     const waterDrank = localStorage.getItem(`water_${today}`) || 0;
+
+     document.getElementById('water-display').innerText = `${waterDrank} ml`;
+     console.log("Loading data for date:", today);
  }

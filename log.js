@@ -449,3 +449,51 @@ window.deleteLogItem = function(itemId) {
 
 // Run this when the page loads
 document.addEventListener('DOMContentLoaded', displayDailyLog);
+
+
+// Run this when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    updateDateDisplay();
+    loadDiaryEntries();
+});
+
+window.changeDate = function(offset) {
+    const d = new Date(window.currentViewDate);
+    d.setDate(d.getDate() + offset);
+
+    window.currentViewDate = d.toISOString().split('T')[0]; // Sets YYYY-MM-DD
+
+    updateDateDisplay();
+    loadDiaryEntries(); // Refresh the list for the new date
+};
+
+function loadDiaryEntries() {
+    const container = document.getElementById('diaryEntries');
+    const dateKey = window.currentViewDate;
+
+    // Example: Fetching food logs for the selected date
+    const logs = JSON.parse(localStorage.getItem(`logs_${dateKey}`)) || [];
+
+    if (logs.length === 0) {
+        container.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No entries for this date.</p>`;
+        return;
+    }
+
+    container.innerHTML = logs.map(item => `
+        <div class="card">
+            <h3>${item.name}</h3>
+            <p>${item.calories} kcal</p>
+        </div>
+    `).join('');
+}
+
+function updateDateDisplay() {
+    const display = document.getElementById('displayDate');
+    const today = getToday();
+
+    if (window.currentViewDate === today) {
+        display.innerText = "Today";
+    } else {
+        display.innerText = window.currentViewDate;
+    }
+}
