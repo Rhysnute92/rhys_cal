@@ -176,3 +176,77 @@ window.getTotalsForDate = function(dateString) {
         return acc;
     }, { p: 0, c: 0, f: 0, kcal: 0 });
 };
+
+window.changeTileSize = function(newSize) {
+    // 1. Update the CSS variable globally
+    document.documentElement.style.setProperty('--tile-size', newSize + 'px');
+
+    // 2. Update the text label next to the slider
+    const label = document.getElementById('sizeValue');
+    if (label) label.innerText = newSize + 'px';
+
+    // 3. Save the preference so it stays that way when they come back
+    localStorage.setItem('userTileSize', newSize);
+};
+
+// On Page Load: Check if they have a saved preference
+window.addEventListener('DOMContentLoaded', () => {
+    const savedSize = localStorage.getItem('userTileSize');
+    if (savedSize) {
+        changeTileSize(savedSize);
+        // Also update the slider position if it exists on the page
+        const slider = document.getElementById('sizeSlider');
+        if (slider) slider.value = savedSize;
+    }
+});
+
+/* Add this to your state.js */
+
+window.resetTileSize = function() {
+    const defaultSize = 160;
+
+    // 1. Update the UI
+    changeTileSize(defaultSize);
+
+    // 2. Update the slider position
+    const slider = document.getElementById('sizeSlider');
+    if (slider) slider.value = defaultSize;
+
+    // 3. Clear the saved setting
+    localStorage.removeItem('userTileSize');
+};
+
+window.toggleDarkMode = function() {
+    // If the body has dark-theme, remove it and force light-theme
+    // If it doesn't, add dark-theme and remove light-theme
+    if (document.body.classList.contains('dark-theme')) {
+        document.body.classList.remove('dark-theme');
+        document.body.classList.add('light-theme');
+        localStorage.setItem('theme-preference', 'light');
+    } else {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
+        localStorage.setItem('theme-preference', 'dark');
+    }
+    updateDarkModeButton();
+};
+
+function updateDarkModeButton() {
+    const btn = document.getElementById('darkBtn');
+    if (!btn) return;
+    const isDark = document.body.classList.contains('dark-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches && !document.body.classList.contains('light-theme'));
+
+    btn.innerText = isDark ? "☀️ Switch to Light Mode" : "🌙 Switch to Dark Mode";
+}
+
+// Apply theme on load
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme-preference');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    }
+    updateDarkModeButton();
+});

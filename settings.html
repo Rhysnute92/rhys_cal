@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="dashboard.css">
   <script src="settings.js"></script>
+  <script src="state.js"></script>
   <link rel="icon" type="image/png" href="rhys_logo.png">
   <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -19,6 +20,19 @@
     <h1>Settings</h1>
   </div>
 </header>
+
+<div class="settings-card">
+    <label for="sizeSlider">Adjust Tile Size</label>
+    <input type="range" id="sizeSlider" min="120" max="250" value="160" oninput="changeTileSize(this.value)">
+    <span id="sizeValue">160px</span>
+</div>
+
+<div class="card settings-container">
+    <label>Appearance</label>
+    <button class="btn-primary" onclick="toggleDarkMode()" id="darkBtn">
+        🌙 Switch to Dark Mode
+    </button>
+</div>
 
 <div class="container" style="margin-top: 180px;">
   <section class="card">

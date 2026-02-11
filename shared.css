@@ -1,5 +1,6 @@
 /* --- Root Variables & Reset --- */
 :root {
+    --tile-size: 160px;
     --primary: #4caf50;
     --secondary: #6c757d;
     --success: #4dbdff;
@@ -52,20 +53,42 @@ body {
 
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(var(--tile-size), 1fr));
         gap: 12px;
-        margin-top: 20px;
+        padding: 15px;
     }
 
     /* --- Cards --- */
 
     .card {
         background: var(--card);
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(0, 0, 0, 0.03);
+        aspect-ratio: 1/1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        transition: all 0.2s ease-out;
     }
+
+    /*Inside  the tiles*/
+.card h3 {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--secondary);
+}
+
+.card p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.card img {
+    max-width: 40%;
+    height: auto;
+}
 /* Navigation Container */
 .nav-wrapper {
     width: 100%;
@@ -240,3 +263,64 @@ body {
         overflow: hidden;
         background: #000;
     }
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch; /* Makes the button full-width for easy tapping */
+}
+
+.slider-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#sizeSlider {
+    flex-grow: 1;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--border);
+    outline: none;
+}
+
+#sizeValue {
+    font-family: monospace;
+    font-weight: bold;
+    min-width: 50px;
+}
+
+/* shared.css */
+
+/* Dark Mode Colors */
+body.dark-theme {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text-main: #e0e0e0;
+    --dark: #ffffff;
+    --border: #333333;
+    --secondary: #2c2c2e;
+}
+
+/* Add a smooth transition so the color swap doesn't hurt the eyes */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Automatically apply dark colors if the phone is set to Dark Mode */
+@media (prefers-color-scheme: dark) {
+    /* Only apply if the user hasn't manually picked "Light Mode" */
+    body:not(.light-theme) {
+        --bg: #121212;
+        --card: #1e1e1e;
+        --text-main: #e0e0e0;
+        --dark: #ffffff;
+        --border: #333333;
+        --secondary: #2c2c2e;
+    }
+}
