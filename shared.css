@@ -405,3 +405,11 @@ body {
         transform: scale(0.95);
     }
 
+.settings-tile {
+    border-bottom: 4px solid #6c757d; /* A subtle grey for settings */
+}
+
+    .settings-tile:active .gear-icon {
+        transform: rotate(90deg); /* Spins slightly when you tap it! */
+        transition: 0.3s;
+    }

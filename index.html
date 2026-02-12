@@ -14,107 +14,113 @@
 </head>
 <body>
 
-<header class="app-header">
-    <div class="header-content">
-        <img src="rhys_logo.png" class="header-logo" alt="Logo">
-        <h1>Fitness Tracker</h1>
+    <header class="app-header">
+        <div class="header-content">
+            <img src="rhys_logo.png" class="header-logo" alt="Logo">
+            <h1>Fitness Tracker</h1>
+        </div>
+
+        <nav class="nav-wrapper">
+            <div class="nav-bar">
+                <a href="index.html" class="nav-item">
+                    <img src="dashboard.png" alt="home">
+                    <span>Home</span>
+                </a>
+                <a href="log.html" class="nav-item">
+                    <img src="diary.png" alt="diary">
+                    <span>Food</span>
+                </a>
+                <a href="training.html" class="nav-item">
+                    <img src="training.png" alt="gym">
+                    <span>Gym</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="header-spacer"></div>
+
+    <div class="card settings-tile" onclick="location.href='settings.html'">
+        <span class="gear-icon">⚙️</span>
+        <h3>Settings</h3>
+        <p>Account & Goals</p>
     </div>
 
-    <nav class="nav-wrapper">
-        <div class="nav-bar">
-            <a href="index.html" class="nav-item">
-                <img src="dashboard.png" alt="home">
-                <span>Home</span>
-            </a>
-            <a href="log.html" class="nav-item">
-                <img src="diary.png" alt="diary">
-                <span>Food</span>
-            </a>
-            <a href="training.html" class="nav-item">
-                <img src="training.png" alt="gym">
-                <span>Gym</span>
-            </a>
-        </div>
-    </nav>
-</header>
-
-<div class="header-spacer"></div>
-
-<div class="container">
-    <div class="card training-card">
-        <div class="training-info">
-            <h2 id="calorieGoal">1500 kcal</h2>
-            <p id="dayStatus">Rest Day</p>
-        </div>
-        <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
-            Mark Training
-        </button>
-    </div>
-
-    <section class="dashboard-grid">
-        <div class="card grid-tile">
-            <div class="tile-header"><h4>Calories</h4><span>🔥</span></div>
-            <div class="tile-value"><span id="dashCals">0</span> / <span id="calGoal">1500</span></div>
-            <div class="progress-bg"><div id="cal-bar" class="progress-fill"></div></div>
-        </div>
-
-        <div class="card grid-tile">
-            <h4>Daily Macros</h4>
-            <div class="macro-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 0.8rem;">
-                <div>P: <span id="p-val">0</span>/200g</div>
-                <div>C: <span id="c-val">0</span>/145g</div>
-                <div>F: <span id="f-val">0</span>/45g</div>
+    <div class="container">
+        <div class="card training-card">
+            <div class="training-info">
+                <h2 id="calorieGoal">1500 kcal</h2>
+                <p id="dayStatus">Rest Day</p>
             </div>
-            <div class="chart-container" style="height: 150px; margin-top: 10px;">
-                <canvas id="macroPieChart"></canvas>
-            </div>
+            <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
+                Mark Training
+            </button>
         </div>
 
-        <div class="card grid-tile" onclick="window.location.href='log.html'">
-            <div id="nutritionTile">
-                <h3>Daily Nutrition</h3>
-                <div class="progress-container">
-                    <div id="kcalProgressBar" class="progress-fill"></div>
+        <section class="dashboard-grid">
+            <div class="card grid-tile">
+                <div class="tile-header"><h4>Calories</h4><span>🔥</span></div>
+                <div class="tile-value"><span id="dashCals">0</span> / <span id="calGoal">1500</span></div>
+                <div class="progress-bg"><div id="cal-bar" class="progress-fill"></div></div>
+            </div>
+
+            <div class="card grid-tile">
+                <h4>Daily Macros</h4>
+                <div class="macro-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 0.8rem;">
+                    <div>P: <span id="p-val">0</span>/200g</div>
+                    <div>C: <span id="c-val">0</span>/145g</div>
+                    <div>F: <span id="f-val">0</span>/45g</div>
                 </div>
-                <p id="kcalRemaining" class="remaining-text"></p>
+                <div class="chart-container" style="height: 150px; margin-top: 10px;">
+                    <canvas id="macroPieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card grid-tile" onclick="window.location.href='log.html'">
+                <div id="nutritionTile">
+                    <h3>Daily Nutrition</h3>
+                    <div class="progress-container">
+                        <div id="kcalProgressBar" class="progress-fill"></div>
+                    </div>
+                    <p id="kcalRemaining" class="remaining-text"></p>
+                </div>
+            </div>
+
+            <div class="card grid-tile">
+                <div class="tile-header"><h4>Weight Comparison (7-Day)</h4><span>⚖️</span></div>
+                <div id="dashWeightDisplay" class="tile-value">-- kg</div>
+                <div class="chart-container">
+                    <canvas id="weightComparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+        <button class="icon-btn full-width" onclick="window.print()" style="margin-top: 20px;">📑 Export PDF Report</button>
+        <div id="mainGrid" class="dashboard-grid">
+        </div>
+        <div id="addTileModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>Add New Tile</h3>
+                <select id="tileType">
+                    <option value="water">Water Tracker</option>
+                    <option value="steps">Step Counter</option>
+                    <option value="sleep">Sleep Log</option>
+                    <option value="gym">Gym Progress</option>
+                </select>
+                <button onclick="addNewTile()" class="btn-primary">Add to Dashboard</button>
+                <button onclick="closeModal()" class="btn-text">Cancel</button>
             </div>
         </div>
-
-        <div class="card grid-tile">
-            <div class="tile-header"><h4>Weight Comparison (7-Day)</h4><span>⚖️</span></div>
-            <div id="dashWeightDisplay" class="tile-value">-- kg</div>
-            <div class="chart-container">
-                <canvas id="weightComparisonChart"></canvas>
-            </div>
-        </div>
-    </section>
-    <button class="icon-btn full-width" onclick="window.print()" style="margin-top: 20px;">📑 Export PDF Report</button>
-    <div id="mainGrid" class="dashboard-grid">
     </div>
-    <div id="addTileModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h3>Add New Tile</h3>
-            <select id="tileType">
-                <option value="water">Water Tracker</option>
-                <option value="steps">Step Counter</option>
-                <option value="sleep">Sleep Log</option>
-                <option value="gym">Gym Progress</option>
-            </select>
-            <button onclick="addNewTile()" class="btn-primary">Add to Dashboard</button>
-            <button onclick="closeModal()" class="btn-text">Cancel</button>
-        </div>
-    </div>
-</div>
 
-<script type="module" src="index.js"></script>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('Service Worker Failed', err));
-        });
-    }
-</script>
+    <script type="module" src="index.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
+            });
+        }
+    </script>
 </body>
 </html>
