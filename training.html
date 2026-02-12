@@ -42,20 +42,22 @@
 <div class="header-spacer"></div>
 
 <section class="card">
-    <h3>Log Activity</h3>
-
-    <div class="category-pills">
+    <h3>Select Category</h3>
+    <div class="category-grid">
         <button class="pill active" onclick="filterExercises('Chest')">Chest</button>
         <button class="pill" onclick="filterExercises('Back')">Back</button>
         <button class="pill" onclick="filterExercises('Legs')">Legs</button>
+        <button class="pill" onclick="filterExercises('Shoulders')">Shoulders</button>
         <button class="pill" onclick="filterExercises('Arms')">Arms</button>
+        <button class="pill" onclick="filterExercises('Core')">Core</button>
     </div>
 
-    <div class="input-group">
-        <label>Select Exercise</label>
-        <select id="exerciseSelect">
+    <div class="input-group" style="margin-top: 20px;">
+        <label>Exercise</label>
+        <select id="exerciseSelect" class="full-width-select">
         </select>
     </div>
+</section>
 
     <div class="input-row">
         <div class="input-group">

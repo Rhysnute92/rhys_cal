@@ -20,3 +20,56 @@
     text-align: left;
     border-bottom: 1px solid #eee;
 }
+
+/* Container for the 2-per-row layout */
+.category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Individual Pill/Button Styling */
+.pill {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--dark);
+    padding: 12px 5px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+    /* Active/Selected State */
+    .pill.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Hover/Tap Effect */
+    .pill:active {
+        transform: scale(0.95);
+        background: var(--border);
+    }
+
+/* Styling the dropdown to match */
+.full-width-select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 1rem;
+    color: var(--dark);
+    appearance: none; /* Removes default browser arrow for a cleaner look */
+}

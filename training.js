@@ -186,3 +186,27 @@ window.showLive1RM = function () {
         display.innerText = "";
     }
 };
+
+window.filterExercises = function (category) {
+    const select = document.getElementById('exerciseSelect');
+    if (!select) return;
+
+    // 1. Clear and Populate
+    select.innerHTML = '';
+    const exercises = window.gymDB[category] || [];
+    exercises.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex.name;
+        opt.innerText = ex.name;
+        select.appendChild(opt);
+    });
+
+    // 2. Update Visuals
+    document.querySelectorAll('.pill').forEach(btn => {
+        if (btn.innerText.trim().toLowerCase() === category.toLowerCase()) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+};
