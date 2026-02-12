@@ -199,17 +199,20 @@ body {
         background: var(--primary);
         color: white;
         margin: 10px;
+        width: auto;
     }
 
     .btn-clear {
         background: var(--danger);
         color: white;
         margin: 10px;
+        width: auto;
     }
 
     .btn-secondary {
         background: var(--secondary);
         color: white;
+        width: auto;
     }
 
     .btn-tile {
