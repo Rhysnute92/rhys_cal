@@ -81,6 +81,17 @@
     </section>
 
     <section class="card">
+    <h3>Strength Progress (1RM)</h3>
+    <div class="input-group">
+        <select id="chartExerciseSelector" onchange="renderStrengthChart()" class="full-width-select">
+            </select>
+    </div>
+    <div class="graph-container" style="height: 200px; margin-top: 15px;">
+        <canvas id="strengthChart"></canvas>
+    </div>
+</section>
+
+    <section class="card">
         <h3>Weight Progress (Last 7 Days)</h3>
         <div class="graph-container">
             <canvas id="weightChart"></canvas>
