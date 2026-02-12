@@ -41,16 +41,14 @@
 <div class="header-spacer"></div>
 
 <div class="container">
-    <div class="card training-toggle-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <div>
-                <h3 id="targetDisplay">Goal: 1500 kcal</h3>
-                <p id="trainingStatus">Rest Day</p>
-            </div>
-            <button id="trainToggleBtn" class="btn-primary" onclick="toggleTrainingDay()" style="border-radius: 50px; padding: 10px 20px;">
-                💪 Mark Training
-            </button>
+    <div class="card training-card">
+        <div class="training-info">
+            <h2 id="calorieGoal">1500 kcal</h2>
+            <p id="dayStatus">Rest Day</p>
         </div>
+        <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
+            Mark Training
+        </button>
     </div>
 
     <section class="dashboard-grid">

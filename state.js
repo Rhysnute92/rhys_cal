@@ -328,3 +328,104 @@ window.updateCalorieGoal = function () {
 
 // Ensure it loads correctly on page open
 document.addEventListener('DOMContentLoaded', updateCalorieGoal);
+
+/* state.js */
+
+window.handleTrainingToggle = function () {
+    const today = getToday();
+    const key = `isTraining_${today}`;
+
+    // 1. Toggle the true/false state
+    const currentStatus = localStorage.getItem(key) === 'true';
+    const newStatus = !currentStatus;
+    localStorage.setItem(key, newStatus);
+
+    // 2. Trigger the UI update
+    updateDailyGoalUI();
+};
+
+window.updateDailyGoalUI = function () {
+    const today = getToday();
+    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
+
+    const goalText = document.getElementById('calorieGoal');
+    const statusText = document.getElementById('dayStatus');
+    const btn = document.getElementById('trainingBtn');
+
+    if (isTraining) {
+        // Training Day Settings
+        if (goalText) goalText.innerText = "1800 kcal";
+        if (statusText) statusText.innerText = "Training Day";
+        if (btn) {
+            btn.innerText = "Set to Rest";
+            btn.style.background = "#28a745"; // Green for active
+        }
+        statusText.classList.add('training-active');
+    } else {
+        // Rest Day Settings
+        if (goalText) goalText.innerText = "1500 kcal";
+        if (statusText) statusText.innerText = "Rest Day";
+        if (btn) {
+            btn.innerText = "Mark Training";
+            btn.style.background = "var(--primary)";
+        }
+        statusText.classList.remove('training-active');
+    }
+};
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', updateDailyGoalUI);
+
+window.handleTrainingToggle = function () {
+    const today = getToday();
+    const key = `isTraining_${today}`;
+    const logKey = `logs_${today}`;
+
+    const isNowTraining = localStorage.getItem(key) !== 'true'; // Flipping the state
+    localStorage.setItem(key, isNowTraining);
+
+    // Manage the Diary Entry
+    let logs = JSON.parse(localStorage.getItem(logKey)) || [];
+
+    if (isNowTraining) {
+        // Add "Workout" to diary if it's not already there
+        const exists = logs.some(entry => entry.name === "Workout 💪");
+        if (!exists) {
+            logs.push({ name: "Workout 💪", calories: 0, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        }
+    } else {
+        // Remove "Workout" if they switch back to Rest Day
+        logs = logs.filter(entry => entry.name !== "Workout 💪");
+    }
+
+    localStorage.setItem(logKey, JSON.stringify(logs));
+
+    // Update UI
+    updateDailyGoalUI();
+    if (typeof loadDiaryEntries === "function") loadDiaryEntries();
+};
+
+window.updateDailyGoalUI = function () {
+    const today = getToday();
+    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
+
+    const goalText = document.getElementById('calorieGoal');
+    const statusText = document.getElementById('dayStatus');
+    const btn = document.getElementById('trainingBtn');
+
+    if (isTraining) {
+        if (goalText) goalText.innerText = "1800 kcal";
+        if (statusText) statusText.innerText = "Training Day";
+        if (btn) {
+            btn.innerText = "Logged as Workout ✅";
+            btn.style.background = "#28a745";
+        }
+    } else {
+        if (goalText) goalText.innerText = "1500 kcal";
+        if (statusText) statusText.innerText = "Rest Day";
+        if (btn) {
+            btn.innerText = "Mark Training 💪";
+            btn.style.background = "var(--primary)";
+        }
+    }
+};
