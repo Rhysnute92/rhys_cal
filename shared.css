@@ -361,13 +361,13 @@ body {
 }
 
 .today-text {
-  color: var(--button); /* A standard bright blue */
+  color: black; /* A standard bright blue */
   font-weight: bold;
   font-size: 1.2rem;
 }
 
 .nav-btn {
-  background: #f0f0f0;
+  background: var(--button);
   border: none;
   padding: 5px 20px;
   border-radius: 20px;
