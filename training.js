@@ -150,3 +150,39 @@ window.saveBodyWeight = function() {
     localStorage.setItem('weightHistory', JSON.stringify(history));
     renderWeightChart(); // Updates the graph
 };
+
+window.filterExercises = function (category) {
+    const select = document.getElementById('exerciseSelect');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    // Access the global gymDB from state.js
+    const exercises = window.gymDB[category] || [];
+
+    exercises.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex.name;
+        opt.innerText = ex.name;
+        select.appendChild(opt);
+    });
+
+    // Update the UI pills
+    document.querySelectorAll('.pill').forEach(p => {
+        p.classList.toggle('active', p.innerText === category);
+    });
+};
+
+/* training.js helper */
+window.showLive1RM = function () {
+    const w = document.getElementById('weightLifted').value;
+    const r = document.getElementById('repsDone').value;
+    const display = document.getElementById('live1RM');
+
+    if (w > 0 && r > 0) {
+        const est = calculate1RM(w, r);
+        display.innerText = `Est. 1RM: ${est}kg`;
+    } else {
+        display.innerText = "";
+    }
+};

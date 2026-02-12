@@ -24,6 +24,23 @@ export let goals = {
 
 export const WATER_GOAL = 2000;
 
+window.gymDB = {
+    "Cardio" : [
+        { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
+        { name: "Walking", equipment: "None", muscle: "Legs (Cardio)" }
+    ],
+    "Chest": [],
+    "Legs": [],
+    "Back": [],
+    "Shoulders": [],
+    "Arms": []
+}
+
+// Helper to get a flat list of all exercise names
+window.getAllExerciseNames = function () {
+    return Object.values(window.gymDB).flat().map(ex => ex.name);
+};
+
 // Expanded Exercise Database including Cardio (Swimming/Walking)
 export const gymDB = [
     { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
@@ -428,4 +445,15 @@ window.updateDailyGoalUI = function () {
             btn.style.background = "var(--primary)";
         }
     }
+};
+
+/* Strength Formulas */
+
+// Brzycki Formula: Weight / ( 1.0278 - ( 0.0278 * Reps ) )
+window.calculate1RM = function (weight, reps) {
+    if (reps == 1) return weight;
+    if (reps > 10) return "Estimate less accurate > 10 reps";
+
+    const oneRM = weight / (1.0278 - (0.0278 * reps));
+    return Math.round(oneRM);
 };
