@@ -196,7 +196,7 @@ body {
         transition: opacity 0.2s;
     }
 
-    .icon-btn {
+    .icon-btn full-width {
         margin-top: 20px;
         background: #1e90ff;
         color: white;
@@ -351,6 +351,27 @@ body {
 .add-tile:active {
     background: rgba(77, 189, 255, 0.1);
     transform: scale(0.95);
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;  /* Vertically aligns items */
+  justify-content: center; /* Horizontally centers the group */
+  gap: 15px; /* Adds space between the arrows and text */
+}
+
+.today-text {
+  color: var(--button); /* A standard bright blue */
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.nav-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 5px 20px;
+  border-radius: 20px;
+  cursor: pointer;
 }
 
 /* Ensure icons inside tiles look good */

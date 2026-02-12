@@ -53,17 +53,11 @@
 <div class="header-spacer"></div>
 
 <div class="container">
-    <div class="card date-nav">
-        <button onclick="changeDate(-1)">◀</button>
-        <h2 id="displayDate">Today</h2>
-        <button onclick="changeDate(1)">▶</button>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 20px;">
-        <button class="btn-tile" onclick="copyTodayToDate()" style="font-size: 12px; background: var(--secondary); color: white;">
-            📋 Copy Today's Entry to this Date
-        </button>
-    </div>
+<div class="calendar-controls">
+  <button class="nav-btn">◀</button>
+  <span class="today-text">Today</span>
+  <button class="nav-btn">▶</button>
+</div>
 
     <div class="card quick-add-container">
         <label>Quick Add Favorites</label>
