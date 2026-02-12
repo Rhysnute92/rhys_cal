@@ -314,23 +314,17 @@ document.addEventListener('DOMContentLoaded', () => {
  });
 
  /* index.js - Updated renderDashboard */
- function renderDashboard() {
-     const grid = document.getElementById('mainGrid');
-     const today = getToday();
+/* index.js */
 
-     // Get Data
-     const totals = getTotalsForDate(today);
-     const water = (JSON.parse(localStorage.getItem('waterLog')) || {})[today] || 0;
-     const steps = (JSON.parse(localStorage.getItem('stepsLog')) || {})[today] || 0;
-     const sleep = (JSON.parse(localStorage.getItem('sleepLog')) || {})[today] || 0;
+function renderDashboard() {
+    const grid = document.getElementById('mainGrid');
+    if (!grid) return;
 
+    // 1. Load custom tiles from storage
+    const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
 
-
-         // 1. Get custom tiles from storage (or an empty array if none exist)
-         const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-
-         // 2. Build the Grid HTML
-         let gridHTML = `
+    // 2. Start with Core Tiles (Training & Settings)
+    let gridHTML = `
         <div class="card" onclick="location.href='training.html'">
             <span>💪</span>
             <h3>Training</h3>
@@ -344,29 +338,59 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-         // 3. Add Custom User Tiles to the HTML
-         customTiles.forEach((tile, index) => {
-             gridHTML += `
-            <div class="card">
-                <span>stats</span>
+    // 3. Add the User's Custom Tiles
+    customTiles.forEach((tile, index) => {
+        gridHTML += `
+            <div class="card" style="position: relative;">
+                <span>✨</span>
                 <h3>${tile.name}</h3>
-                <p>Tracked</p>
-                <button onclick="deleteTile(${index})" style="font-size: 10px; background: none; border: none; color: var(--danger); cursor: pointer;">Remove</button>
+                <p>Custom Tracker</p>
+                <button onclick="removeTile(${index})" class="delete-btn">×</button>
             </div>
         `;
-         });
+    });
 
-         // 4. Add the "Add New Tile" button at the very end
-         gridHTML += `
-        <div class="card add-tile" onclick="addNewTilePrompt()">
-            <span style="font-size: 2.5rem; color: var(--primary);">+</span>
+    // 4. Add the "Add New Tile" prompt button
+    gridHTML += `
+        <div class="card add-tile-btn" onclick="addNewTilePrompt()">
+            <span style="font-size: 2rem; color: var(--primary);">+</span>
             <h3>Add Tile</h3>
-            <p>New Tracker</p>
+            <p>New Feature</p>
         </div>
     `;
 
-         grid.innerHTML = gridHTML;
-     }
+    grid.innerHTML = gridHTML;
+}
+
+// Function to trigger the prompt and save data
+window.addNewTilePrompt = function () {
+    const name = prompt("What would you like to track? (e.g., Caffeine, Protein, Stretching)");
+
+    if (name && name.trim() !== "") {
+        const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+
+        // Add new tile object
+        customTiles.push({
+            name: name,
+            id: Date.now() // Unique ID for later use
+        });
+
+        localStorage.setItem('customTiles', JSON.stringify(customTiles));
+        renderDashboard(); // Refresh the screen
+    }
+};
+
+// Function to delete a custom tile
+window.removeTile = function (index) {
+    if (confirm("Delete this tile?")) {
+        const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
+        customTiles.splice(index, 1);
+        localStorage.setItem('customTiles', JSON.stringify(customTiles));
+        renderDashboard();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', renderDashboard);
 
 // Function to save a new tile to LocalStorage
      window.addNewTilePrompt = function() {
@@ -398,4 +422,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
      document.getElementById('water-display').innerText = `${waterDrank} ml`;
      console.log("Loading data for date:", today);
- }
+}
+
+/* index.js */
+
+function renderDashboard() {
+    const grid = document.getElementById('mainGrid');
+    if (!grid) return;
+
+    const today = getToday();
+    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+
+    // 1. Core Tiles
+    let gridHTML = `
+        <div class="card" onclick="location.href='training.html'">
+            <span>💪</span>
+            <h3>Training</h3>
+            <p>View Progress →</p>
+        </div>
+        <div class="card" onclick="location.href='settings.html'">
+            <span>⚙️</span>
+            <h3>Settings</h3>
+            <p>Customize</p>
+        </div>
+    `;
+
+    // 2. Custom Interactive Tiles
+    customTiles.forEach((tile, index) => {
+        gridHTML += `
+            <div class="card interactive-tile" onclick="incrementTile(${index})">
+                <button onclick="event.stopPropagation(); removeTile(${index})" class="delete-btn">×</button>
+                <span class="tile-icon">✨</span>
+                <h3>${tile.name}</h3>
+                <div class="tile-value">${tile.amount}</div>
+                <p>${tile.unit}</p>
+            </div>
+        `;
+    });
+
+    // 3. Add Button
+    gridHTML += `
+        <div class="card add-tile-btn" onclick="addNewTilePrompt()">
+            <span>+</span>
+            <h3>Add Tracker</h3>
+        </div>
+    `;
+
+    grid.innerHTML = gridHTML;
+}
+
+// Logic to add a new functional tracker
+window.addNewTilePrompt = function () {
+    const name = prompt("Name (e.g., Water, Coffee, Steps):");
+    const unit = prompt("Unit (e.g., ml, cups, count):", "count");
+    const step = prompt("Increment amount (e.g., 250, 1):", "1");
+
+    if (name) {
+        const today = getToday();
+        const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+
+        customTiles.push({
+            name: name,
+            unit: unit,
+            step: parseInt(step),
+            amount: 0
+        });
+
+        localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
+        renderDashboard();
+    }
+};
+
+// Increment the value when the tile is tapped
+window.incrementTile = function (index) {
+    const today = getToday();
+    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+
+    customTiles[index].amount += customTiles[index].step;
+
+    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
+    renderDashboard();
+
+    // Haptic feedback for a "real" button feel
+    if (navigator.vibrate) navigator.vibrate(30);
+};
