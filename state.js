@@ -282,3 +282,49 @@ window.copyTodayToDate = function() {
         alert("Nothing found in Today's log to copy.");
     }
 };
+
+/* state.js */
+
+window.toggleTrainingDay = function () {
+    const today = getToday();
+    const key = `isTraining_${today}`;
+
+    // 1. Check if it's currently a training day
+    const isTraining = localStorage.getItem(key) === 'true';
+    const newState = !isTraining;
+
+    // 2. Save the new state
+    localStorage.setItem(key, newState);
+
+    // 3. Update the UI
+    updateCalorieGoal();
+};
+
+window.updateCalorieGoal = function () {
+    const today = getToday();
+    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
+    const targetDisplay = document.getElementById('targetDisplay');
+    const statusText = document.getElementById('trainingStatus');
+    const btn = document.getElementById('trainToggleBtn');
+
+    // Default 1500, jumps to 1800 if training
+    const goal = isTraining ? 1800 : 1500;
+
+    if (targetDisplay) targetDisplay.innerText = `Goal: ${goal} kcal`;
+
+    if (statusText) {
+        statusText.innerText = isTraining ? "Training Day Active" : "Rest Day";
+        statusText.style.color = isTraining ? "var(--primary)" : "var(--secondary)";
+    }
+
+    if (btn) {
+        btn.innerText = isTraining ? "✅ Training Set" : "💪 Mark Training";
+        btn.style.background = isTraining ? "#28a745" : "var(--primary)";
+    }
+
+    // Save the numeric goal for other parts of the app to use
+    localStorage.setItem(`goal_${today}`, goal);
+};
+
+// Ensure it loads correctly on page open
+document.addEventListener('DOMContentLoaded', updateCalorieGoal);

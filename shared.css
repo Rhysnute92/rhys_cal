@@ -324,7 +324,6 @@ body {
     }
 }
 
-/* shared.css */
 .add-tile {
     border: 2px dashed var(--primary); /* Dashed border for the "Add" action */
     background: transparent;
@@ -341,4 +340,24 @@ body {
 .card span {
     font-size: 1.5rem;
     margin-bottom: 5px;
+}
+
+.training-toggle-container {
+    background: var(--card);
+    border-left: 5px solid var(--primary); /* Visual cue for the goal */
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+#targetDisplay {
+    font-size: 1.4rem;
+    margin: 0;
+    font-weight: 800;
+}
+
+#trainingStatus {
+    font-size: 0.9rem;
+    margin: 5px 0 0 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }

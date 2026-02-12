@@ -41,11 +41,17 @@
 <div class="header-spacer"></div>
 
 <div class="container">
-    <section class="card">
-        <button id="trainModeBtn" class="full-width" onclick="toggleTrainingMode()" style="background: var(--primary); color: white; padding: 15px; border-radius: 8px; border: none; font-weight: bold;">
-            Mode: Rest Day (1500 kcal)
-        </button>
-    </section>
+    <div class="card training-toggle-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+                <h3 id="targetDisplay">Goal: 1500 kcal</h3>
+                <p id="trainingStatus">Rest Day</p>
+            </div>
+            <button id="trainToggleBtn" class="btn-primary" onclick="toggleTrainingDay()" style="border-radius: 50px; padding: 10px 20px;">
+                💪 Mark Training
+            </button>
+        </div>
+    </div>
 
     <section class="dashboard-grid">
         <div class="card grid-tile">
