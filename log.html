@@ -65,6 +65,16 @@
         </button>
     </div>
 
+    <div class="card quick-add-container">
+        <label>Quick Add Favorites</label>
+        <div class="quick-chips">
+            <button class="chip" onclick="quickAdd('Protein Shake', 200, 30, 5, 2, 'Drinks')">🥤 Shake</button>
+            <button class="chip" onclick="quickAdd('Chicken Breast', 165, 31, 0, 3.6, 'Dinner')">🍗 Chicken</button>
+            <button class="chip" onclick="quickAdd('Apple', 95, 0.5, 25, 0.3, 'Snacks')">🍎 Apple</button>
+            <button class="chip" onclick="quickAdd('Skyr Yogurt', 100, 11, 4, 0.2, 'Breakfast')">🥣 Yogurt</button>
+        </div>
+    </div>
+
     <div id="diaryEntries" class="dashboard-grid">
     </div>
 </div>
@@ -90,18 +100,21 @@
         <label>Food Name</label>
         <input type="text" id="foodSearch" placeholder="Product Name">
 
-        <div class="macro-grid">
-            <div>
-                <label>Protein (g)</label>
-                <input type="number" id="manualP" step="0.1">
+        <div class="card macro-overview">
+            <div class="macro-stat">
+                <label>Protein</label>
+                <div class="progress-bg"><div id="barP" class="progress-fill protein"></div></div>
+                <span id="txtP">0 / 200g</span>
             </div>
-            <div>
-                <label>Carbs (g)</label>
-                <input type="number" id="manualC" step="0.1">
+            <div class="macro-stat">
+                <label>Carbs</label>
+                <div class="progress-bg"><div id="barC" class="progress-fill carbs"></div></div>
+                <span id="txtC">0 / 145g</span>
             </div>
-            <div>
-                <label>Fat (g)</label>
-                <input type="number" id="manualF" step="0.1">
+            <div class="macro-stat">
+                <label>Fat</label>
+                <div class="progress-bg"><div id="barF" class="progress-fill fat"></div></div>
+                <span id="txtF">0 / 45g</span>
             </div>
         </div>
 
@@ -133,6 +146,14 @@
             <button onclick="clearDailyLog()" class="btn-clear">Clear Selected Day</button>
         </div>
     </section>
+
+    <div class="card weekly-trends">
+        <h3>Last 7 Days (kcal)</h3>
+        <div class="chart-container" id="weeklyChart">
+        </div>
+        <div class="chart-labels" id="chartLabels">
+        </div>
+    </div>
 </div>
 
 <script type="module" src="log.js"></script>

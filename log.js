@@ -497,3 +497,233 @@ function updateDateDisplay() {
         display.innerText = window.currentViewDate;
     }
 }
+
+/* log.js */
+import { getToday } from './state.js';
+
+// Initialize Page
+document.addEventListener('DOMContentLoaded', () => {
+    window.currentViewDate = getToday();
+    updateDateDisplay();
+    displayDailyLog();
+});
+
+// --- BARCODE SCANNER LOGIC ---
+window.startCamera = function () {
+    document.getElementById('scannerOverlay').style.display = 'block';
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'),
+            constraints: { facingMode: "environment" }
+        },
+        decoder: { readers: ["ean_reader", "ean_8_reader"] }
+    }, (err) => {
+        if (err) return console.error(err);
+        Quagga.start();
+    });
+
+    Quagga.onDetected((data) => {
+        const code = data.codeResult.code;
+        stopScanner();
+        fetchFoodData(code);
+    });
+};
+
+window.stopScanner = function () {
+    Quagga.stop();
+    document.getElementById('scannerOverlay').style.display = 'none';
+};
+
+async function fetchFoodData(barcode) {
+    // Using OpenFoodFacts API (Free)
+    try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+        const data = await res.json();
+        if (data.status === 1) {
+            const p = data.product;
+            // Fill the manual entry form with scanned data
+            document.getElementById('manualEntryForm').style.display = 'block';
+            document.getElementById('foodSearch').value = p.product_name || "Unknown Item";
+            document.getElementById('manualCal').value = p.nutriments['energy-kcal_100g'] || 0;
+            document.getElementById('manualP').value = p.nutriments.proteins_100g || 0;
+            document.getElementById('manualC').value = p.nutriments.carbohydrates_100g || 0;
+            document.getElementById('manualF').value = p.nutriments.fat_100g || 0;
+        } else {
+            alert("Product not found. Please enter manually.");
+            document.getElementById('manualEntryForm').style.display = 'block';
+        }
+    } catch (e) {
+        alert("Error fetching food data.");
+    }
+}
+
+// --- MEAL TABS LOGIC ---
+window.selectTab = function (btn, type) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('mealType').value = type;
+};
+
+// --- SAVE & DISPLAY LOGIC ---
+window.saveScannedFood = function () {
+    const today = window.currentViewDate;
+    const logKey = `logs_${today}`;
+    const logs = JSON.parse(localStorage.getItem(logKey)) || [];
+
+    const newItem = {
+        name: document.getElementById('foodSearch').value,
+        calories: parseInt(document.getElementById('manualCal').value) || 0,
+        protein: document.getElementById('manualP').value,
+        meal: document.getElementById('mealType').value, // Matches the tab value
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    logs.push(newItem);
+    localStorage.setItem(logKey, JSON.stringify(logs));
+
+    document.getElementById('manualEntryForm').style.display = 'none';
+    displayDailyLog();
+};
+
+window.displayDailyLog = function () {
+    const today = window.currentViewDate;
+    const logs = JSON.parse(localStorage.getItem(`logs_${today}`)) || [];
+    const container = document.getElementById('dailyLogList');
+    container.innerHTML = "";
+
+    const meals = ['Breakfast', 'Dinner', 'Tea', 'Snacks', 'Drinks'];
+    let totalDayCals = 0;
+
+    meals.forEach(meal => {
+        const mealLogs = logs.filter(l => l.meal === meal);
+        const mealSection = document.createElement('div');
+        mealSection.className = "meal-group card";
+
+        let mealTotal = 0;
+        const itemsHtml = mealLogs.map(l => {
+            mealTotal += l.calories;
+            return `<div class="meal-item"><span>${l.name}</span><strong>${l.calories}kcal</strong></div>`;
+        }).join('');
+
+        totalDayCals += mealTotal;
+
+        mealSection.innerHTML = `
+            <div class="meal-header">
+                <h3>${meal}</h3>
+                <span>${mealTotal} kcal</span>
+            </div>
+            <div class="meal-items-list">${itemsHtml || '<p class="empty-msg">No entries</p>'}</div>
+        `;
+        container.appendChild(mealSection);
+    });
+
+    document.getElementById('totalLogCals').innerText = totalDayCals;
+};
+
+/* Inside your displayDailyLog function in log.js */
+
+function updateMacros(logs) {
+    // 1. Set your Daily Targets
+    const targets = { p: 200, c: 145, f: 45 };
+
+    // 2. Sum up current logs
+    let totals = { p: 0, c: 0, f: 0 };
+
+    logs.forEach(item => {
+        totals.p += parseFloat(item.protein) || 0;
+        totals.c += parseFloat(item.carbs) || 0;
+        totals.f += parseFloat(item.fat) || 0;
+    });
+
+    // 3. Update Text and Bars
+    const updateBar = (id, current, target, barId) => {
+        const percent = Math.min((current / target) * 100, 100);
+        document.getElementById(id).innerText = `${Math.round(current)} / ${target}g`;
+        document.getElementById(barId).style.width = percent + "%";
+    };
+
+    updateBar('txtP', totals.p, targets.p, 'barP');
+    updateBar('txtC', totals.c, targets.c, 'barC');
+    updateBar('txtF', totals.f, targets.f, 'barF');
+}
+
+// Call updateMacros(logs) inside your existing displayDailyLog function
+
+/* log.js */
+
+window.quickAdd = function (name, cals, p, c, f, category) {
+    const today = window.currentViewDate;
+    const logKey = `logs_${today}`;
+    const logs = JSON.parse(localStorage.getItem(logKey)) || [];
+
+    const newItem = {
+        name: name,
+        calories: parseInt(cals),
+        protein: parseFloat(p),
+        carbs: parseFloat(c),
+        fat: parseFloat(f),
+        meal: category,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    logs.push(newItem);
+    localStorage.setItem(logKey, JSON.stringify(logs));
+
+    // Refresh the diary and macros
+    displayDailyLog();
+
+    // Simple feedback
+    if (window.navigator.vibrate) window.navigator.vibrate(20);
+};
+
+/* log.js */
+
+window.renderWeeklyChart = function () {
+    const chartContainer = document.getElementById('weeklyChart');
+    const labelContainer = document.getElementById('chartLabels');
+    if (!chartContainer) return;
+
+    chartContainer.innerHTML = '';
+    labelContainer.innerHTML = '';
+
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        last7Days.push(d.toISOString().split('T')[0]);
+    }
+
+    // Get data and find max for scaling
+    const dailyTotals = last7Days.map(date => {
+        const logs = JSON.parse(localStorage.getItem(`logs_${date}`)) || [];
+        return logs.reduce((sum, item) => sum + (item.calories || 0), 0);
+    });
+
+    const maxCal = Math.max(...dailyTotals, 2000); // Scale against at least 2000
+
+    dailyTotals.forEach((total, index) => {
+        const height = (total / maxCal) * 100;
+        const dayName = new Date(last7Days[index]).toLocaleDateString([], { weekday: 'short' });
+
+        // Create Bar
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.height = `${height}%`;
+        bar.setAttribute('data-value', total);
+        chartContainer.appendChild(bar);
+
+        // Create Label
+        const label = document.createElement('span');
+        label.innerText = dayName;
+        labelContainer.appendChild(label);
+    });
+};
+
+// Update chart whenever the log changes
+const originalDisplayLog = window.displayDailyLog;
+window.displayDailyLog = function () {
+    originalDisplayLog();
+    renderWeeklyChart();
+};
