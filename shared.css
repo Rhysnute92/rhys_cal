@@ -11,6 +11,7 @@
     --dark: #1a1a1b;
     --text-main: #4a4a4a;
     --border: #e1e4e8;
+    --button: #1e90ff;
 }
 
 * { box-sizing: border-box; }
@@ -188,11 +189,17 @@ body {
         width: 100%;
         padding: 14px;
         border: none;
-        border-radius: 10px;
+        border-radius: 30px;
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
         transition: opacity 0.2s;
+    }
+
+    .icon-btn {
+        margin-top: 20px;
+        background: #1e90ff;
+        color: white;
     }
 
     .btn-primary {
