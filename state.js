@@ -207,9 +207,6 @@ function createSettingsTile() {
     `;
 }
 
-/* state.js - Shared logic for all pages */
-const getToday = () => new Date().toISOString().split('T')[0];
-
 // Universal Update for Dashboard Trackers
 window.updateTracker = function(type, val = null) {
     const today = getToday();
