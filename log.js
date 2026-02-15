@@ -1,213 +1,215 @@
-/* log.js */
-import { getToday } from './state.js'; 
+// ---------- STORAGE ----------
+const STORAGE_KEY = "foodEntries";
+const GOAL_KEY = "macroGoals";
 
-// --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Set a global date if not already set
-    if (!window.currentViewDate) {
-        window.currentViewDate = (typeof getToday === 'function') ? getToday() : new Date().toISOString().split('T')[0];
-    }
-    
-    // Sync the date picker UI
-    const picker = document.getElementById('logDatePicker');
-    if (picker) {
-        picker.value = window.currentViewDate;
-    }
+let editingIndex = null;
 
-    refreshUI();
-});
+// ---------- UTIL ----------
+const today = () => new Date().toISOString().split("T")[0];
 
-// Helper to update everything at once
-function refreshUI() {
-    displayDailyLog();
-    if (window.renderWeeklyChart) window.renderWeeklyChart();
+const getEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+const saveEntries = data => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    syncCloud(data);
+};
+
+const getGoals = () => JSON.parse(localStorage.getItem(GOAL_KEY)) || {protein:200, carbs:145, fat:45};
+
+// ---------- CLOUD SYNC (Firebase ready) ----------
+function syncCloud(data){
+    // INSERT Firebase or Supabase sync here
 }
 
-// --- ATTACH TO WINDOW (Fixes "Not Defined" errors) ---
+// ---------- DATE ----------
+datePicker.value = today();
+datePicker.onchange = render;
 
-window.startCamera = function() {
-    const overlay = document.getElementById('scannerOverlay');
-    if (overlay) overlay.style.display = 'block';
-    
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#interactive'),
-            constraints: { facingMode: "environment" }
-        },
-        decoder: { readers: ["ean_reader", "ean_8_reader"] }
-    }, (err) => {
-        if (err) { console.error(err); return; }
-        Quagga.start();
-    });
+// ---------- SCANNER ----------
+let scanning=false;
 
-    Quagga.onDetected((data) => {
-        window.stopScanner();
-        fetchFoodData(data.codeResult.code);
-    });
+window.startCamera=()=>{
+ scannerOverlay.style.display="block";
+
+ Quagga.init({
+  inputStream:{type:"LiveStream",target:interactive},
+  decoder:{readers:["ean_reader","upc_reader"]}
+ }, err=>{
+  if(!err){Quagga.start(); scanning=true;}
+ });
+
+ Quagga.onDetected(async res=>{
+  stopScanner();
+  lookupBarcode(res.codeResult.code);
+ });
 };
 
-window.stopScanner = function() {
-    Quagga.stop();
-    const overlay = document.getElementById('scannerOverlay');
-    if (overlay) overlay.style.display = 'none';
+window.stopScanner=()=>{
+ scannerOverlay.style.display="none";
+ if(scanning) Quagga.stop();
 };
 
-window.quickAdd = function(name, cals, p, c, f, category) {
-    const date = document.getElementById('logDatePicker').value;
-    const logKey = `logs_${date}`;
-    const logs = JSON.parse(localStorage.getItem(logKey)) || [];
+// ---------- BARCODE LOOKUP ----------
+async function lookupBarcode(code){
+ const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
+ const data = await res.json();
 
-    logs.push({
-        id: Date.now(),
-        name,
-        calories: parseInt(cals),
-        protein: parseFloat(p),
-        carbs: parseFloat(c),
-        fat: parseFloat(f),
-        meal: category
-    });
+ if(data.status===1){
+  const p=data.product;
+  foodName.value=p.product_name || "";
+  calories.value=p.nutriments["energy-kcal_100g"] || 0;
+  protein.value=p.nutriments.proteins_100g || 0;
+  carbs.value=p.nutriments.carbohydrates_100g || 0;
+  fat.value=p.nutriments.fat_100g || 0;
+ }
 
-    localStorage.setItem(logKey, JSON.stringify(logs));
-    refreshUI();
-};
-
-window.saveScannedFood = function() {
-    const foodName = document.getElementById('foodSearch').value;
-    if (!foodName) return alert("Please enter a food name.");
-
-    const date = document.getElementById('logDatePicker').value;
-    const logKey = `logs_${date}`;
-    const logs = JSON.parse(localStorage.getItem(logKey)) || [];
-
-    logs.push({
-        id: Date.now(),
-        name: foodName,
-        calories: parseInt(document.getElementById('manualCal').value) || 0,
-        protein: parseFloat(document.getElementById('manualP')?.value) || 0,
-        carbs: parseFloat(document.getElementById('manualC')?.value) || 0,
-        fat: parseFloat(document.getElementById('manualF')?.value) || 0,
-        meal: document.getElementById('mealType').value
-    });
-
-    localStorage.setItem(logKey, JSON.stringify(logs));
-    document.getElementById('manualEntryForm').style.display = 'none';
-    refreshUI();
-};
-
-window.displayDailyLog = function() {
-    const container = document.getElementById('dailyLogList');
-    const picker = document.getElementById('logDatePicker');
-    if (!container || !picker) return;
-
-    const selectedDate = picker.value;
-    const logs = JSON.parse(localStorage.getItem(`logs_${selectedDate}`)) || [];
-    
-    container.innerHTML = "";
-    const meals = ['Breakfast', 'Dinner', 'Tea', 'Snacks', 'Drinks'];
-    let dayTotals = { kcal: 0, p: 0, c: 0, f: 0 };
-
-    meals.forEach(mealType => {
-        const mealLogs = logs.filter(l => l.meal === mealType);
-        let mealKcal = 0;
-
-        const itemsHtml = mealLogs.map(l => {
-            mealKcal += l.calories;
-            dayTotals.kcal += l.calories;
-            dayTotals.p += (l.protein || 0);
-            dayTotals.c += (l.carbs || 0);
-            dayTotals.f += (l.fat || 0);
-            return `
-                <div class="meal-item">
-                    <span>${l.name}</span>
-                    <div class="log-actions">
-                        <strong>${l.calories} kcal</strong>
-                        <button class="delete-btn" onclick="deleteItem(${l.id})">×</button>
-                    </div>
-                </div>`;
-        }).join('');
-
-        const section = document.createElement('div');
-        section.className = "meal-group card";
-        section.innerHTML = `
-            <div class="meal-header">
-                <h3>${mealType}</h3>
-                <span>${mealKcal} kcal</span>
-            </div>
-            <div class="meal-items-list">${itemsHtml || '<p class="empty-msg">No entries</p>'}</div>
-        `;
-        container.appendChild(section);
-    });
-
-    updateMacroUI(dayTotals);
-};
-
-function updateMacroUI(totals) {
-    const targets = { p: 200, c: 145, f: 45 };
-    
-    const updateBar = (id, current, target, barId) => {
-        const percent = Math.min((current / target) * 100, 100);
-        const textEl = document.getElementById(id);
-        const barEl = document.getElementById(barId);
-        if (textEl) textEl.innerText = `${Math.round(current)} / ${target}g`;
-        if (barEl) barEl.style.width = percent + "%";
-    };
-
-    updateBar('txtP', totals.p, targets.p, 'barP');
-    updateBar('txtC', totals.c, targets.c, 'barC');
-    updateBar('txtF', totals.f, targets.f, 'barF');
+ entryForm.classList.remove("hidden");
 }
 
-window.deleteItem = function(id) {
-    const date = document.getElementById('logDatePicker').value;
-    const logKey = `logs_${date}`;
-    let logs = JSON.parse(localStorage.getItem(logKey)) || [];
-    logs = logs.filter(item => item.id !== id);
-    localStorage.setItem(logKey, JSON.stringify(logs));
-    refreshUI();
+// ---------- SAVE ENTRY ----------
+window.saveEntry=()=>{
+ const entry={
+  name:foodName.value,
+  calories:+calories.value,
+  protein:+protein.value,
+  carbs:+carbs.value,
+  fat:+fat.value,
+  meal:mealType.value,
+  date:datePicker.value
+ };
+
+ let entries=getEntries();
+
+ if(editingIndex!==null){
+  entries[editingIndex]=entry;
+  editingIndex=null;
+ }else{
+  entries.push(entry);
+ }
+
+ saveEntries(entries);
+ entryForm.classList.add("hidden");
+ render();
 };
 
-window.clearDailyLog = function() {
-    const date = document.getElementById('logDatePicker').value;
-    if (confirm(`Clear all entries for ${date}?`)) {
-        localStorage.removeItem(`logs_${date}`);
-        refreshUI();
-    }
+// ---------- EDIT / DELETE ----------
+function editEntry(i){
+ const e=getEntries()[i];
+ editingIndex=i;
+
+ foodName.value=e.name;
+ calories.value=e.calories;
+ protein.value=e.protein;
+ carbs.value=e.carbs;
+ fat.value=e.fat;
+ mealType.value=e.meal;
+
+ entryForm.classList.remove("hidden");
+}
+
+function deleteEntry(i){
+ let entries=getEntries();
+ entries.splice(i,1);
+ saveEntries(entries);
+ render();
+}
+
+// ---------- GOALS ----------
+window.saveGoals=()=>{
+ const goals={
+  protein:+goalP.value,
+  carbs:+goalC.value,
+  fat:+goalF.value
+ };
+ localStorage.setItem(GOAL_KEY,JSON.stringify(goals));
+ render();
 };
 
-window.renderWeeklyChart = function() {
-    const chartContainer = document.getElementById('weeklyChart');
-    const labelContainer = document.getElementById('chartLabels');
-    if (!chartContainer || !labelContainer) return;
+// ---------- RENDER ----------
+let pieChart, weekChart;
 
-    chartContainer.innerHTML = '';
-    labelContainer.innerHTML = '';
+function render(){
+ const date=datePicker.value;
+ const entries=getEntries().filter(e=>e.date===date);
+ logList.innerHTML="";
 
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        const dayName = d.toLocaleDateString([], { weekday: 'short' });
+ let totals={cal:0,p:0,c:0,f:0};
 
-        const logs = JSON.parse(localStorage.getItem(`logs_${dateStr}`)) || [];
-        const totalCals = logs.reduce((sum, item) => sum + (item.calories || 0), 0);
-        const height = Math.min((totalCals / 2500) * 100, 100);
+ entries.forEach((e,i)=>{
+  totals.cal+=e.calories;
+  totals.p+=e.protein;
+  totals.c+=e.carbs;
+  totals.f+=e.fat;
 
-        const bar = document.createElement('div');
-        bar.className = 'chart-bar';
-        bar.style.height = `${height}%`;
-        bar.setAttribute('data-value', totalCals);
-        chartContainer.appendChild(bar);
+  const div=document.createElement("div");
+  div.className="log-item";
+  div.innerHTML=`
+   <strong>${e.name}</strong>
+   <small>${e.calories} kcal</small>
+   <button onclick="editEntry(${i})">✏️</button>
+   <button onclick="deleteEntry(${i})">🗑</button>
+  `;
+  logList.appendChild(div);
+ });
 
-        const label = document.createElement('span');
-        label.innerText = dayName;
-        labelContainer.appendChild(label);
-    }
-};
+ updateMacroDisplay(totals);
+ drawPie(totals);
+ drawWeekly();
+}
 
-window.selectTab = function(element, category) {
-    document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
-    element.classList.add('active');
-    document.getElementById('mealType').value = category;
-};
+// ---------- MACROS ----------
+function updateMacroDisplay(t){
+ const g=getGoals();
+ macroText.innerHTML=`
+ Protein: ${t.p}/${g.protein}g<br>
+ Carbs: ${t.c}/${g.carbs}g<br>
+ Fat: ${t.f}/${g.fat}g
+ `;
+}
+
+// ---------- PIE CHART ----------
+function drawPie(t){
+ if(pieChart) pieChart.destroy();
+
+ pieChart=new Chart(macroPie,{
+  type:"pie",
+  data:{
+   labels:["Protein","Carbs","Fat"],
+   datasets:[{data:[t.p,t.c,t.f]}]
+  }
+ });
+}
+
+// ---------- WEEKLY ----------
+function drawWeekly(){
+ const entries=getEntries();
+ const days=[];
+ const values=[];
+
+ for(let i=6;i>=0;i--){
+  const d=new Date();
+  d.setDate(d.getDate()-i);
+  const ds=d.toISOString().split("T")[0];
+
+  const total=entries
+   .filter(e=>e.date===ds)
+   .reduce((s,e)=>s+e.calories,0);
+
+  days.push(d.getDate());
+  values.push(total);
+ }
+
+ if(weekChart) weekChart.destroy();
+
+ weekChart=new Chart(weeklyChart,{
+  type:"bar",
+  data:{labels:days,datasets:[{data:values}]}
+ });
+}
+
+// ---------- PWA INSTALL ----------
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("sw.js");
+}
+
+// ---------- INIT ----------
+render();

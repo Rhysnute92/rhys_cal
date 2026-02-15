@@ -1,143 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Food Diary</title>
-    <link rel="stylesheet" href="shared.css">
-    <link rel="stylesheet" href="log.css">
-    <link rel="icon" type="image/png" href="rhys_logo.png">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Diary</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="rhys_logo.png">
+
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="log.css">
+
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<header class="app-header">
-    <div class="header-content">
-        <img src="rhys_logo.png" class="header-logo" alt="Logo">
-        <h1>Food Diary</h1>
-    </div>
 
-    <nav class="nav-wrapper">
-        <div class="nav-bar">
-            <a href="index.html" class="nav-item">
-                <img src="dashboard.png" alt="home">
-                <span>Home</span>
-            </a>
-            <a href="log.html" class="nav-item">
-                <img src="diary.png" alt="diary">
-                <span>Food</span>
-            </a>
-            <a href="training.html" class="nav-item">
-                <img src="training.png" alt="gym">
-                <span>Gym</span>
-            </a>
-        </div>
-    </nav>
+<header class="app-header">
+    <h1>Food Diary</h1>
 </header>
 
-    <section class="card no-print">
-        <button class="icon-btn full-width" onclick="startCamera()" style="background: var(--dark);">
-            📷 Scan Barcode
-        </button>
-    </section>
-
-    <div id="scannerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:2000;">
-        <div id="interactive" class="viewport" style="width:100%; height:80vh;"></div>
-        <div style="padding: 20px; text-align: center;">
-            <button class="icon-btn" onclick="stopScanner()" style="background:red;">Cancel Scan</button>
-        </div>
-    </div>
-
-<div class="header-spacer"></div>
-
 <div class="container">
-<div class="calendar-controls">
-  <button class="nav-btn">◀</button>
-  <span class="today-text">Today</span>
-  <button class="nav-btn">▶</button>
+
+<button class="btn-primary full" onclick="startCamera()">📸 Scan Barcode</button>
+
+<!-- scanner -->
+<div id="scannerOverlay" class="scanner-overlay">
+    <div id="interactive" class="viewport"></div>
+    <button onclick="stopScanner()" class="btn-danger">Cancel</button>
 </div>
 
-    <div class="card quick-add-container">
-        <label>Quick Add Favorites</label>
-        <div class="quick-chips">
-            <button class="chip" onclick="quickAdd('Protein Shake', 200, 30, 5, 2, 'Drinks')">🥤 Shake</button>
-            <button class="chip" onclick="quickAdd('Chicken Breast', 165, 31, 0, 3.6, 'Dinner')">🍗 Chicken</button>
-            <button class="chip" onclick="quickAdd('Apple', 95, 0.5, 25, 0.3, 'Snacks')">🍎 Apple</button>
-            <button class="chip" onclick="quickAdd('Skyr Yogurt', 100, 11, 4, 0.2, 'Breakfast')">🥣 Yogurt</button>
-        </div>
-    </div>
-
-    <div id="diaryEntries" class="dashboard-grid">
-    </div>
+<!-- goals -->
+<div class="card">
+<h3>Macro Goals</h3>
+<input id="goalP" type="number" placeholder="Protein">
+<input id="goalC" type="number" placeholder="Carbs">
+<input id="goalF" type="number" placeholder="Fat">
+<button onclick="saveGoals()">Save Goals</button>
 </div>
 
-<div id="daySummary" class="card summary-container">
+<!-- manual entry -->
+<div id="entryForm" class="card hidden">
+<input id="foodName" placeholder="Food name">
+
+<div class="grid">
+<input id="calories" type="number" placeholder="Calories">
+<input id="protein" type="number" placeholder="Protein">
+<input id="carbs" type="number" placeholder="Carbs">
+<input id="fat" type="number" placeholder="Fat">
 </div>
 
-<div class="container">
-    <div id="manualEntryForm" class="card">
-        <div class="meal-tabs-container">
-            <label>Select Meal</label>
-            <div class="meal-tabs">
-                <button type="button" class="tab-btn active" onclick="selectTab(this, 'Breakfast')">Breakfast</button>
-                <button type="button" class="tab-btn" onclick="selectTab(this, 'Dinner')">Dinner</button>
-                <button type="button" class="tab-btn" onclick="selectTab(this, 'Tea')">Tea</button>
-                <button type="button" class="tab-btn" onclick="selectTab(this, 'Snacks')">Snacks</button>
-                <button type="button" class="tab-btn" onclick="selectTab(this, 'Drinks')">Drinks</button>
-            </div>
-            <input type="hidden" id="mealType" value="Breakfast">
-        </div>
-        <h3>Scanned Item Details</h3>
+<select id="mealType">
+<option>Breakfast</option>
+<option>Lunch</option>
+<option>Dinner</option>
+<option>Snacks</option>
+<option>Drinks</option>
+</select>
 
-<label>Food Name</label>
-<input type="text" id="foodSearch" placeholder="Product Name">
-
-<div class="macro-grid">
-    <div>
-        <label>Protein (g)</label>
-        <input type="number" id="manualP" step="0.1">
-    </div>
-    <div>
-        <label>Carbs (g)</label>
-        <input type="number" id="manualC" step="0.1">
-    </div>
-    <div>
-        <label>Fat (g)</label>
-        <input type="number" id="manualF" step="0.1">
-    </div>
+<button onclick="saveEntry()">Add</button>
 </div>
 
-<label>Calories (kcal)</label>
-<input type="number" id="manualCal">
+<!-- macro progress -->
+<div class="card">
+<h3>Macros</h3>
+<div id="macroText"></div>
+<canvas id="macroPie"></canvas>
+</div>
 
-        <button onclick="saveScannedFood()" class="btn-primary">Add to Log</button>
-    </div>
+<!-- log -->
+<div class="card">
+<h3>Daily Log</h3>
+<input type="date" id="datePicker">
+<div id="logList"></div>
+</div>
 
-    <section class="card">
-        <div class="log-header">
-            <h3>Food Diary</h3>
-            <input type="date" id="logDatePicker" onchange="displayDailyLog()">
-        </div>
+<!-- weekly chart -->
+<div class="card">
+<h3>Last 7 Days</h3>
+<canvas id="weeklyChart"></canvas>
+</div>
 
-        <div id="dailyLogList">
-        </div>
-
-        <div class="log-footer">
-            <button onclick="clearDailyLog()" class="btn-clear">Clear Selected Day</button>
-        </div>
-    </section>
-
-    <div class="card weekly-trends">
-        <h3>Last 7 Days (kcal)</h3>
-        <div class="chart-container" id="weeklyChart">
-        </div>
-        <div class="chart-labels" id="chartLabels">
-        </div>
-    </div>
 </div>
 
 <script type="module" src="log.js"></script>
+<script type="module" src="state.js"></script>
 </body>
 </html>

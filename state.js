@@ -1,506 +1,223 @@
-/* state.js additions */
-/* state.js */
-export const getToday = () => new Date().toISOString().split('T')[0];
-export const todayKey = () => getToday();
-
-// Persistence Helpers
-export const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-export const load = (key) => JSON.parse(localStorage.getItem(key)) || null;
-
-// Formula for 1RM
-export const calculate1RM = (w, r) => r === 1 ? w : Math.round(w / (1.0278 - (0.0278 * r)));
-
-export const GOALS = {
-    REST: { kcal: 1500, p: 200, c: 145, f: 45 },
-    TRAINING: { kcal: 1800, p: 200, c: 220, f: 45 } // Higher carbs for training
-};
-
-export function toggleTrainingDay() {
-    let currentMode = localStorage.getItem('isTrainingDay') === 'true';
-    currentMode = !currentMode; // Toggle the state
-    
-    localStorage.setItem('isTrainingDay', currentMode);
-    
-    // Update active goals based on mode
-    const newGoals = currentMode ? GOALS.TRAINING : GOALS.REST;
-    localStorage.setItem('userGoals', JSON.stringify(newGoals));
-    
-    return currentMode;
-}
-
 /* ================================
-   GLOBAL STATE & CONFIG
+   DATE HELPERS
 ================================ */
 
-// Manages unit preference and persistent data from localStorage
+export const getToday = () => new Date().toISOString().split('T')[0];
+window.getToday = getToday;
+
+/* ================================
+   STORAGE HELPERS
+================================ */
+
+export const save = (key, data) =>
+    localStorage.setItem(key, JSON.stringify(data));
+
+export const load = (key, fallback = null) =>
+    JSON.parse(localStorage.getItem(key)) ?? fallback;
+
+/* ================================
+   GLOBAL STATE
+================================ */
+
 export const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 
-export let workoutData = JSON.parse(localStorage.getItem('workoutData')) || {};
-export let foodData = JSON.parse(localStorage.getItem('foodData')) || {};
-export let waterData = JSON.parse(localStorage.getItem('waterData')) || {};
-export let weightHistory = JSON.parse(localStorage.getItem('weightHistory')) || [];
-export let isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || false;
-
-// Fixed Goals as requested: 1500 (Rest) / 1800 (Train)
-// Macros are locked at 200g P, 145g C, 45g F for both modes
-export let goals = {
-    restCals: 1500,
-    trainCals: 1800,
-    protein: 200,
-    carbs: 145,
-    fat: 45,
-    targetWeight: 75 // Added target weight for the comparison chart
-};
+export let workoutData = load('workoutData', {});
+export let foodData = load('foodData', {});
+export let waterData = load('waterData', {});
+export let weightHistory = load('weightHistory', []);
 
 export const WATER_GOAL = 2000;
 
-window.gymDB = {
-    "Cardio" : [
-    { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
-    { name: "Walking", equipment: "None", muscle: "Legs (Cardio)" }
-    ],
-    "Chest": [
-    { name: "Barbell Bench Press", equipment: "Barbell", muscle: "Chest" },
-    { name: "Incline DB Press", equipment: "Dumbbells", muscle: "Chest" }
-    ],
-    "Legs": [
-    { name: "Barbell Squat", equipment: "Barbell", muscle: "Legs" },
-    { name: "Leg Press", equipment: "Machine", muscle: "Legs" }
-    ],
-    "Back": [
-    { name: "Deadlift", equipment: "Barbell", muscle: "Back" },
-    { name: "Bent Over Row", equipment: "Barbell", muscle: "Back" },
-    { name: "Lat Pulldown", equipment: "Machine", muscle: "Back" }        
-    ],
-    "Shoulders": [
-    { name: "Overhead Press", equipment: "Barbell", muscle: "Shoulders" },
-    { name: "Lateral Raise", equipment: "Dumbbells", muscle: "Shoulders" }        
-    ],
-    "Arms": [
-    { name: "Bicep Curl", equipment: "Dumbbells", muscle: "Arms" },
-    { name: "Tricep Pushdown", equipment: "Cable", muscle: "Arms" },
-    { name: "Hammer Curl", equipment: "Dumbbells", muscle: "Arms" },
-    { name: "Skull Crushers", equipment: "Barbell", muscle: "Arms" }        
-    ],
-    "Core":[
-    { name: "Leg Raises", muscle: "Core"},
-    { name: "Sit-ups", muscle: "Core"},
-    { name: "Plank", muscle: "Core"},
-    { name: "Crunches", muscle: "Core"}
-    ]
-}
-
-// Helper to get a flat list of all exercise names
-window.getAllExerciseNames = function () {
-    return Object.values(window.gymDB).flat().map(ex => ex.name);
+export const GOALS = {
+    REST: { kcal: 1500, protein: 200, carbs: 145, fat: 45 },
+    TRAINING: { kcal: 1800, protein: 200, carbs: 220, fat: 45 }
 };
 
-// Expanded Exercise Database including Cardio (Swimming/Walking)
-export const gymDB = [
-    { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
-    { name: "Walking", equipment: "None", muscle: "Legs (Cardio)" },
-    { name: "Barbell Bench Press", equipment: "Barbell", muscle: "Chest" },
-    { name: "Incline DB Press", equipment: "Dumbbells", muscle: "Chest" },
-    { name: "Barbell Squat", equipment: "Barbell", muscle: "Legs" },
-    { name: "Leg Press", equipment: "Machine", muscle: "Legs" },
-    { name: "Deadlift", equipment: "Barbell", muscle: "Back" },
-    { name: "Bent Over Row", equipment: "Barbell", muscle: "Back" },
-    { name: "Lat Pulldown", equipment: "Machine", muscle: "Back" },
-    { name: "Overhead Press", equipment: "Barbell", muscle: "Shoulders" },
-    { name: "Lateral Raise", equipment: "Dumbbells", muscle: "Shoulders" },
-    { name: "Bicep Curl", equipment: "Dumbbells", muscle: "Arms" },
-    { name: "Tricep Pushdown", equipment: "Cable", muscle: "Arms" },
-    { name: "Hammer Curl", equipment: "Dumbbells", muscle: "Arms" },
-    { name: "Skull Crushers", equipment: "Barbell", muscle: "Arms" }
-];
-
-export let activeLogDate = new Date().toISOString().split('T')[0];
+export const goals = {
+    targetWeight: 75
+};
 
 /* ================================
-   HELPERS
+   TRAINING DAY MANAGEMENT
 ================================ */
 
-// Saves state to localStorage to ensure data persists on refresh
-export function saveState(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+export function isTrainingDay(date = getToday()) {
+    return localStorage.getItem(`isTraining_${date}`) === 'true';
 }
 
+export function toggleTrainingDay(date = getToday()) {
+    const key = `isTraining_${date}`;
+    const newState = !isTrainingDay(date);
+    localStorage.setItem(key, newState);
 
-// Handles conversion for weight display
+    updateDailyGoalUI(date);
+    syncWorkoutDiaryEntry(date, newState);
+
+    return newState;
+}
+
+function syncWorkoutDiaryEntry(date, isTraining) {
+    const logKey = `logs_${date}`;
+    let logs = load(logKey, []);
+
+    if (isTraining) {
+        if (!logs.some(e => e.name === "Workout 💪")) {
+            logs.push({
+                name: "Workout 💪",
+                calories: 0,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+        }
+    } else {
+        logs = logs.filter(e => e.name !== "Workout 💪");
+    }
+
+    save(logKey, logs);
+}
+
+/* ================================
+   DAILY GOAL UI
+================================ */
+
+export function getCalorieGoal(date = getToday()) {
+    return isTrainingDay(date) ? GOALS.TRAINING.kcal : GOALS.REST.kcal;
+}
+
+window.updateDailyGoalUI = function(date = getToday()) {
+    const goal = getCalorieGoal(date);
+    const training = isTrainingDay(date);
+
+    const goalText = document.getElementById('calorieGoal');
+    const statusText = document.getElementById('dayStatus');
+    const btn = document.getElementById('trainingBtn');
+
+    if (goalText) goalText.innerText = `${goal} kcal`;
+
+    if (statusText) {
+        statusText.innerText = training ? "Training Day" : "Rest Day";
+        statusText.classList.toggle('training-active', training);
+    }
+
+    if (btn) {
+        btn.innerText = training ? "Logged as Workout ✅" : "Mark Training 💪";
+        btn.style.background = training ? "#28a745" : "var(--primary)";
+    }
+
+    localStorage.setItem(`goal_${date}`, goal);
+};
+
+/* ================================
+   COPY TODAY DATA
+================================ */
+
+window.copyTodayToDate = function () {
+    const today = getToday();
+    const target = window.currentViewDate;
+
+    if (today === target) return alert("Already viewing today.");
+
+    const todayData = localStorage.getItem(`logs_${today}`);
+
+    if (todayData) {
+        localStorage.setItem(`logs_${target}`, todayData);
+        if (typeof loadDiaryEntries === "function") loadDiaryEntries();
+        alert("Logs copied successfully!");
+    } else {
+        alert("Nothing to copy.");
+    }
+};
+
+/* ================================
+   NUTRITION TOTALS
+================================ */
+
+window.getTotalsForDate = function(dateString) {
+    const history = load('foodHistory', {});
+    const entries = history[dateString] || [];
+
+    return entries.reduce((acc, item) => {
+        acc.p += +item.protein || 0;
+        acc.c += +item.carbs || 0;
+        acc.f += +item.fats || 0;
+        acc.kcal += +item.calories || 0;
+        return acc;
+    }, { p: 0, c: 0, f: 0, kcal: 0 });
+};
+
+/* ================================
+   STRENGTH FORMULA
+================================ */
+
+export function calculate1RM(weight, reps) {
+    if (reps === 1) return weight;
+    if (reps > 10) return null; // less accurate
+    return Math.round(weight / (1.0278 - (0.0278 * reps)));
+}
+
+window.calculate1RM = calculate1RM;
+
+/* ================================
+   DISPLAY HELPERS
+================================ */
+
 export function getDisplayWeight(kg) {
     return weightUnit === 'lbs'
         ? (kg * 2.20462).toFixed(1)
         : kg.toFixed(1);
 }
 
-function getTodayString() {
-    const today = new Date();
-    // Returns YYYY-MM-DD
-    return today.toISOString().split('T')[0];
-}
+/* ================================
+   EXERCISE DATABASE
+================================ */
 
-// Calculates totals for any given date
-window.getTotalsForDate = function(dateString) {
-    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
-    const entries = history[dateString] || [];
-
-    return entries.reduce((acc, item) => {
-        acc.p += parseFloat(item.protein) || 0;
-        acc.c += parseFloat(item.carbs) || 0;
-        acc.f += parseFloat(item.fats) || 0;
-        acc.kcal += parseInt(item.calories) || 0;
-        return acc;
-    }, { p: 0, c: 0, f: 0, kcal: 0 });
+window.gymDB = {
+    Chest: [
+        { name: "Barbell Bench Press", equipment: "Barbell" },
+        { name: "Incline DB Press", equipment: "Dumbbells" }
+    ],
+    Legs: [
+        { name: "Barbell Squat", equipment: "Barbell" },
+        { name: "Leg Press", equipment: "Machine" }
+    ],
+    Back: [
+        { name: "Deadlift", equipment: "Barbell" },
+        { name: "Lat Pulldown", equipment: "Machine" }
+    ],
+    Shoulders: [
+        { name: "Overhead Press", equipment: "Barbell" },
+        { name: "Lateral Raise", equipment: "Dumbbells" }
+    ],
+    Arms: [
+        { name: "Bicep Curl", equipment: "Dumbbells" },
+        { name: "Tricep Pushdown", equipment: "Cable" }
+    ],
+    Cardio: [
+        { name: "Swimming" },
+        { name: "Walking" }
+    ],
+    Core: [
+        { name: "Plank" },
+        { name: "Crunches" }
+    ]
 };
 
-// Specifically updates the card on the Log page
-window.updateLogSummaryUI = function() {
-    const selectedDate = document.getElementById('logDatePicker').value;
-    const totals = getTotalsForDate(selectedDate);
-    const summaryDiv = document.getElementById('daySummary');
+window.getAllExerciseNames = () =>
+    Object.values(window.gymDB).flat().map(ex => ex.name);
 
-    if (!summaryDiv) return;
-
-    summaryDiv.innerHTML = `
-        <div class="summary-grid">
-            <div class="summary-item"><span class="label">Kcal</span><strong>${totals.kcal}</strong></div>
-            <div class="summary-item"><span class="label">Prot</span><strong>${totals.p.toFixed(0)}g</strong></div>
-            <div class="summary-item"><span class="label">Carb</span><strong>${totals.c.toFixed(0)}g</strong></div>
-            <div class="summary-item"><span class="label">Fat</span><strong>${totals.f.toFixed(0)}g</strong></div>
-        </div>
-    `;
-};
-
-/* --- Settings & Goals --- */
-window.saveGoals = function() {
-    const goals = {
-        calories: parseInt(document.getElementById('goalKcal').value) || 2000,
-        protein: parseInt(document.getElementById('goalP').value) || 150,
-        carbs: parseInt(document.getElementById('goalC').value) || 200,
-        fats: parseInt(document.getElementById('goalF').value) || 60
-    };
-    localStorage.setItem('userGoals', JSON.stringify(goals));
-    alert("Goals updated!");
-};
-
-/* --- Dynamic Tile Management --- */
-window.renderDashboard = function() {
-    const grid = document.getElementById('mainGrid');
-    const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
-
-    grid.innerHTML = activeTiles.map(tile => {
-        if (tile === 'nutrition') return createNutritionTile();
-        if (tile === 'gym') return createGymTile();
-        if (tile === 'settings') return createSettingsTile();
-        // Add more logic here for custom tiles
-        return `<div class="card"><h3>${tile}</h3><p>Custom Tracker</p></div>`;
-    }).join('') + `<div class="card add-tile" onclick="openModal()">+ Add Tile</div>`;
-};
-
-function createSettingsTile() {
-    return `
-        <div class="card settings-tile" onclick="window.location.href='settings.html'">
-            <h3>Settings</h3>
-            <p>Update Goals & Profile</p>
-            <div class="icon-circle">⚙️</div>
-        </div>
-    `;
-}
-
-// Universal Update for Dashboard Trackers
-window.updateTracker = function(type, val = null) {
-    const today = getToday();
-    let storageKey = type === 'water' ? 'waterLog' : type === 'steps' ? 'stepsLog' : 'sleepLog';
-    let data = JSON.parse(localStorage.getItem(storageKey)) || {};
-
-    if (type === 'water') {
-        data[today] = (data[today] || 0) + 1;
-    } else if (type === 'steps') {
-        const input = prompt("Total steps for today:", data[today] || "");
-        if (input === null) return;
-        data[today] = parseInt(input) || 0;
-    } else if (type === 'sleep') {
-        data[today] = parseFloat(val);
-    }
-
-    localStorage.setItem(storageKey, JSON.stringify(data));
-    if (typeof renderDashboard === "function") renderDashboard();
-    if (window.navigator.vibrate) window.navigator.vibrate(20);
-};
-
-// Global totals for the Index and Log summaries
-window.getTotalsForDate = function(dateString) {
-    const history = JSON.parse(localStorage.getItem('foodHistory')) || {};
-    const entries = history[dateString] || [];
-    return entries.reduce((acc, item) => {
-        acc.p += parseFloat(item.protein) || 0;
-        acc.c += parseFloat(item.carbs) || 0;
-        acc.f += parseFloat(item.fats) || 0;
-        acc.kcal += parseInt(item.calories) || 0;
-        return acc;
-    }, { p: 0, c: 0, f: 0, kcal: 0 });
-};
+/* ================================
+   THEME TOGGLE
+================================ */
 
 window.toggleDarkMode = function() {
-    // If the body has dark-theme, remove it and force light-theme
-    // If it doesn't, add dark-theme and remove light-theme
-    if (document.body.classList.contains('dark-theme')) {
-        document.body.classList.remove('dark-theme');
-        document.body.classList.add('light-theme');
-        localStorage.setItem('theme-preference', 'light');
-    } else {
-        document.body.classList.remove('light-theme');
-        document.body.classList.add('dark-theme');
-        localStorage.setItem('theme-preference', 'dark');
-    }
-    updateDarkModeButton();
+    document.body.classList.toggle('dark-theme');
+    localStorage.setItem(
+        'theme-preference',
+        document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+    );
 };
 
-function updateDarkModeButton() {
-    const btn = document.getElementById('darkBtn');
-    if (!btn) return;
-    const isDark = document.body.classList.contains('dark-theme') ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches && !document.body.classList.contains('light-theme'));
-
-    btn.innerText = isDark ? "☀️ Switch to Light Mode" : "🌙 Switch to Dark Mode";
-}
-
-// Apply theme on load
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme-preference');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-    } else if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-    }
-    updateDarkModeButton();
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('theme-preference');
+    if (saved === 'dark') document.body.classList.add('dark-theme');
+    updateDailyGoalUI();
 });
-
-/* Standardized Date Fetcher */
-window.getToday = function() {
-    const now = new Date();
-    const year = now.getFullYear();
-    // Month is 0-indexed, so we add 1 and pad with a leading zero if needed
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`; // Returns format: "2026-02-11"
-};
-
-// Global variable to track what date the user is LOOKING at
-window.currentViewDate = getToday();
-
-// Navigate dates
-window.changeDate = function(offset) {
-    const d = new Date(window.currentViewDate);
-    d.setDate(d.getDate() + offset);
-
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-
-    window.currentViewDate = `${year}-${month}-${day}`;
-
-    // Update UI
-    if (typeof renderDashboard === "function") renderDashboard();
-    updateDateDisplay();
-};
-
-// Copy Data Function
-window.copyTodayToDate = function() {
-    const today = getToday();
-    const target = window.currentViewDate;
-
-    if (today === target) {
-        alert("You are already looking at today!");
-        return;
-    }
-
-    // List of keys you want to copy (e.g., water, calories, steps)
-    const trackers = ['water', 'calories', 'steps', 'protein'];
-
-    trackers.forEach(key => {
-        const todayData = localStorage.getItem(`${key}_${today}`);
-        if (todayData) {
-            localStorage.setItem(`${key}_${target}`, todayData);
-        }
-    });
-
-    alert(`Copied today's stats to ${target}!`);
-    renderDashboard();
-};
-
-window.copyTodayToDate = function() {
-    const today = getToday();
-    const target = window.currentViewDate;
-
-    if (today === target) return alert("You are already on Today!");
-
-    const todayData = localStorage.getItem(`logs_${today}`);
-
-    if (todayData) {
-        localStorage.setItem(`logs_${target}`, todayData);
-        loadDiaryEntries(); // Refresh the UI
-        alert("Logs copied successfully!");
-    } else {
-        alert("Nothing found in Today's log to copy.");
-    }
-};
-
-/* state.js */
-
-window.toggleTrainingDay = function () {
-    const today = getToday();
-    const key = `isTraining_${today}`;
-
-    // 1. Check if it's currently a training day
-    const isTraining = localStorage.getItem(key) === 'true';
-    const newState = !isTraining;
-
-    // 2. Save the new state
-    localStorage.setItem(key, newState);
-
-    // 3. Update the UI
-    updateCalorieGoal();
-};
-
-window.updateCalorieGoal = function () {
-    const today = getToday();
-    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
-    const targetDisplay = document.getElementById('targetDisplay');
-    const statusText = document.getElementById('trainingStatus');
-    const btn = document.getElementById('trainToggleBtn');
-
-    // Default 1500, jumps to 1800 if training
-    const goal = isTraining ? 1800 : 1500;
-
-    if (targetDisplay) targetDisplay.innerText = `Goal: ${goal} kcal`;
-
-    if (statusText) {
-        statusText.innerText = isTraining ? "Training Day Active" : "Rest Day";
-        statusText.style.color = isTraining ? "var(--primary)" : "var(--secondary)";
-    }
-
-    if (btn) {
-        btn.innerText = isTraining ? "✅ Training Set" : "💪 Mark Training";
-        btn.style.background = isTraining ? "#28a745" : "var(--primary)";
-    }
-
-    // Save the numeric goal for other parts of the app to use
-    localStorage.setItem(`goal_${today}`, goal);
-};
-
-// Ensure it loads correctly on page open
-document.addEventListener('DOMContentLoaded', updateCalorieGoal);
-
-/* state.js */
-
-window.handleTrainingToggle = function () {
-    const today = getToday();
-    const key = `isTraining_${today}`;
-
-    // 1. Toggle the true/false state
-    const currentStatus = localStorage.getItem(key) === 'true';
-    const newStatus = !currentStatus;
-    localStorage.setItem(key, newStatus);
-
-    // 2. Trigger the UI update
-    updateDailyGoalUI();
-};
-
-window.updateDailyGoalUI = function () {
-    const today = getToday();
-    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
-
-    const goalText = document.getElementById('calorieGoal');
-    const statusText = document.getElementById('dayStatus');
-    const btn = document.getElementById('trainingBtn');
-
-    if (isTraining) {
-        // Training Day Settings
-        if (goalText) goalText.innerText = "1800 kcal";
-        if (statusText) statusText.innerText = "Training Day";
-        if (btn) {
-            btn.innerText = "Set to Rest";
-            btn.style.background = "#28a745"; // Green for active
-        }
-        statusText.classList.add('training-active');
-    } else {
-        // Rest Day Settings
-        if (goalText) goalText.innerText = "1500 kcal";
-        if (statusText) statusText.innerText = "Rest Day";
-        if (btn) {
-            btn.innerText = "Mark Training";
-            btn.style.background = "var(--primary)";
-        }
-        statusText.classList.remove('training-active');
-    }
-};
-
-// Run on page load
-document.addEventListener('DOMContentLoaded', updateDailyGoalUI);
-
-window.handleTrainingToggle = function () {
-    const today = getToday();
-    const key = `isTraining_${today}`;
-    const logKey = `logs_${today}`;
-
-    const isNowTraining = localStorage.getItem(key) !== 'true'; // Flipping the state
-    localStorage.setItem(key, isNowTraining);
-
-    // Manage the Diary Entry
-    let logs = JSON.parse(localStorage.getItem(logKey)) || [];
-
-    if (isNowTraining) {
-        // Add "Workout" to diary if it's not already there
-        const exists = logs.some(entry => entry.name === "Workout 💪");
-        if (!exists) {
-            logs.push({ name: "Workout 💪", calories: 0, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        }
-    } else {
-        // Remove "Workout" if they switch back to Rest Day
-        logs = logs.filter(entry => entry.name !== "Workout 💪");
-    }
-
-    localStorage.setItem(logKey, JSON.stringify(logs));
-
-    // Update UI
-    updateDailyGoalUI();
-    if (typeof loadDiaryEntries === "function") loadDiaryEntries();
-};
-
-window.updateDailyGoalUI = function () {
-    const today = getToday();
-    const isTraining = localStorage.getItem(`isTraining_${today}`) === 'true';
-
-    const goalText = document.getElementById('calorieGoal');
-    const statusText = document.getElementById('dayStatus');
-    const btn = document.getElementById('trainingBtn');
-
-    if (isTraining) {
-        if (goalText) goalText.innerText = "1800 kcal";
-        if (statusText) statusText.innerText = "Training Day";
-        if (btn) {
-            btn.innerText = "Logged as Workout ✅";
-            btn.style.background = "#28a745";
-        }
-    } else {
-        if (goalText) goalText.innerText = "1500 kcal";
-        if (statusText) statusText.innerText = "Rest Day";
-        if (btn) {
-            btn.innerText = "Mark Training 💪";
-            btn.style.background = "var(--primary)";
-        }
-    }
-};
-
-/* Strength Formulas */
-
-// Brzycki Formula: Weight / ( 1.0278 - ( 0.0278 * Reps ) )
-window.calculate1RM = function (weight, reps) {
-    if (reps == 1) return weight;
-    if (reps > 10) return "Estimate less accurate > 10 reps";
-
-    const oneRM = weight / (1.0278 - (0.0278 * reps));
-    return Math.round(oneRM);
-};
