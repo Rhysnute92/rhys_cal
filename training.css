@@ -1,5 +1,6 @@
 .category-grid {
     display: grid;
+    background: var(--secondary);
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 20px;
@@ -96,7 +97,7 @@
 .rest-btn {
     flex: 1;
     border: none;
-    background: none;
+    background: var(--secondary);
     padding: 8px;
     border-radius: 8px;
     font-size: 0.85rem;

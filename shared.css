@@ -1,6 +1,6 @@
 /* --- Root Variables & Reset --- */
 :root {
-    --tile-size: 160px;
+    --tile-size: 200px;
     --primary: #4caf50;
     --secondary: #6c757d;
     --success: #4dbdff;
