@@ -6,22 +6,18 @@
     <title>Training & History</title>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="training.css">
-    <link rel="icon" type="image/png" href="rhys_logo.png">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
+<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 <header class="app-header">
     <div class="header-content">
-            <img src="rhys_logo.png" class="header-logo" alt="Logo">
-            <h1>Gym</h1>
+        <img src="rhys_logo.png" class="header-logo" alt="Logo">
+        <h1>Gym</h1>
     </div>
 
-
-    <nav class="nav-wrapper">
+     <nav class="nav-wrapper">
         <div class="nav-bar">
             <a href="index.html" class="nav-item">
                 <img src="dashboard.png" alt="home">
@@ -41,72 +37,73 @@
 
 <div class="header-spacer"></div>
 
-<section class="card">
-    <h3>Select Category</h3>
-    <div class="category-grid">
-        <button class="pill active" onclick="filterExercises('Chest')">Chest</button>
-        <button class="pill" onclick="filterExercises('Back')">Back</button>
-        <button class="pill" onclick="filterExercises('Legs')">Legs</button>
-        <button class="pill" onclick="filterExercises('Shoulders')">Shoulders</button>
-        <button class="pill" onclick="filterExercises('Arms')">Arms</button>
-        <button class="pill" onclick="filterExercises('Core')">Core</button>
-    </div>
-
-    <div class="input-group" style="margin-top: 20px;">
-        <label>Exercise</label>
-        <select id="exerciseSelect" class="full-width-select">
-        </select>
-    </div>
-</section>
-
-    <div class="input-row">
-        <div class="input-group">
-            <label>Weight</label>
-            <input type="number" id="weightLifted" oninput="showLive1RM()">
-        </div>
-        <div class="input-group">
-            <label>Reps</label>
-            <input type="number" id="repsDone" oninput="showLive1RM()">
-        </div>
-    </div>
-    <p id="live1RM" style="font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-top: 5px;"></p>
-
+<main class="container">
     <section class="card">
-        <h3>Body Weight Tracker</h3>
+        <h3>Select Category</h3>
+        <div id="categoryGrid" class="category-grid">
+            </div>
+
         <div class="input-group">
-            <label>Current Weight (kg)</label>
-            <input type="number" id="bodyWeight" step="0.1" placeholder="75.0">
+            <label>Exercise</label>
+            <select id="exerciseSelect" class="full-width-select"></select>
         </div>
-        <button onclick="saveBodyWeight()" class="btn-secondary">Log Body Weight</button>
+
+        <div class="input-row" style="margin-top: 15px;">
+            <div class="input-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="weightLifted" oninput="showLive1RM()" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label>Reps</label>
+                <input type="number" id="repsDone" oninput="showLive1RM()" placeholder="0">
+            </div>
+        </div>
+        <p id="live1RM" class="live-1rm-display"></p>
+        <div id="timerContainer" class="timer-container" style="display: none;">
+<div class="input-group" style="margin-top: 15px;">
+    <label>Rest Duration</label>
+    <div class="rest-toggle-group">
+        <button type="button" class="rest-btn" onclick="setRest(30)">30s</button>
+        <button type="button" class="rest-btn active" id="defaultRest" onclick="setRest(60)">60s</button>
+        <button type="button" class="rest-btn" onclick="setRest(90)">90s</button>
+    </div>
+</div>
+
+<div id="timerContainer" class="timer-container" style="display: none;">
+    <div class="timer-display">
+        Resting: <span id="timerClock">01:00</span>
+    </div>
+    <button onclick="stopTimer()" class="btn-text">Skip</button>
+</div>
+        <button onclick="saveExercise()" class="btn-primary" style="width: 100%; margin-top: 10px;">Log Set</button>
     </section>
 
     <section class="card">
-    <h3>Strength Progress (1RM)</h3>
-    <div class="input-group">
-        <select id="chartExerciseSelector" onchange="renderStrengthChart()" class="full-width-select">
-            </select>
-    </div>
-    <div class="graph-container" style="height: 200px; margin-top: 15px;">
-        <canvas id="strengthChart"></canvas>
-    </div>
-</section>
+        <h3>Strength Progress (1RM)</h3>
+        <select id="chartExerciseSelector" onchange="renderStrengthChart()" class="full-width-select"></select>
+        <div class="graph-container" style="height: 200px; margin-top: 15px;">
+            <canvas id="strengthChart"></canvas>
+        </div>
+    </section>
 
     <section class="card">
-        <h3>Weight Progress (Last 7 Days)</h3>
-        <div class="graph-container">
+        <h3>Body Weight Tracker</h3>
+        <div class="input-row">
+            <input type="number" id="bodyWeight" step="0.1" placeholder="Current Weight (kg)" class="full-width-select">
+            <button onclick="saveBodyWeight()" class="btn-secondary">Log</button>
+        </div>
+        <div class="graph-container" style="height: 200px; margin-top: 15px;">
             <canvas id="weightChart"></canvas>
         </div>
     </section>
 
     <section class="card">
-        <h3>Recent History</h3>
-        <div id="exerciseHistoryList" class="history-list">
-        </div>
+        <h3>Today's History</h3>
+        <div id="exerciseHistoryList" class="history-list"></div>
     </section>
+</main>
 
-    </main>
-
-    <script src="state.js"></script>
-    <script src="training.js"></script>
+<script type="module" src="training.js"></script>
+<script type="module" src="state.js"></script>
 </body>
 </html>
