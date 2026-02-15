@@ -125,10 +125,6 @@ export function saveState(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
 }
 
-// Utility to get the current date key (YYYY-MM-DD)
-export function todayKey() {
-    return new Date().toISOString().split('T')[0];
-}
 
 // Handles conversion for weight display
 export function getDisplayWeight(kg) {
