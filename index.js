@@ -240,3 +240,44 @@ window.handleTrainingToggle = function() {
     localStorage.setItem('isTrainingDay', JSON.stringify(newState));
     location.reload(); 
 };
+
+import { customTilesHistory, customTileConfig, todayKey, saveState } from './state.js';
+
+window.renderDashboard = function() {
+    const grid = document.getElementById('mainGrid');
+    const today = todayKey();
+    
+    // Ensure today's entry exists in history
+    if (!customTilesHistory[today]) {
+        customTilesHistory[today] = {};
+    }
+
+    let gridHTML = ``; // Add your core tiles here first...
+
+    customTileConfig.forEach((config, index) => {
+        // Get today's count, or 0 if it's a brand new day
+        const currentAmount = customTilesHistory[today][config.name] || 0;
+
+        gridHTML += `
+            <div class="card grid-tile interactive-tile" onclick="incrementTracker('${config.name}', ${index})">
+                <div class="tile-header"><h4>${config.name}</h4><span>${config.icon || '✨'}</span></div>
+                <div class="tile-value">${currentAmount} <small>${config.unit}</small></div>
+                <p style="font-size:0.7rem; color:gray;">Daily Reset Active</p>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = gridHTML;
+};
+
+window.incrementTracker = function(name, configIndex) {
+    const today = todayKey();
+    const step = customTileConfig[configIndex].step;
+
+    // Update the value for TODAY specifically
+    const current = customTilesHistory[today][name] || 0;
+    customTilesHistory[today][name] = current + step;
+
+    saveState();
+    renderDashboard();
+};

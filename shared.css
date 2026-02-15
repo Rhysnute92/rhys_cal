@@ -516,3 +516,92 @@ body {
 .delete-btn {
     z-index: 10; /* Ensure the X stays clickable over the tile */
 }
+
+.settings-card, .settings-container {
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.input-group input {
+    width: 80px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.macro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.macro-grid div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.macro-grid input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.btn-clear {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+body.dark-mode .card {
+    background-color: #2d2d2d;
+    color: #ffffff;
+}
+
+.danger-zone {
+    border: 2px solid #ff4444;
+    background-color: rgba(255, 68, 68, 0.05);
+    margin-top: 30px;
+}
+
+.danger-zone h3 {
+    color: #ff4444;
+}
+
+.btn-delete-all {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-delete-all:hover {
+    background-color: #cc0000;
+}

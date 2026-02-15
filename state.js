@@ -163,3 +163,19 @@ export function setTrainingDay(val) {
     isTrainingDay = val;
     saveState();
 }
+
+// state.js
+
+// Load the full history of custom trackers
+export let customTilesHistory = JSON.parse(localStorage.getItem('customTilesHistory')) || {};
+
+// Load the current configuration (what trackers exist)
+export let customTileConfig = JSON.parse(localStorage.getItem('customTileConfig')) || [
+    { name: 'Water', unit: 'ml', step: 250, icon: '💧' }
+];
+
+export function saveState() {
+    // ... your other saves ...
+    localStorage.setItem('customTilesHistory', JSON.stringify(customTilesHistory));
+    localStorage.setItem('customTileConfig', JSON.stringify(customTileConfig));
+}
