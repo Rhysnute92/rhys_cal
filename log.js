@@ -1,3 +1,11 @@
+Quagga.offDetected();
+Quagga.onDetected(result => {
+    if (!scanning) return;
+    scanning = false;
+    stopScanner();
+    lookupBarcode(result.codeResult.code);
+});
+
 // ---------- STORAGE ----------
 const STORAGE_KEY = "foodEntries";
 const GOAL_KEY = "macroGoals";
@@ -28,14 +36,35 @@ datePicker.onchange = render;
 let scanning=false;
 
 window.startCamera=()=>{
- scannerOverlay.style.display="block";
+    document.body.classList.add("scanning");    
+    scannerOverlay.style.display="block";
 
- Quagga.init({
-  inputStream:{type:"LiveStream",target:interactive},
-  decoder:{readers:["ean_reader","upc_reader"]}
- }, err=>{
-  if(!err){Quagga.start(); scanning=true;}
- });
+Quagga.init({
+    inputStream: {
+        type: "LiveStream",
+        target: document.querySelector("#interactive"),
+        willReadFrequently: true,
+        constraints: {
+            facingMode: "environment"
+        }
+    },
+    locator: {
+        patchSize: "medium",
+        halfSample: true
+    },
+    numOfWorkers: navigator.hardwareConcurrency || 4,
+    frequency: 10,
+    decoder: {
+        readers: ["ean_reader", "ean_8_reader", "upc_reader"]
+    },
+    locate: true
+}, err => {
+    if (!err) {
+        Quagga.start();
+        scanning = true;
+    }
+});
+
 
  Quagga.onDetected(async res=>{
   stopScanner();
@@ -43,10 +72,21 @@ window.startCamera=()=>{
  });
 };
 
+Quagga.offDetected();   // prevents stacking listeners
+Quagga.onDetected(result => {
+    stopScanner();
+    lookupBarcode(result.codeResult.code);
+});
+
 window.stopScanner=()=>{
+    document.body.classList.remove("scanning");
  scannerOverlay.style.display="none";
- if(scanning) Quagga.stop();
+
+ if(scanning) {
+    Quagga.stop();
+    scanning = false;
 };
+}
 
 // ---------- BARCODE LOOKUP ----------
 async function lookupBarcode(code){
@@ -157,13 +197,22 @@ function render(){
 }
 
 // ---------- MACROS ----------
-function updateMacroDisplay(t){
- const g=getGoals();
- macroText.innerHTML=`
- Protein: ${t.p}/${g.protein}g<br>
- Carbs: ${t.c}/${g.carbs}g<br>
- Fat: ${t.f}/${g.fat}g
- `;
+function updateMacroDisplay(totals) {
+    const goals = getGoals();
+
+    if (!goals) return;
+
+    const remainP = Math.max(goals.protein - totals.p, 0);
+    const remainC = Math.max(goals.carbs - totals.c, 0);
+    const remainF = Math.max(goals.fat - totals.f, 0);
+
+    document.getElementById("pConsumed").textContent = totals.p.toFixed(0) + "g";
+    document.getElementById("cConsumed").textContent = totals.c.toFixed(0) + "g";
+    document.getElementById("fConsumed").textContent = totals.f.toFixed(0) + "g";
+
+    document.getElementById("pRemaining").textContent = remainP + "g left";
+    document.getElementById("cRemaining").textContent = remainC + "g left";
+    document.getElementById("fRemaining").textContent = remainF + "g left";
 }
 
 // ---------- PIE CHART ----------
