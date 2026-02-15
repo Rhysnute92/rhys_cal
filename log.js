@@ -151,20 +151,9 @@ function render(){
   logList.appendChild(div);
  });
 
-function updateMacroDisplay(totals) {
-    const goals = getGoals();
-
-    const remainingP = Math.max(goals.protein - totals.p, 0);
-    const remainingC = Math.max(goals.carbs - totals.c, 0);
-    const remainingF = Math.max(goals.fat - totals.f, 0);
-
-    pConsumed.textContent = totals.p.toFixed(0) + "g";
-    cConsumed.textContent = totals.c.toFixed(0) + "g";
-    fConsumed.textContent = totals.f.toFixed(0) + "g";
-
-    pRemaining.textContent = remainingP + "g left";
-    cRemaining.textContent = remainingC + "g left";
-    fRemaining.textContent = remainingF + "g left";
+ updateMacroDisplay(totals);
+ drawPie(totals);
+ drawWeekly();
 }
 
 // ---------- MACROS ----------
@@ -178,33 +167,17 @@ function updateMacroDisplay(t){
 }
 
 // ---------- PIE CHART ----------
-function drawPie(totals){
-    const goals = getGoals();
+function drawPie(t){
+ if(pieChart) pieChart.destroy();
 
-    if(pieChart) pieChart.destroy();
-
-    pieChart = new Chart(macroPie, {
-        type: "doughnut",
-        data: {
-            labels: ["Protein","Carbs","Fat"],
-            datasets: [{
-                data: [
-                    totals.p,
-                    totals.c,
-                    totals.f
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            cutout: "70%",
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
+ pieChart=new Chart(macroPie,{
+  type:"pie",
+  data:{
+   labels:["Protein","Carbs","Fat"],
+   datasets:[{data:[t.p,t.c,t.f]}]
+  }
+ });
 }
-
 
 // ---------- WEEKLY ----------
 function drawWeekly(){
@@ -240,4 +213,3 @@ if("serviceWorker" in navigator){
 
 // ---------- INIT ----------
 render();
-}
