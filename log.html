@@ -48,7 +48,7 @@
 
 <div class="container">
 
-<button class="btn-primary full" onclick="startCamera()">📸 Scan Barcode</button>
+<button class="btn-primary" onclick="startCamera()">📸 Scan Barcode</button>
 
 <!-- scanner -->
 <div id="scannerOverlay" class="scanner-overlay">
@@ -88,38 +88,10 @@
 </div>
 
 <!-- macro progress -->
-<div class="card macro-card">
-    <h3>Macros</h3>
-
-    <div class="macro-layout">
-        <canvas id="macroPie"></canvas>
-
-        <div class="macro-values">
-            <div class="macro-row protein">
-                <span>Protein</span>
-                <div class="macro-numbers">
-                    <strong id="pConsumed">0g</strong>
-                    <span class="remaining" id="pRemaining">0g left</span>
-                </div>
-            </div>
-
-            <div class="macro-row carbs">
-                <span>Carbs</span>
-                <div class="macro-numbers">
-                    <strong id="cConsumed">0g</strong>
-                    <span class="remaining" id="cRemaining">0g left</span>
-                </div>
-            </div>
-
-            <div class="macro-row fat">
-                <span>Fat</span>
-                <div class="macro-numbers">
-                    <strong id="fConsumed">0g</strong>
-                    <span class="remaining" id="fRemaining">0g left</span>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="card">
+<h3>Macros</h3>
+<div id="macroText"></div>
+<canvas id="macroPie"></canvas>
 </div>
 
 <!-- log -->
