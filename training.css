@@ -122,3 +122,15 @@
 .timer-finished-flash {
     animation: timerFinish 0.5s ease 3; /* Flashes 3 times */
 }
+
+.graph-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#macroAnalysis strong {
+    color: var(--primary);
+}

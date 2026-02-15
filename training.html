@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training & History</title>
-    <link rel="stylesheet" href="shared.css">
-    <link rel="stylesheet" href="training.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Diary</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="rhys_logo.png">
+
+<link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="log.css">
+
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 <header class="app-header">
     <div class="header-content">
         <img src="rhys_logo.png" class="header-logo" alt="Logo">
         <h1>Gym</h1>
     </div>
-
-     <nav class="nav-wrapper">
+    <nav class="nav-wrapper">
         <div class="nav-bar">
-            <a href="index.html" class="nav-item">
-                <img src="dashboard.png" alt="home">
-                <span>Home</span>
-            </a>
-            <a href="log.html" class="nav-item">
-                <img src="diary.png" alt="diary">
-                <span>Food</span>
-            </a>
-            <a href="training.html" class="nav-item">
-                <img src="training.png" alt="gym">
-                <span>Gym</span>
-            </a>
+            <a href="index.html" class="nav-item"><span>Home</span></a>
+            <a href="log.html" class="nav-item"><span>Food</span></a>
+            <a href="training.html" class="nav-item active"><span>Gym</span></a>
         </div>
     </nav>
 </header>
@@ -40,8 +40,7 @@
 <main class="container">
     <section class="card">
         <h3>Select Category</h3>
-        <div id="categoryGrid" class="category-grid">
-            </div>
+        <div id="categoryGrid" class="category-grid"></div>
 
         <div class="input-group">
             <label>Exercise</label>
@@ -59,27 +58,26 @@
             </div>
         </div>
         <p id="live1RM" class="live-1rm-display"></p>
-        <div id="timerContainer" class="timer-container" style="display: none;">
-<div class="input-group" style="margin-top: 15px;">
-    <label>Rest Duration</label>
-    <div class="rest-toggle-group">
-        <button type="button" class="rest-btn" onclick="setRest(30)">30s</button>
-        <button type="button" class="rest-btn active" id="defaultRest" onclick="setRest(60)">60s</button>
-        <button type="button" class="rest-btn" onclick="setRest(90)">90s</button>
-    </div>
-</div>
 
-<div id="timerContainer" class="timer-container" style="display: none;">
-    <div class="timer-display">
-        Resting: <span id="timerClock">01:00</span>
-    </div>
-    <button onclick="stopTimer()" class="btn-text">Skip</button>
-</div>
-        <button onclick="saveExercise()" class="btn-primary" style="width: 100%; margin-top: 10px;">Log Set</button>
+        <div class="input-group" style="margin-top: 15px;">
+            <label>Rest Duration</label>
+            <div class="rest-toggle-group">
+                <button type="button" class="rest-btn" onclick="setRest(30)">30s</button>
+                <button type="button" class="rest-btn active" onclick="setRest(60)">60s</button>
+                <button type="button" class="rest-btn" onclick="setRest(90)">90s</button>
+            </div>
+        </div>
+
+        <div id="timerContainer" class="timer-container" style="display: none;">
+            <div class="timer-display">Resting: <span id="timerClock">00:00</span></div>
+            <button onclick="stopTimer()" class="btn-text">Skip</button>
+        </div>
+
+        <button onclick="saveExercise()" class="btn-primary" style="width: 100%; margin-top: 15px;">Log Set</button>
     </section>
 
     <section class="card">
-        <h3>Strength Progress (1RM)</h3>
+        <h3>Strength Progress</h3>
         <select id="chartExerciseSelector" onchange="renderStrengthChart()" class="full-width-select"></select>
         <div class="graph-container" style="height: 200px; margin-top: 15px;">
             <canvas id="strengthChart"></canvas>
@@ -87,9 +85,26 @@
     </section>
 
     <section class="card">
-        <h3>Body Weight Tracker</h3>
+        <h3>Weekly Energy Balance</h3>
+        <div class="graph-container" style="height: 220px; margin-top: 15px;">
+            <canvas id="weeklySummaryChart"></canvas>
+        </div>
+        <div id="weeklyStatusMsg" style="font-size: 0.85rem; margin-top: 10px; text-align: center; font-weight: bold;"></div>
+    </section>
+
+    <section class="card">
+        <h3>Weekly Macro Split</h3>
+        <div class="graph-container" style="height: 220px; margin-top: 15px;">
+            <canvas id="macroPieChart"></canvas>
+        </div>
+        <div id="macroAnalysis" style="font-size: 0.85rem; margin-top: 10px; line-height: 1.4;">
+            </div>
+    </section>
+
+    <section class="card">
+        <h3>Body Weight</h3>
         <div class="input-row">
-            <input type="number" id="bodyWeight" step="0.1" placeholder="Current Weight (kg)" class="full-width-select">
+            <input type="number" id="bodyWeight" step="0.1" placeholder="kg" class="full-width-select">
             <button onclick="saveBodyWeight()" class="btn-secondary">Log</button>
         </div>
         <div class="graph-container" style="height: 200px; margin-top: 15px;">
@@ -102,6 +117,8 @@
         <div id="exerciseHistoryList" class="history-list"></div>
     </section>
 </main>
+
+<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script type="module" src="training.js"></script>
 <script type="module" src="state.js"></script>
