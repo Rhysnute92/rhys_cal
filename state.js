@@ -1,3 +1,45 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+
+// Load data from Cloud on startup
+export async function loadUserSession() {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+        let { data, error } = await supabase
+            .from('fitness_data')
+            .select('*')
+            .single();
+
+        if (data) {
+            // Update our local variables with cloud data
+            Object.assign(foodData, data.food_logs);
+            Object.assign(goals, data.goals);
+            // ... and so on
+        }
+    }
+}
+
+// Pro Version of saveState
+export async function saveState() {
+    // 1. Always save to local first (safety)
+    localStorage.setItem('foodLogs', JSON.stringify(foodData));
+    localStorage.setItem('userGoals', JSON.stringify(goals));
+
+    // 2. If logged in, push to Supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        await supabase.from('fitness_data').upsert({
+            id: user.id,
+            food_logs: foodData,
+            goals: goals,
+            weight_history: weightHistory,
+            updated_at: new Date()
+        });
+    }
+}
+
 /* ================================
    DATE HELPERS
 ================================ */
