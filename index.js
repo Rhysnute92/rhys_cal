@@ -1,8 +1,53 @@
- import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
+import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    const today = todayKey();
+    const logs = foodLogs[today] || [];
+    
+    const totalCals = logs.reduce((sum, item) => sum + item.calories, 0);
+    
+    // Update the "0 / 1500" display
+    document.getElementById('currentCals').innerText = totalCals;
+    document.getElementById('goalCals').innerText = userGoals.kcal;
+    
+    // Calculate Progress Bar
+    const percent = Math.min((totalCals / userGoals.kcal) * 100, 100);
+    document.getElementById('calProgress').style.width = percent + '%';
+});
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
     initCharts();
+
+    /* index.js - Inside DOMContentLoaded */
+const trainingBtn = document.querySelector('.btn-training'); // Ensure your button has this class
+
+if (trainingBtn) {
+    trainingBtn.addEventListener('click', () => {
+        const isTraining = toggleTrainingDay();
+        
+        // Update Button Visuals
+        trainingBtn.innerText = isTraining ? "Mark Rest Day" : "Mark Training Day";
+        trainingBtn.classList.toggle('active-training', isTraining);
+        
+        // Refresh the Dashboard Numbers
+        updateDashboardUI();
+    });
+}
+
+function updateDashboardUI() {
+    const goals = JSON.parse(localStorage.getItem('userGoals')) || GOALS.REST;
+    const todayLogs = foodLogs[todayKey()] || [];
+    const totalCals = todayLogs.reduce((sum, item) => sum + item.calories, 0);
+
+    // Update Text
+    document.getElementById('goalCals').innerText = `${goals.kcal} kcal`;
+    document.getElementById('modeLabel').innerText = localStorage.getItem('isTrainingDay') === 'true' ? "TRAINING DAY" : "REST DAY";
+
+    // Update Progress Bar
+    const percent = Math.min((totalCals / goals.kcal) * 100, 100);
+    document.getElementById('calProgressBar').style.width = percent + '%';
+}
 });
 
 export function updateDashboard() {

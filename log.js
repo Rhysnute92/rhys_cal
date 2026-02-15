@@ -1,5 +1,56 @@
 /* log.js */
-import {foodData, todayKey, saveState, gymDB} from './state.js';
+import {foodData, todayKey, saveState, gymDB, foodLogs, save} from './state.js';
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderFoodLog();
+    updateMacroUI();
+});
+
+// --- SCANNER & MANUAL BACKUP ---
+window.startCamera = function() {
+    document.getElementById('scannerOverlay').style.display = 'block';
+    // Quagga initialization here...
+};
+
+window.manualBarcodeEntry = function() {
+    const code = prompt("Enter 13-digit Barcode:");
+    if (code) fetchFoodData(code);
+};
+
+async function fetchFoodData(barcode) {
+    // Show the form immediately so user can see something is happening
+    document.getElementById('manualEntryForm').style.display = 'block';
+    try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+        const data = await res.json();
+        if (data.status === 1) {
+            const p = data.product;
+            document.getElementById('foodSearch').value = p.product_name || "";
+            document.getElementById('manualCal').value = p.nutriments['energy-kcal_100g'] || 0;
+            document.getElementById('manualP').value = p.nutriments.proteins_100g || 0;
+        }
+    } catch (e) { console.error("API Error"); }
+}
+
+// --- QUICK ADD ---
+window.quickAdd = function(name, cal, p, c, f, meal) {
+    const today = todayKey();
+    if (!foodLogs[today]) foodLogs[today] = [];
+    
+    foodLogs[today].push({ name, calories: cal, protein: p, carbs: c, fat: f, meal });
+    save('foodLogs', foodLogs);
+    renderFoodLog();
+};
+
+function renderFoodLog() {
+    const container = document.getElementById('dailyLogList');
+    const today = todayKey();
+    const logs = foodLogs[today] || [];
+    
+    // Grouping logic by Meal Type (Breakfast, Dinner, etc.)
+    // Update IDs totalLogCals and dailyLogList
+}
 
 window.fetchProductByBarcode = function(barcode) {
     // 1. Start the fetch request

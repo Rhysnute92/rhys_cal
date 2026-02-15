@@ -1,3 +1,33 @@
+/* state.js additions */
+/* state.js */
+export const getToday = () => new Date().toISOString().split('T')[0];
+export const todayKey = () => getToday();
+
+// Persistence Helpers
+export const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+export const load = (key) => JSON.parse(localStorage.getItem(key)) || null;
+
+// Formula for 1RM
+export const calculate1RM = (w, r) => r === 1 ? w : Math.round(w / (1.0278 - (0.0278 * r)));
+
+export const GOALS = {
+    REST: { kcal: 1500, p: 200, c: 145, f: 45 },
+    TRAINING: { kcal: 1800, p: 200, c: 220, f: 45 } // Higher carbs for training
+};
+
+export function toggleTrainingDay() {
+    let currentMode = localStorage.getItem('isTrainingDay') === 'true';
+    currentMode = !currentMode; // Toggle the state
+    
+    localStorage.setItem('isTrainingDay', currentMode);
+    
+    // Update active goals based on mode
+    const newGoals = currentMode ? GOALS.TRAINING : GOALS.REST;
+    localStorage.setItem('userGoals', JSON.stringify(newGoals));
+    
+    return currentMode;
+}
+
 /* ================================
    GLOBAL STATE & CONFIG
 ================================ */
@@ -26,14 +56,38 @@ export const WATER_GOAL = 2000;
 
 window.gymDB = {
     "Cardio" : [
-        { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
-        { name: "Walking", equipment: "None", muscle: "Legs (Cardio)" }
+    { name: "Swimming", equipment: "Pool", muscle: "Full Body (Cardio)" },
+    { name: "Walking", equipment: "None", muscle: "Legs (Cardio)" }
     ],
-    "Chest": [],
-    "Legs": [],
-    "Back": [],
-    "Shoulders": [],
-    "Arms": []
+    "Chest": [
+    { name: "Barbell Bench Press", equipment: "Barbell", muscle: "Chest" },
+    { name: "Incline DB Press", equipment: "Dumbbells", muscle: "Chest" }
+    ],
+    "Legs": [
+    { name: "Barbell Squat", equipment: "Barbell", muscle: "Legs" },
+    { name: "Leg Press", equipment: "Machine", muscle: "Legs" }
+    ],
+    "Back": [
+    { name: "Deadlift", equipment: "Barbell", muscle: "Back" },
+    { name: "Bent Over Row", equipment: "Barbell", muscle: "Back" },
+    { name: "Lat Pulldown", equipment: "Machine", muscle: "Back" }        
+    ],
+    "Shoulders": [
+    { name: "Overhead Press", equipment: "Barbell", muscle: "Shoulders" },
+    { name: "Lateral Raise", equipment: "Dumbbells", muscle: "Shoulders" }        
+    ],
+    "Arms": [
+    { name: "Bicep Curl", equipment: "Dumbbells", muscle: "Arms" },
+    { name: "Tricep Pushdown", equipment: "Cable", muscle: "Arms" },
+    { name: "Hammer Curl", equipment: "Dumbbells", muscle: "Arms" },
+    { name: "Skull Crushers", equipment: "Barbell", muscle: "Arms" }        
+    ],
+    "Core":[
+    { name: "Leg Raises", muscle: "Core"},
+    { name: "Sit-ups", muscle: "Core"},
+    { name: "Plank", muscle: "Core"},
+    { name: "Crunches", muscle: "Core"}
+    ]
 }
 
 // Helper to get a flat list of all exercise names
