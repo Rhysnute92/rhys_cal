@@ -234,3 +234,9 @@ window.onbeforeprint = () => {
         `;
     }
 };
+
+window.handleTrainingToggle = function() {
+    const newState = !isTrainingDay;
+    localStorage.setItem('isTrainingDay', JSON.stringify(newState));
+    location.reload(); 
+};

@@ -1,10 +1,30 @@
 /* ================================
    DATE HELPERS
 ================================ */
+export const goals =  JSON.parse(localStorage.getItem('userGoals')) || {
+    trainCals: 1800,
+    restCals: 1500,
+    targetWeight: 80
+};
 export const getToday = () => new Date().toISOString().split('T')[0];
 export const todayKey = getToday; // Alias for training.js compatibility
 window.getToday = getToday;
-
+export function todayKey() {
+    return new Date().toISOString().split('T')[0];
+}
+export function saveState() {
+    // Save the calorie goals
+    localStorage.setItem('userGoals', JSON.stringify(goals));
+    
+    // Save the meal logs
+    localStorage.setItem('foodLogs', JSON.stringify(foodData));
+    
+    // Save the current training status
+    localStorage.setItem('isTrainingDay', JSON.stringify(isTrainingDay));
+    
+    // Save the weight history array
+    localStorage.setItem('weightHistory', JSON.stringify(weightHistory));
+}
 /* ================================
    STORAGE HELPERS
 ================================ */
@@ -25,9 +45,10 @@ export const foodData = {
         { name: "Oatmeal", calories: 300, protein: 10, carbs: 50, fats: 5 },
         { name: "Chicken Breast", calories: 450, protein: 60, carbs: 0, fats: 8 }
     ]
-};export let waterData = load('waterData', {});
-export let weightHistory = load('weightHistory', []);
-
+};
+export const isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || {};
+export const weightHistory = JSON.parse(localStorage.getItem('weightHistory')) || {};
+export let waterData = load('waterData', {});
 export const WATER_GOAL = 2000;
 export const GOALS = {
     REST: { kcal: 1500, protein: 200, carbs: 145, fat: 45 },
@@ -135,3 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDailyGoalUI();
 });
 
+// Inside state.js
+export let isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || false;
+
+export function setTrainingDay(val) {
+    isTrainingDay = val;
+    saveState();
+}
