@@ -8,6 +8,11 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="rhys_logo.png">
 
+<link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<link rel="manifest" href="manifest.json">
+
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="log.css">
 
@@ -17,7 +22,28 @@
 <body>
 
 <header class="app-header">
-    <h1>Food Diary</h1>
+    <div class="header-content">
+            <img src="rhys_logo.png" class="header-logo" alt="Logo">
+            <h1>Food Diary</h1>
+    </div>
+
+
+    <nav class="nav-wrapper">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-item">
+                <img src="dashboard.png" alt="home">
+                <span>Home</span>
+            </a>
+            <a href="log.html" class="nav-item">
+                <img src="diary.png" alt="diary">
+                <span>Food</span>
+            </a>
+            <a href="training.html" class="nav-item">
+                <img src="training.png" alt="gym">
+                <span>Gym</span>
+            </a>
+        </div>
+    </nav>
 </header>
 
 <div class="container">
