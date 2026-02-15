@@ -48,7 +48,7 @@
 
 <div class="container">
 
-<button class="btn-primary" onclick="startCamera()">📸 Scan Barcode</button>
+<button class="btn-primary full" onclick="startCamera()">📸 Scan Barcode</button>
 
 <!-- scanner -->
 <div id="scannerOverlay" class="scanner-overlay">
@@ -62,11 +62,11 @@
 <input id="goalP" type="number" placeholder="Protein">
 <input id="goalC" type="number" placeholder="Carbs">
 <input id="goalF" type="number" placeholder="Fat">
-<button onclick="saveGoals()">Save Goals</button>
+<button class="btn-primary" onclick="saveGoals()">Save Goals</button>
 </div>
 
 <!-- manual entry -->
-<div id="entryForm" class="card hidden">
+<div id="entryForm" class="card">
 <input id="foodName" placeholder="Food name">
 
 <div class="grid">
