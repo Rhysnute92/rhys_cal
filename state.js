@@ -19,8 +19,13 @@ export const load = (key, fallback = null) =>
 ================================ */
 export const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 export let workoutData = load('workoutData', {});
-export let foodData = load('foodData', {});
-export let waterData = load('waterData', {});
+// Example structure in state.js
+export const foodData = {
+    "2026-02-15": [
+        { name: "Oatmeal", calories: 300, protein: 10, carbs: 50, fats: 5 },
+        { name: "Chicken Breast", calories: 450, protein: 60, carbs: 0, fats: 8 }
+    ]
+};export let waterData = load('waterData', {});
 export let weightHistory = load('weightHistory', []);
 
 export const WATER_GOAL = 2000;
@@ -129,3 +134,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saved === 'dark') document.body.classList.add('dark-theme');
     updateDailyGoalUI();
 });
+

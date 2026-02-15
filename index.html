@@ -46,56 +46,42 @@
         <p>Account & Goals</p>
     </div>
 
-    <div class="container">
-        <div class="card training-card">
-            <div class="training-info">
-                <h2 id="calorieGoal">1500 kcal</h2>
-                <p id="dayStatus">Rest Day</p>
-            </div>
-            <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
-                Mark Training
-            </button>
+ <div class="container">
+    <div class="card training-card">
+        <div class="training-info">
+            <h2 id="calorieGoal">-- kcal</h2>
+            <p id="dayStatus">Loading...</p>
         </div>
+        <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
+            Mark Training
+        </button>
+    </div>
 
-        <section class="dashboard-grid">
-            <div class="card grid-tile">
-                <div class="tile-header"><h4>Calories</h4><span>🔥</span></div>
-                <div class="tile-value"><span id="dashCals">0</span> / <span id="calGoal">1500</span></div>
-                <div class="progress-bg"><div id="cal-bar" class="progress-fill"></div></div>
-            </div>
-
-            <div class="card grid-tile">
-                <h4>Daily Macros</h4>
-                <div class="macro-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 0.8rem;">
-                    <div>P: <span id="p-val">0</span>/200g</div>
-                    <div>C: <span id="c-val">0</span>/145g</div>
-                    <div>F: <span id="f-val">0</span>/45g</div>
-                </div>
-                <div class="chart-container" style="height: 150px; margin-top: 10px;">
-                    <canvas id="macroPieChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card grid-tile" onclick="window.location.href='log.html'">
-                <div id="nutritionTile">
-                    <h3>Daily Nutrition</h3>
-                    <div class="progress-container">
-                        <div id="kcalProgressBar" class="progress-fill"></div>
-                    </div>
-                    <p id="kcalRemaining" class="remaining-text"></p>
-                </div>
-            </div>
-
-            <div class="card grid-tile">
-                <div class="tile-header"><h4>Weight Comparison (7-Day)</h4><span>⚖️</span></div>
-                <div id="dashWeightDisplay" class="tile-value">-- kg</div>
-                <div class="chart-container">
-                    <canvas id="weightComparisonChart"></canvas>
-                </div>
-            </div>
+    <section id="mainGrid" class="dashboard-grid">
         </section>
-        <button class="icon-btn full-width" onclick="window.print()" style="margin-top: 20px;">📑 Export PDF Report</button>
-        <div id="mainGrid" class="dashboard-grid">
+
+    <div class="card grid-tile full-width">
+        <h4>7-Day Weight Trend</h4>
+        <div class="chart-container">
+            <canvas id="weightComparisonChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="card grid-tile">
+        <h4>Macro Split</h4>
+        <div class="chart-container" style="height: 150px;">
+            <canvas id="macroPieChart"></canvas>
+        </div>
+    </div>
+</div>
+<button class="icon-btn full-width no-print" onclick="window.print()" style="margin-top: 20px;">
+    📑 Export PDF Report
+</button>
+
+<div class="print-only-header">
+    <h1>Fitness Progress Report</h1>
+    <p id="printDate"></p>
+</div>        <div id="mainGrid" class="dashboard-grid">
         </div>
         <div id="addTileModal" class="modal" style="display:none;">
             <div class="modal-content">
@@ -112,7 +98,26 @@
         </div>
     </div>
 
+    <div id="printFoodTableContainer" class="print-only">
+    <h3>Daily Food Log</h3>
+    <table id="foodSummaryTable">
+        <thead>
+            <tr>
+                <th>Food Item</th>
+                <th>Calories</th>
+                <th>P (g)</th>
+                <th>C (g)</th>
+                <th>F (g)</th>
+            </tr>
+        </thead>
+        <tbody id="foodSummaryBody">
+            </tbody>
+        <tfoot id="foodSummaryFoot">
+            </tfoot>
+    </table>
+</div>
     <script type="module" src="index.js"></script>
+    <script type="module" src="state.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

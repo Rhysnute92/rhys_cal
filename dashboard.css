@@ -36,3 +36,134 @@
     height: 100%;
     transition: width 0.5s ease;
 }
+
+.interactive-tile {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.interactive-tile:active {
+    transform: scale(0.95);
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255,0,0,0.1);
+    border: none;
+    color: red;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.add-tile-btn {
+    border: 2px dashed #ccc;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.tile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tile-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+@media print {
+    /* Hide UI elements that aren't needed on paper */
+    .app-header, .nav-wrapper, .no-print, .add-tile-btn, .delete-btn, .settings-tile, .header-spacer {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+
+    .container {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+
+    .card {
+        border: 1px solid #eee;
+        box-shadow: none;
+        break-inside: avoid; /* Prevents cards from splitting across pages */
+    }
+
+    .dashboard-grid {
+        display: block; /* Stack tiles vertically for better readability on paper */
+    }
+
+    .chart-container {
+        height: 300px !important; /* Make charts larger for the report */
+        page-break-after: always;
+    }
+
+    .print-only-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid var(--primary);
+    }
+}
+
+/* Hide print header during normal web browsing */
+.print-only-header {
+    display: none;
+}
+
+@media print {
+    .print-only {
+        display: block !important;
+        margin-top: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+
+    th {
+        background-color: #f2f2f2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+
+    }
+
+    tfoot tr {
+        font-weight: bold;
+        background-color: #f9f9f9 !important;
+    }
+}
+
+/* Hide by default on screen */
+.print-only {
+    display: none;
+}

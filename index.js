@@ -1,553 +1,236 @@
 import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
 
-
 document.addEventListener('DOMContentLoaded', () => {
-    const today = todayKey();
-    const logs = foodLogs[today] || [];
-    
-    const totalCals = logs.reduce((sum, item) => sum + item.calories, 0);
-    
-    // Update the "0 / 1500" display
-    document.getElementById('currentCals').innerText = totalCals;
-    document.getElementById('goalCals').innerText = userGoals.kcal;
-    
-    // Calculate Progress Bar
-    const percent = Math.min((totalCals / userGoals.kcal) * 100, 100);
-    document.getElementById('calProgress').style.width = percent + '%';
-});
-document.addEventListener('DOMContentLoaded', () => {
-    updateDashboard();
+    initDashboard();
     initCharts();
-
-    /* index.js - Inside DOMContentLoaded */
-const trainingBtn = document.querySelector('.btn-training'); // Ensure your button has this class
-
-if (trainingBtn) {
-    trainingBtn.addEventListener('click', () => {
-        const isTraining = toggleTrainingDay();
-        
-        // Update Button Visuals
-        trainingBtn.innerText = isTraining ? "Mark Rest Day" : "Mark Training Day";
-        trainingBtn.classList.toggle('active-training', isTraining);
-        
-        // Refresh the Dashboard Numbers
-        updateDashboardUI();
-    });
-}
-
-function updateDashboardUI() {
-    const goals = JSON.parse(localStorage.getItem('userGoals')) || GOALS.REST;
-    const todayLogs = foodLogs[todayKey()] || [];
-    const totalCals = todayLogs.reduce((sum, item) => sum + item.calories, 0);
-
-    // Update Text
-    document.getElementById('goalCals').innerText = `${goals.kcal} kcal`;
-    document.getElementById('modeLabel').innerText = localStorage.getItem('isTrainingDay') === 'true' ? "TRAINING DAY" : "REST DAY";
-
-    // Update Progress Bar
-    const percent = Math.min((totalCals / goals.kcal) * 100, 100);
-    document.getElementById('calProgressBar').style.width = percent + '%';
-}
 });
 
-export function updateDashboard() {
+function initDashboard() {
+    // Display Date
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    const dateElement = document.getElementById('currentDateDisplay');
+    if (dateElement) dateElement.innerText = new Date().toLocaleDateString(undefined, options);
+
+    updateTrainingHeader();
+    renderDashboard();
+}
+
+function updateTrainingHeader() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totalCals = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
+    
+    // Determine goal based on training status
+    const currentGoal = isTrainingDay ? goals.trainCals : goals.restCals;
+    const statusText = isTrainingDay ? "Training Day" : "Rest Day";
+
+    // Update Top Card
+    document.getElementById('calorieGoal').innerText = `${currentGoal} kcal`;
+    document.getElementById('dayStatus').innerText = statusText;
+    
+    const btn = document.getElementById('trainingBtn');
+    btn.innerText = isTrainingDay ? "Mark Rest Day" : "Mark Training Day";
+    btn.classList.toggle('active-training', isTrainingDay);
+}
+
+window.handleTrainingToggle = function() {
+    // Toggle state (import logic usually handles this, but here is the setter)
+    const newState = !isTrainingDay;
+    localStorage.setItem('isTrainingDay', JSON.stringify(newState));
+    location.reload(); 
+};
+
+window.renderDashboard = function() {
+    const grid = document.getElementById('mainGrid');
+    if (!grid) return;
+
     const today = todayKey();
     const meals = foodData[today] || [];
     const totals = meals.reduce((acc, m) => ({
-        cals: acc.cals + (m.calories || 0),
+        kcal: acc.kcal + (m.calories || 0),
         p: acc.p + (m.protein || 0),
         c: acc.c + (m.carbs || 0),
         f: acc.f + (m.fats || 0)
-    }), { cals: 0, p: 0, c: 0, f: 0 });
+    }), { kcal: 0, p: 0, c: 0, f: 0 });
 
     const currentGoal = isTrainingDay ? goals.trainCals : goals.restCals;
+    const progress = Math.min((totals.kcal / currentGoal) * 100, 100);
 
-    // Update Text Elements
-    if(document.getElementById('dashCals')) document.getElementById('dashCals').innerText = totals.cals;
-    if(document.getElementById('calGoal')) document.getElementById('calGoal').innerText = currentGoal;
-
-    // Update Progress Bar
-    const pct = Math.min((totals.cals / currentGoal) * 100, 100);
-    if(document.getElementById('cal-bar')) document.getElementById('cal-bar').style.width = pct + '%';
-
-    renderCharts(totals);
-}
-
-window.toggleTrainingMode = function() {
-    const currentState = JSON.parse(localStorage.getItem('isTrainingDay')) || false;
-    localStorage.setItem('isTrainingDay', JSON.stringify(!currentState));
-    location.reload(); // Refresh to apply new calorie targets
-};
-
-function renderCharts(totals) {
-    // 1. Macro Pie Chart
-    const pieCtx = document.getElementById('macroPieChart')?.getContext('2d');
-    if (pieCtx) {
-        new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Protein', 'Carbs', 'Fats'],
-                datasets: [{
-                    data: [totals.p, totals.c, totals.f],
-                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800']
-                }]
-            }
-        });
-    }
-
-    // 2. 7-Day Weight Comparison
-    const weightCtx = document.getElementById('weightComparisonChart')?.getContext('2d');
-    if (weightCtx) {
-        const last7 = weightHistory.slice(-7);
-        new Chart(weightCtx, {
-            type: 'line',
-            data: {
-                labels: last7.map(d => d.date),
-                datasets: [{
-                    label: 'Weight',
-                    data: last7.map(d => d.weight),
-                    borderColor: '#4CAF50'
-                }, {
-                    label: 'Target',
-                    data: new Array(last7.length).fill(goals.targetWeight),
-                    borderColor: 'red',
-                    borderDash: [5, 5]
-                }]
-            }
-        });
-    }
-}
-
-// index.js
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    const totals = getTotalsForDate(today);
-
-    const nutritionTile = document.getElementById('nutritionTile');
-    if (nutritionTile) {
-        nutritionTile.innerHTML = `
-            <h3>Today's Nutrition</h3>
-            <div class="tile-stats">
-                <p><strong>${totals.kcal}</strong> Calories</p>
-                <div class="mini-macro-bar">
-                    <span>P: ${totals.p.toFixed(0)}g</span>
-                    <span>C: ${totals.c.toFixed(0)}g</span>
-                    <span>F: ${totals.f.toFixed(0)}g</span>
-                </div>
-            </div>
-        `;
-    }
-});
-
-// index.js
-document.addEventListener('DOMContentLoaded', () => {
-    const calorieGoal = 1800; // You can change this or pull from localStorage
-    const today = new Date().toISOString().split('T')[0];
-
-    // Use the function we created earlier
-    const totals = getTotalsForDate(today);
-
-    // Calculate percentage (capped at 100%)
-    const percentage = Math.min((totals.kcal / calorieGoal) * 100, 100);
-    const remaining = calorieGoal - totals.kcal;
-
-    // Update Progress Bar
-    const bar = document.getElementById('kcalProgressBar');
-    if (bar) {
-        bar.style.width = percentage + '%';
-        // Change color to red if over goal
-        if (totals.kcal > calorieGoal) {
-            bar.style.background = '#ff4444';
-        }
-    }
-
-    // Update Text
-    const remainingText = document.getElementById('kcalRemaining');
-    if (remainingText) {
-        remainingText.innerText = remaining >= 0
-            ? `${remaining} kcal remaining`
-            : `${Math.abs(remaining)} kcal over goal`;
-    }
-});
-
- /* --- Inside your renderDashboard function --- */
- // Add this to your existing switch or if/else block:
- if (tile === 'water') return createWaterTile();
-
- /* --- The Water Tile Function --- */
- function createWaterTile() {
-     const today = new Date().toISOString().split('T')[0];
-     const waterHistory = JSON.parse(localStorage.getItem('waterLog')) || {};
-     const intake = waterHistory[today] || 0;
-     const goal = 8; // Default 8 glasses
-
-     return `
-        <div class="card water-tile">
-            <div class="water-header">
-                <h3>Water</h3>
-                <span class="water-count">${intake}/${goal}</span>
-            </div>
-            <div class="water-grid">
-                ${generateWaterIcons(intake)}
-            </div>
-            <button class="btn-water-add" onclick="addWater()">+ Add Glass</button>
-        </div>
-    `;
- }
-
- function generateWaterIcons(count) {
-     let icons = '';
-     for (let i = 1; i <= 8; i++) {
-         icons += `<span class="drop ${i <= count ? 'filled' : ''}">💧</span>`;
-     }
-     return icons;
- }
-
- window.addWater = function() {
-     const today = new Date().toISOString().split('T')[0];
-     const waterHistory = JSON.parse(localStorage.getItem('waterLog')) || {};
-
-     // Increment count for today
-     waterHistory[today] = (waterHistory[today] || 0) + 1;
-
-     localStorage.setItem('waterLog', JSON.stringify(waterHistory));
-
-     // Refresh only the dashboard to show the new drop
-     renderDashboard();
-
-     // Haptic feedback (vibes when you add water)
-     if (window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
- };
-
- window.addNewTile = function() {
-     const type = document.getElementById('tileType').value;
-     const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
-
-     if (!activeTiles.includes(type)) {
-         activeTiles.push(type);
-         localStorage.setItem('activeTiles', JSON.stringify(activeTiles));
-         renderDashboard();
-     }
-     closeModal();
- };
-
- /* index.js - Dashboard Controller */
-
- document.addEventListener('DOMContentLoaded', () => {
-     // Display today's date in the header
-     const options = { weekday: 'long', day: 'numeric', month: 'long' };
-     document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString(undefined, options);
-     renderDashboard();
- });
-
- window.renderDashboard = function() {
-     const grid = document.getElementById('mainGrid');
-     if (!grid) return;
-
-     // Default tiles if none are set
-     const activeTiles = JSON.parse(localStorage.getItem('activeTiles')) || ['nutrition', 'gym', 'settings'];
-
-     grid.innerHTML = activeTiles.map(tile => {
-         switch(tile) {
-             case 'nutrition': return createNutritionTile();
-             case 'water':     return createWaterTile();
-             case 'steps':     return createStepsTile();
-             case 'sleep':     return createSleepTile();
-             case 'gym':       return createGymTile();
-             case 'settings':  return createSettingsTile();
-             default: return '';
-         }
-     }).join('') + `<div class="card add-tile" onclick="openModal()">+ Add Tracker</div>`;
- };
-
- // --- Tile Creators ---
-
- function createNutritionTile() {
-     const today = new Date().toISOString().split('T')[0];
-     const totals = getTotalsForDate(today);
-     const goals = JSON.parse(localStorage.getItem('userGoals')) || { calories: 2000 };
-     const progress = Math.min((totals.kcal / goals.calories) * 100, 100);
-
-     return `
-        <div class="card nutrition-tile" onclick="window.location.href='log.html'">
-            <h3>Nutrition</h3>
-            <div class="stat-main"><strong>${totals.kcal}</strong> <small>/ ${goals.calories} kcal</small></div>
-            <div class="progress-container">
-                <div class="progress-fill" style="width: ${progress}%; background: ${totals.kcal > goals.calories ? '#ff4444' : 'var(--primary-color)'}"></div>
-            </div>
-            <div class="mini-macros">
-                <span>P: ${totals.p.toFixed(0)}g</span>
-                <span>C: ${totals.c.toFixed(0)}g</span>
-                <span>F: ${totals.f.toFixed(0)}g</span>
-            </div>
-        </div>
-    `;
- }
-
- function createGymTile() {
-     const log = JSON.parse(localStorage.getItem('exerciseLog')) || [];
-     const lastWorkout = log.length > 0 ? log[log.length - 1].name : "No workouts yet";
-     return `
-        <div class="card gym-tile" onclick="window.location.href='training.html'">
-            <h3>Training</h3>
-            <p>Last: ${lastWorkout}</p>
-            <div class="icon-circle">🏋️</div>
-        </div>
-    `;
- }
-
- function createSettingsTile() {
-     return `
-        <div class="card settings-tile" onclick="window.location.href='settings.html'">
-            <h3>Settings</h3>
-            <p>Goals & Layout</p>
-            <div class="icon-circle">⚙️</div>
-        </div>
-    `;
- }
-
- // --- Modal Controls ---
- window.openModal = () => document.getElementById('addTileModal').style.display = 'flex';
- window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
-
- /* --- Steps Tile Function --- */
- function createStepsTile() {
-     const today = new Date().toISOString().split('T')[0];
-     const stepsData = JSON.parse(localStorage.getItem('stepsLog')) || {};
-     const count = stepsData[today] || 0;
-     const goal = 10000;
-     const progress = Math.min((count / goal) * 100, 100);
-
-     return `
-        <div class="card steps-tile">
-            <h3>Steps</h3>
-            <div class="stat-main">
-                <strong>${count.toLocaleString()}</strong> 
-                <small>/ ${goal.toLocaleString()}</small>
-            </div>
-            <div class="progress-container">
-                <div class="progress-fill" style="width: ${progress}%; background: #4caf50;"></div>
-            </div>
-            <button class="btn-tile-action" onclick="updateTracker('steps')">Log Steps</button>
-        </div>
-    `;
- }
-
- /* --- Sleep Tile Function --- */
- function createSleepTile() {
-     const today = new Date().toISOString().split('T')[0];
-     const sleepData = JSON.parse(localStorage.getItem('sleepLog')) || {};
-     const hours = sleepData[today] || 0;
-
-     return `
-        <div class="card sleep-tile">
-            <h3>Sleep</h3>
-            <div class="stat-main">
-                <strong>${hours}</strong> <small>hrs</small>
-            </div>
-            <input type="range" min="0" max="12" step="0.5" value="${hours}" 
-                   onchange="updateTracker('sleep', this.value)" class="sleep-slider">
-            <p class="label">Last Night</p>
-        </div>
-    `;
- }
-
- /* index.js - Dashboard Display */
- document.addEventListener('DOMContentLoaded', () => {
-     renderDashboard();
-     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString();
- });
-
- /* index.js - Updated renderDashboard */
-/* index.js */
-
-function renderDashboard() {
-    const grid = document.getElementById('mainGrid');
-    if (!grid) return;
-
-    // 1. Load custom tiles from storage
-    const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-
-    // 2. Start with Core Tiles (Training & Settings)
+    // 1. Core Nutrition Tile
     let gridHTML = `
-        <div class="card" onclick="location.href='training.html'">
-            <span>💪</span>
-            <h3>Training</h3>
-            <p>View Progress →</p>
-        </div>
-
-        <div class="card" onclick="location.href='settings.html'">
-            <span>⚙️</span>
-            <h3>Settings</h3>
-            <p>Customize</p>
-        </div>
-    `;
-
-    // 3. Add the User's Custom Tiles
-    customTiles.forEach((tile, index) => {
-        gridHTML += `
-            <div class="card" style="position: relative;">
-                <span>✨</span>
-                <h3>${tile.name}</h3>
-                <p>Custom Tracker</p>
-                <button onclick="removeTile(${index})" class="delete-btn">×</button>
+        <div class="card grid-tile" onclick="location.href='log.html'">
+            <div class="tile-header"><h4>Calories</h4><span>🔥</span></div>
+            <div class="tile-value"><span>${totals.kcal}</span> / ${currentGoal}</div>
+            <div class="progress-bg">
+                <div class="progress-fill" style="width: ${progress}%; background: ${totals.kcal > currentGoal ? '#ff4444' : 'var(--primary)'}"></div>
             </div>
-        `;
-    });
-
-    // 4. Add the "Add New Tile" prompt button
-    gridHTML += `
-        <div class="card add-tile-btn" onclick="addNewTilePrompt()">
-            <span style="font-size: 2rem; color: var(--primary);">+</span>
-            <h3>Add Tile</h3>
-            <p>New Feature</p>
+            <div class="mini-macros" style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.75rem;">
+                <span>P: ${totals.p}g</span> <span>C: ${totals.c}g</span> <span>F: ${totals.f}g</span>
+            </div>
         </div>
     `;
 
-    grid.innerHTML = gridHTML;
-}
-
-// Function to trigger the prompt and save data
-window.addNewTilePrompt = function () {
-    const name = prompt("What would you like to track? (e.g., Caffeine, Protein, Stretching)");
-
-    if (name && name.trim() !== "") {
-        const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-
-        // Add new tile object
-        customTiles.push({
-            name: name,
-            id: Date.now() // Unique ID for later use
-        });
-
-        localStorage.setItem('customTiles', JSON.stringify(customTiles));
-        renderDashboard(); // Refresh the screen
-    }
-};
-
-// Function to delete a custom tile
-window.removeTile = function (index) {
-    if (confirm("Delete this tile?")) {
-        const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-        customTiles.splice(index, 1);
-        localStorage.setItem('customTiles', JSON.stringify(customTiles));
-        renderDashboard();
-    }
-};
-
-document.addEventListener('DOMContentLoaded', renderDashboard);
-
-// Function to save a new tile to LocalStorage
-     window.addNewTilePrompt = function() {
-         const name = prompt("What would you like to track? (e.g., Caffeine, Stretching)");
-         if (name && name.trim() !== "") {
-             const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-             customTiles.push({ name: name });
-             localStorage.setItem('customTiles', JSON.stringify(customTiles));
-             renderDashboard(); // Re-render to show the new tile immediately
-         }
-     };
-
-// Function to remove a tile
-     window.deleteTile = function(index) {
-         if(confirm("Delete this tracker?")) {
-             const customTiles = JSON.parse(localStorage.getItem('customTiles')) || [];
-             customTiles.splice(index, 1);
-             localStorage.setItem('customTiles', JSON.stringify(customTiles));
-             renderDashboard();
-         }
-     };
-
-// Initial Render
-     document.addEventListener('DOMContentLoaded', renderDashboard);
-
- function loadDashboard() {
-     const today = getToday();
-     const waterDrank = localStorage.getItem(`water_${today}`) || 0;
-
-     document.getElementById('water-display').innerText = `${waterDrank} ml`;
-     console.log("Loading data for date:", today);
-}
-
-/* index.js */
-
-function renderDashboard() {
-    const grid = document.getElementById('mainGrid');
-    if (!grid) return;
-
-    const today = getToday();
+    // 2. Load Custom Dynamic Tiles (Water, Steps, etc.)
     const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
-
-    // 1. Core Tiles
-    let gridHTML = `
-        <div class="card" onclick="location.href='training.html'">
-            <span>💪</span>
-            <h3>Training</h3>
-            <p>View Progress →</p>
-        </div>
-        <div class="card" onclick="location.href='settings.html'">
-            <span>⚙️</span>
-            <h3>Settings</h3>
-            <p>Customize</p>
-        </div>
-    `;
-
-    // 2. Custom Interactive Tiles
     customTiles.forEach((tile, index) => {
         gridHTML += `
-            <div class="card interactive-tile" onclick="incrementTile(${index})">
+            <div class="card grid-tile interactive-tile" onclick="incrementTile(${index})">
                 <button onclick="event.stopPropagation(); removeTile(${index})" class="delete-btn">×</button>
-                <span class="tile-icon">✨</span>
-                <h3>${tile.name}</h3>
-                <div class="tile-value">${tile.amount}</div>
-                <p>${tile.unit}</p>
+                <div class="tile-header"><h4>${tile.name}</h4><span>✨</span></div>
+                <div class="tile-value">${tile.amount} <small>${tile.unit}</small></div>
+                <p style="font-size:0.7rem; color:gray;">Tap to add ${tile.step}</p>
             </div>
         `;
     });
 
     // 3. Add Button
     gridHTML += `
-        <div class="card add-tile-btn" onclick="addNewTilePrompt()">
-            <span>+</span>
+        <div class="card add-tile-btn" onclick="openModal()">
+            <span style="font-size:2rem;">+</span>
             <h3>Add Tracker</h3>
         </div>
     `;
 
     grid.innerHTML = gridHTML;
-}
-
-// Logic to add a new functional tracker
-window.addNewTilePrompt = function () {
-    const name = prompt("Name (e.g., Water, Coffee, Steps):");
-    const unit = prompt("Unit (e.g., ml, cups, count):", "count");
-    const step = prompt("Increment amount (e.g., 250, 1):", "1");
-
-    if (name) {
-        const today = getToday();
-        const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
-
-        customTiles.push({
-            name: name,
-            unit: unit,
-            step: parseInt(step),
-            amount: 0
-        });
-
-        localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
-        renderDashboard();
-    }
 };
 
-// Increment the value when the tile is tapped
-window.incrementTile = function (index) {
-    const today = getToday();
+// --- Custom Tile Logic ---
+window.addNewTile = function() {
+    const type = document.getElementById('tileType').value;
+    const today = todayKey();
     const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
 
-    customTiles[index].amount += customTiles[index].step;
+    const presets = {
+        water: { name: 'Water', unit: 'ml', step: 250 },
+        steps: { name: 'Steps', unit: 'steps', step: 1000 },
+        sleep: { name: 'Sleep', unit: 'hrs', step: 1 },
+        gym:   { name: 'Gym', unit: 'sessions', step: 1 }
+    };
 
+    customTiles.push({ ...presets[type], amount: 0 });
+    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
+    closeModal();
+    renderDashboard();
+};
+
+window.incrementTile = function(index) {
+    const today = todayKey();
+    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+    customTiles[index].amount += customTiles[index].step;
     localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
     renderDashboard();
-
-    // Haptic feedback for a "real" button feel
     if (navigator.vibrate) navigator.vibrate(30);
+};
+
+window.removeTile = function(index) {
+    const today = todayKey();
+    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+    customTiles.splice(index, 1);
+    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
+    renderDashboard();
+};
+
+// --- Charts ---
+function initCharts() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totals = meals.reduce((acc, m) => ({
+        p: acc.p + (m.protein || 0),
+        c: acc.c + (m.carbs || 0),
+        f: acc.f + (m.fats || 0)
+    }), { p: 0, c: 0, f: 0 });
+
+    const pieCtx = document.getElementById('macroPieChart')?.getContext('2d');
+    if (pieCtx) {
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Protein', 'Carbs', 'Fats'],
+                datasets: [{
+                    data: [totals.p, totals.c, totals.f],
+                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { display: false } } }
+        });
+    }
+
+    const weightCtx = document.getElementById('weightComparisonChart')?.getContext('2d');
+    if (weightCtx) {
+        const last7 = weightHistory.slice(-7);
+        new Chart(weightCtx, {
+            type: 'line',
+            data: {
+                labels: last7.map(d => d.date.split('-').slice(1).join('/')),
+                datasets: [{
+                    label: 'Weight',
+                    data: last7.map(d => d.weight),
+                    borderColor: '#4CAF50',
+                    tension: 0.3
+                }]
+            },
+            options: { maintainAspectRatio: false }
+        });
+    }
+}
+
+// Modal Controls
+window.openModal = () => document.getElementById('addTileModal').style.display = 'flex';
+window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
+
+
+window.onbeforeprint = () => {
+    // 1. Handle the Date header
+    const printDate = document.getElementById('printDate');
+    if (printDate) {
+        printDate.innerText = `Generated on: ${new Date().toLocaleDateString()}`;
+    }
+
+    // 2. Populate the Summary Table
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const tableBody = document.getElementById('foodSummaryBody');
+    const tableFoot = document.getElementById('foodSummaryFoot');
+    
+    if (!tableBody) return;
+
+    // Clear existing rows
+    tableBody.innerHTML = '';
+    
+    let totals = { kcal: 0, p: 0, c: 0, f: 0 };
+
+    if (meals.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5">No food logged for today.</td></tr>';
+    } else {
+        meals.forEach(item => {
+            const row = `
+                <tr>
+                    <td>${item.name || 'Unnamed Item'}</td>
+                    <td>${item.calories}</td>
+                    <td>${item.protein}g</td>
+                    <td>${item.carbs}g</td>
+                    <td>${item.fats}g</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+            
+            // Calculate totals for the footer
+            totals.kcal += Number(item.calories);
+            totals.p += Number(item.protein);
+            totals.c += Number(item.carbs);
+            totals.f += Number(item.fats);
+        });
+
+        // Inject Totals
+        tableFoot.innerHTML = `
+            <tr>
+                <td>TOTAL</td>
+                <td>${totals.kcal}</td>
+                <td>${totals.p}g</td>
+                <td>${totals.c}g</td>
+                <td>${totals.f}g</td>
+            </tr>
+        `;
+    }
 };
