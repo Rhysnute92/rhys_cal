@@ -51,40 +51,43 @@
     </div>
 
     <div class="main-dashboard">
-    <div class="card calorie-hero">
+<div class="card calorie-hero">
+    <div class="header-flex">
         <h3>Calories</h3>
-        <p class="subtitle">Remaining = Goal - Food</p>
-        
-        <div class="ring-container">
-            <div class="calorie-ring">
-                <div class="ring-center">
-                    <h2 id="displayRemaining">1,280</h2>
-                    <span>Remaining</span>
-                </div>
+        <label class="switch-label">
+            <span>Training Day</span>
+            <input type="checkbox" id="trainingToggle" onchange="toggleTrainingMode()">
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="ring-container">
+        <div class="chart-box">
+            <canvas id="calorieChart"></canvas>
+            <div class="ring-center">
+                <h2 id="displayRemaining">0</h2>
+                <span>Remaining</span>
             </div>
-            
-            <div class="ring-stats">
-                <div class="stat-item">
-                    <span class="icon">🏁</span>
-                    <div><small>Base Goal</small><br><strong id="displayGoal">1,800</strong></div>
-                </div>
-                <div class="stat-item">
-                    <span class="icon">🍴</span>
-                    <div><small>Food</small><br><strong id="displayFood">520</strong></div>
-                </div>
-                <div class="stat-item">
-                    <span class="icon">🔥</span>
-                    <div><small>Exercise</small><br><strong id="displayExercise">148</strong></div>
-                </div>
+        </div>
+        
+        <div class="ring-stats">
+            <div class="stat-item">
+                <span class="icon">🏁</span>
+                <div><small>Goal</small><br><strong id="displayGoal">0</strong></div>
+            </div>
+            <div class="stat-item">
+                <span class="icon">🍴</span>
+                <div><small>Food</small><br><strong id="displayFood">0</strong></div>
             </div>
         </div>
     </div>
+</div>
 
     <div class="stat-row">
         <div class="card stat-card">
             <div class="tile-header"><h4>Steps</h4> <span class="check-icon">✔️</span></div>
             <div class="stat-val">4,099</div>
-            <small>Goal: 10,000 steps</small>
+            <small>Goal: 1,000 steps</small>
             <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
         </div>
         <div class="card stat-card">
@@ -95,7 +98,7 @@
     </div>
 </div>
 
- <div class="container">
+ <!-- <div class="container">
     <div class="card training-card">
         <div class="training-info">
             <h2 id="calorieGoal">-- kcal</h2>
@@ -122,7 +125,7 @@
             <canvas id="macroPieChart"></canvas>
         </div>
     </div>
-</div>
+</div> -->
 <button class="icon-btn full-width no-print" onclick="window.print()" style="margin-top: 20px;">
     📑 Export PDF Report
 </button>

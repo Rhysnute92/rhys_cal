@@ -167,8 +167,6 @@
 .print-only {
     display: none;
 }
-
-
 body { background-color: var(--bg-gray); font-family: 'Inter', sans-serif; }
 
 .calorie-hero {
@@ -226,4 +224,31 @@ body { background-color: var(--bg-gray); font-family: 'Inter', sans-serif; }
 .progress-bar .fill {
     height: 100%;
     background: var(--accent-blue);
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Custom Toggle Switch */
+.switch-label { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+.switch-label input { display: none; }
+.slider {
+    width: 34px; height: 18px; background: #ccc;
+    border-radius: 20px; position: relative; cursor: pointer; transition: .3s;
+}
+input:checked + .slider { background: #0066ee; }
+.slider:before {
+    content: ""; position: absolute; height: 14px; width: 14px;
+    left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: .3s;
+}
+input:checked + .slider:before { transform: translateX(16px); }
+
+.chart-box { position: relative; width: 180px; height: 180px; }
+.ring-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); text-align: center;
 }

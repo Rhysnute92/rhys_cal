@@ -293,3 +293,64 @@ function updateUI() {
     document.getElementById('displayFood').innerText = totalFood.toLocaleString();
     document.getElementById('displayRemaining').innerText = remaining.toLocaleString();
 }
+
+let calorieChart;
+
+export function initCalorieChart() {
+    const ctx = document.getElementById('calorieChart').getContext('2d');
+    
+    // Initialize the toggle state from memory
+    document.getElementById('trainingToggle').checked = isTrainingDay;
+
+    calorieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['#0066ee', '#eef2f3'],
+                borderWidth: 0,
+                circumference: 360,
+                rotation: 0,
+                cutout: '85%'
+            }]
+        },
+        options: {
+            cutout: '85%',
+            plugins: { tooltip: { enabled: false } },
+            animation: { duration: 1500, easing: 'easeOutQuart' }
+        }
+    });
+
+    updateDashboard();
+}
+
+window.toggleTrainingMode = function() {
+    // Update the state variable
+    const toggle = document.getElementById('trainingToggle');
+    // Direct assignment if using 'let' in state.js or via setter
+    // For this example, we assume we update the exported value
+    localStorage.setItem('isTrainingDay', toggle.checked);
+    updateDashboard();
+    saveState();
+};
+
+function updateDashboard() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
+    
+    // Switch goal based on toggle
+    const isTrain = document.getElementById('trainingToggle').checked;
+    const currentGoal = isTrain ? goals.trainCals : goals.restCals;
+    const remaining = Math.max(0, currentGoal - totalFood);
+
+    // Update Text
+    document.getElementById('displayGoal').innerText = currentGoal;
+    document.getElementById('displayFood').innerText = totalFood;
+    document.getElementById('displayRemaining').innerText = remaining;
+
+    // Update Chart Animation
+    const progress = Math.min(100, (totalFood / currentGoal) * 100);
+    calorieChart.data.datasets[0].data = [progress, 100 - progress];
+    calorieChart.update();
+}
