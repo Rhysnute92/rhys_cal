@@ -188,9 +188,6 @@ window.onbeforeprint = () => {
     }
 };
 
-import { initPedometer } from './pedometer.js';
-import { dailySteps, saveState } from './state.js';
-
 document.addEventListener('DOMContentLoaded', () => {
     // Start the pedometer
     initPedometer(() => {
@@ -243,3 +240,21 @@ function startStepTracking() {
         if (dailySteps % 20 === 0) saveState();
     });
 }
+
+function initSplashScreen() {
+    const splash = document.getElementById('splash-screen');
+    const userSession = localStorage.getItem('user_session');
+    const accountExists = localStorage.getItem('user_account_created');
+
+    // If no session exists, show the splash screen
+    if (!userSession || !accountExists) {
+        splash.style.display = 'flex';
+        
+        // Optional: Hide the main app content so they can't see it in the background
+        const mainApp = document.getElementById('app-container'); // Wrap your main app in this ID
+        if (mainApp) mainApp.style.display = 'none';
+    }
+}
+
+// Run this as soon as the DOM is ready
+document.addEventListener('DOMContentLoaded', initSplashScreen);

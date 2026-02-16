@@ -42,21 +42,39 @@ const calorieInput = document.getElementById('goalKcal').value;
 goals.restCals = sanitizeInput(calorieInput); 
 // Now, even if the user typed "2,000 kcal", it saves as 2000.
 
-// --- Goal Management ---
-window.saveGoals = function() {
-    const rest = parseInt(document.getElementById('goalKcal').value) || 2000;
-    
-    goals.restCals = rest;
-    goals.protein = parseInt(document.getElementById('goalP').value) || 0;
-    goals.carbs = parseInt(document.getElementById('goalC').value) || 0;
-    goals.fats = parseInt(document.getElementById('goalF').value) || 0;
-    
-    // --- UPDATE THIS LINE ---
-    goals.trainCals = rest + 300; // Changed from 500 to 300
 
-    saveState(); 
-    alert("Goals updated! Training days now add 300 kcal.");
-};
+// --- Goal Management ---
+export function saveGoals() {
+    // 1. Get values from the HTML inputs
+    const baseCalories = parseInt(document.getElementById('calories')?.value) || 2000;
+    const protein = parseInt(document.getElementById('protein')?.value) || 0;
+    const carbs = parseInt(document.getElementById('carbs')?.value) || 0;
+    const fat = parseInt(document.getElementById('fat')?.value) || 0;
+
+    // 2. Check if Training Day is active (assuming your toggle has id="trainingMode")
+    // If your toggle in index.html is active, we add the 300 kcal bonus
+    const isTrainingDay = document.getElementById('trainingMode')?.checked || false;
+    
+    let finalCalories = baseCalories;
+    if (isTrainingDay) {
+        finalCalories += 300;
+    }
+
+    // 3. Update your state object
+    state.goals = {
+        baseCalories: baseCalories, // Store the original
+        calories: finalCalories,     // Store the calculated total
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+        isTrainingDay: isTrainingDay
+    };
+
+    // 4. Save to localStorage
+    localStorage.setItem('fitness_settings', JSON.stringify(state.goals));
+
+    alert(`Goals saved! ${isTrainingDay ? "Training (+300)" : "Rest"} mode active.`);
+}
 
 // --- Appearance ---
 window.changeTileSize = function(val) {

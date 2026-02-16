@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started - Rhys Cal</title>
+    <link rel="stylesheet" href="register.css">
+    <link rel="stylesheet" href="shared.css">
+
+</head>
+<body>
+
+<div class="card">
+    <h2>Get Started</h2>
+    <p>Create an account or reset your password by entering a new one below.</p>
+    
+    <form id="registerForm">
+        <input type="email" id="regEmail" placeholder="Email Address" required>
+        <input type="password" id="regPassword" placeholder="New Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+        
+        <button type="submit" class="btn-green">Save & Login</button>
+    </form>
+
+    <a href="index.html" class="back-link">← Return to Home</a>
+</div>
+
+<script type="module">
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const pass = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (pass !== confirm) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        // Logic to save user
+        localStorage.setItem('user_account_created', 'true');
+        localStorage.setItem('user_session', 'active');
+        localStorage.setItem('user_email', document.getElementById('regEmail').value);
+        
+        alert("Account secured! Redirecting to dashboard...");
+        window.location.href = 'index.html';
+    });
+</script>
+
+</body>
+</html>

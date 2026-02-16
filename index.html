@@ -6,6 +6,7 @@
     <title>Fitness Dashboard</title>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="register.css"
     <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -13,6 +14,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; text-align: center;">
+    <div style="padding: 20px;">
+        <h1 style="color: #2ecc71; margin-bottom: 10px;">Welcome to Rhys Cal</h1>
+        <p style="color: #666; margin-bottom: 30px;">Track your macros and training days with ease.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px; width: 250px;">
+            <button onclick="window.location.href='register.html'" style="padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Get Started / Register</button>
+            <button onclick="window.location.href='login.html'" style="padding: 12px; background: transparent; color: #2ecc71; border: 2px solid #2ecc71; border-radius: 8px; font-weight: bold; cursor: pointer;">I have an account</button>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 12px; color: #999;">Forgot your password? Click Get Started to reset via registration.</p>
+    </div>
+</div>
 
     <header class="app-header">
         <div class="header-content">
