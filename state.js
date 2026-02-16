@@ -1,182 +1,121 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-
-const SUPABASE_URL='https://xlutwqwtecrlxadfaifu.supabase.co';
-const SUPABASE__ANON_KEY='sb_publishable_Kb2eAvRNrDqBGfmuv3ct3Q_2li9wW9p';
-
+/* =========================================
+   1. INITIALIZATION & DATABASE CLIENT
+   ========================================= */
+const SUPABASE_URL = 'https://xlutwqvtecrlxdafaiifu.supabase.co';
+const SUPABASE__ANON_KEY = 'sb_publishable_Kb2eAvRNrDqBGfmuv3ct3Q_2li9wW9p';
 const supabase = createClient(SUPABASE_URL, SUPABASE__ANON_KEY);
 
-// Load data from Cloud on startup
+/* =========================================
+   2. GLOBAL STATE & LOCAL STORAGE LOADERS
+   ========================================= */
+// Helpers for cleaner loading
+export const load = (key, fallback = null) => JSON.parse(localStorage.getItem(key)) ?? fallback;
+export const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+// Core Data Exports
+export let foodData = load('foodLogs', {});
+export let goals = load('userGoals', { trainCals: 1800, restCals: 1500, protein: 200, carbs: 145, fats: 45 });
+export let isTrainingDay = load('isTrainingDay', false);
+export let workoutData = load('workoutData', {});
+export let weightHistory = load('weightHistory', []);
+export let dailySteps = load('dailySteps', 0);
+export let waterData = load('waterData', {});
+export let customTilesHistory = load('customTilesHistory', {});
+export let customTileConfig = load('customTileConfig', [{ name: 'Water', unit: 'ml', step: 250, icon: '💧' }]);
+
+// Constants
+export const weightUnit = localStorage.getItem('weightUnit') || 'kg';
+export const WATER_GOAL = 2000;
+export const GOALS = {
+    REST: { kcal: 1500, protein: 200, carbs: 145, fat: 45 },
+    TRAINING: { kcal: 1800, protein: 200, carbs: 145, fat: 45 }
+};
+
+/* =========================================
+   3. DATE HELPERS
+   ========================================= */
+export const getToday = () => new Date().toISOString().split('T')[0];
+export const todayKey = getToday; // Alias for training.js compatibility
+window.getToday = getToday;
+
+/* =========================================
+   4. CLOUD SYNC & AUTHENTICATION
+   ========================================= */
+export async function authenticate(email, password, type) {
+    let result = type === 'signup' 
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+    if (result.error) throw result.error;
+    await loadUserSession();
+    return result.data.user;
+}
+
 export async function loadUserSession() {
     const { data: { user } } = await supabase.auth.getUser();
-    
     if (user) {
-        let { data, error } = await supabase
-            .from('fitness_data')
-            .select('*')
-            .single();
-
+        let { data } = await supabase.from('fitness_data').select('*').single();
         if (data) {
-            // Update our local variables with cloud data
             Object.assign(foodData, data.food_logs);
             Object.assign(goals, data.goals);
-            // ... and so on
+            // Add other assignments here
         }
     }
 }
 
-// Pro Version of saveState
 export async function saveState() {
-    // 1. Always save to local first (safety)
-    localStorage.setItem('foodLogs', JSON.stringify(foodData));
-    localStorage.setItem('userGoals', JSON.stringify(goals));
+    // 1. Local Save
+    save('foodLogs', foodData);
+    save('userGoals', goals);
+    save('isTrainingDay', isTrainingDay);
+    save('weightHistory', weightHistory);
+    save('dailySteps', dailySteps);
+    save('workoutData', workoutData);
+    save('customTilesHistory', customTilesHistory);
+    save('customTileConfig', customTileConfig);
 
-    // 2. If logged in, push to Supabase
+    // 2. Cloud Save
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
         await supabase.from('fitness_data').upsert({
             id: user.id,
             food_logs: foodData,
+            is_training_day: isTrainingDay,
             goals: goals,
+            steps: dailySteps,
             weight_history: weightHistory,
             updated_at: new Date()
         });
     }
 }
 
-/* ================================
-   DATE HELPERS
-================================ */
-export const goals =  JSON.parse(localStorage.getItem('userGoals')) || {
-    trainCals: 1800,
-    restCals: 1500,
-    protein: 200,
-    carbs: 145,
-    fats: 45
-};
-export const getToday = () => new Date().toISOString().split('T')[0];
-export const todayKey = getToday; // Alias for training.js compatibility
-window.getToday = getToday;
-export function todayKey() {
-    return new Date().toISOString().split('T')[0];
-}
-export function saveState() {
-    // Save the calorie goals
-    localStorage.setItem('userGoals', JSON.stringify(goals));
-    
-    // Save the meal logs
-    localStorage.setItem('foodLogs', JSON.stringify(foodData));
-    
-    // Save the current training status
-    localStorage.setItem('isTrainingDay', JSON.stringify(isTrainingDay));
-    
-    // Save the weight history array
-    localStorage.setItem('weightHistory', JSON.stringify(weightHistory));
-}
-/* ================================
-   STORAGE HELPERS
-================================ */
-export const save = (key, data) =>
-    localStorage.setItem(key, JSON.stringify(data));
-
-export const load = (key, fallback = null) =>
-    JSON.parse(localStorage.getItem(key)) ?? fallback;
-
-/* ================================
-   GLOBAL STATE
-================================ */
-export const weightUnit = localStorage.getItem('weightUnit') || 'kg';
-export let workoutData = load('workoutData', {});
-// Example structure in state.js
-export const foodData = {
-    "2026-02-15": [
-        { name: "Oatmeal", calories: 300, protein: 10, carbs: 50, fats: 5 },
-        { name: "Chicken Breast", calories: 450, protein: 60, carbs: 0, fats: 8 }
-    ]
-};
-export const isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || {};
-export const weightHistory = JSON.parse(localStorage.getItem('weightHistory')) || {};
-export let waterData = load('waterData', {});
-export const WATER_GOAL = 2000;
-export const GOALS = {
-    REST: { kcal: 1500, protein: 200, carbs: 145, fat: 45 },
-    TRAINING: { kcal: 1800, protein: 200, carbs: 220, fat: 45 }
-};
-
-/* ================================
-   TRAINING DAY MANAGEMENT
-================================ */
-export function isTrainingDay(date = getToday()) {
-    return localStorage.getItem(`isTraining_${date}`) === 'true';
-}
-
-export function toggleTrainingDay(date = getToday()) {
-    const key = `isTraining_${date}`;
-    const newState = !isTrainingDay(date);
-    localStorage.setItem(key, newState);
-    updateDailyGoalUI(date);
-    syncWorkoutDiaryEntry(date, newState);
-    return newState;
-}
-
-function syncWorkoutDiaryEntry(date, isTraining) {
-    const logKey = `logs_${date}`;
-    let logs = load(logKey, []);
-    if (isTraining) {
-        if (!logs.some(e => e.name === "Workout 💪")) {
-            logs.push({
-                name: "Workout 💪",
-                calories: 0,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-        }
-    } else {
-        logs = logs.filter(e => e.name !== "Workout 💪");
-    }
-    save(logKey, logs);
-}
-
-/* ================================
-   DAILY GOAL UI
-================================ */
-export function getCalorieGoal(date = getToday()) {
-    return isTrainingDay(date) ? GOALS.TRAINING.kcal : GOALS.REST.kcal;
-}
-
-window.updateDailyGoalUI = function(date = getToday()) {
-    const goal = getCalorieGoal(date);
-    const training = isTrainingDay(date);
-    const goalText = document.getElementById('calorieGoal');
-    const statusText = document.getElementById('dayStatus');
-    const btn = document.getElementById('trainingBtn');
-
-    if (goalText) goalText.innerText = `${goal} kcal`;
-    if (statusText) {
-        statusText.innerText = training ? "Training Day" : "Rest Day";
-        statusText.classList.toggle('training-active', training);
-    }
-    if (btn) {
-        btn.innerText = training ? "Logged as Workout ✅" : "Mark Training 💪";
-        btn.style.background = training ? "#28a745" : "var(--primary)";
-    }
-    localStorage.setItem(`goal_${date}`, goal);
-};
-
-/* ================================
-   STRENGTH FORMULA
-================================ */
+/* =========================================
+   5. LOGIC & MATH HELPERS
+   ========================================= */
 export function calculate1RM(weight, reps) {
     if (!weight || !reps) return 0;
     if (reps === 1) return weight;
-    // Brzycki Formula
     return Math.round(weight / (1.0278 - (0.0278 * reps)));
 }
-window.calculate1RM = calculate1RM;
 
-/* ================================
-   EXERCISE DATABASE
-================================ */
-// Updated to match the format expected by training.js (Array of Strings)
+export function sanitizeInput(value) {
+    const clean = String(value).replace(/[^0-9.]/g, '');
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : num;
+}
+
+/* =========================================
+   6. TRAINING & UI MANAGEMENT
+   ======================================== */
+export function toggleTrainingDay(date = getToday()) {
+    isTrainingDay = !isTrainingDay;
+    saveState();
+    if (window.updateDailyGoalUI) window.updateDailyGoalUI(date);
+    return isTrainingDay;
+}
+
 export const gymDB = {
     Chest: { icon: "💪", exercises: ["Barbell Bench Press", "Incline DB Press", "Cable Flyes"] },
     Back: { icon: "🚣", exercises: ["Deadlift", "Lat Pulldown", "Bent Over Rows", "Pull Ups"] },
@@ -187,131 +126,17 @@ export const gymDB = {
     Cardio: { icon: "🏃", exercises: ["Swimming", "Walking", "Cycling"] }
 };
 
-/* ================================
-   THEME TOGGLE
-================================ */
-window.toggleDarkMode = function() {
-    document.body.classList.toggle('dark-theme');
-    localStorage.setItem(
-        'theme-preference',
-        document.body.classList.contains('dark-theme') ? 'dark' : 'light'
-    );
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('theme-preference');
-    if (saved === 'dark') document.body.classList.add('dark-theme');
-    updateDailyGoalUI();
-});
-
-// Inside state.js
-export let isTrainingDay = JSON.parse(localStorage.getItem('isTrainingDay')) || false;
-
-export function setTrainingDay(val) {
-    isTrainingDay = val;
-    saveState();
-}
-
-// state.js
-
-// Load the full history of custom trackers
-export let customTilesHistory = JSON.parse(localStorage.getItem('customTilesHistory')) || {};
-
-// Load the current configuration (what trackers exist)
-export let customTileConfig = JSON.parse(localStorage.getItem('customTileConfig')) || [
-    { name: 'Water', unit: 'ml', step: 250, icon: '💧' }
-];
-
-export function saveState() {
-    // ... your other saves ...
-    localStorage.setItem('customTilesHistory', JSON.stringify(customTilesHistory));
-    localStorage.setItem('customTileConfig', JSON.stringify(customTileConfig));
-}
-
-// Function to handle Sign Up and Login
-export async function authenticate(email, password, type) {
-    let result;
-    if (type === 'signup') {
-        result = await supabase.auth.signUp({ email, password });
-    } else {
-        result = await supabase.auth.signInWithPassword({ email, password });
-    }
-
-    if (result.error) {
-        throw result.error;
-    }
-    
-    // Once logged in, immediately pull cloud data
-    await syncFromCloud();
-    return result.data.user;
-}
-
-// Check for existing session on page load
-export async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        console.log("User logged in:", user.email);
-        await syncFromCloud();
-    }
-    return user;
-}
-
-export async function saveState() {
-    // 1. Save locally for speed
-    localStorage.setItem('foodLogs', JSON.stringify(foodData));
-    localStorage.setItem('isTrainingDay', JSON.stringify(isTrainingDay));
-
-    // 2. Push to Supabase if logged in
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        await supabase.from('fitness_data').upsert({
-            id: user.id,
-            food_logs: foodData,
-            is_training_day: isTrainingDay, // Saves the toggle state!
-            goals: goals,
-            updated_at: new Date()
-        });
-    }
-}
-
-// state.js
-
+// Password Recovery
 export async function resetPassword(email) {
-    // Supabase sends an email with a unique recovery link
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/settings.html', // Redirect to settings to change it
+        redirectTo: window.location.origin + '/settings.html',
     });
-
     if (error) throw error;
     return data;
 }
 
-// Logic to update the password once the user returns via the email link
 export async function updatePassword(newPassword) {
-    const { data, error } = await supabase.auth.updateUser({
-        password: newPassword
-    });
-
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
     return data;
-}
-
-export let dailySteps = JSON.parse(localStorage.getItem('dailySteps')) || 0;
-
-export async function saveState() {
-    localStorage.setItem('dailySteps', JSON.stringify(dailySteps));
-    // ... existing save logic ...
-    if (user) {
-        await supabase.from('fitness_data').upsert({
-            // ... existing fields ...
-            steps: dailySteps 
-        });
-    }
-}
-
-export function sanitizeInput(value) {
-    // Remove commas, spaces, and non-numeric characters except decimals
-    const clean = String(value).replace(/[^0-9.]/g, '');
-    const num = parseFloat(clean);
-    return isNaN(num) ? 0 : num;
 }

@@ -1,3 +1,5 @@
+import { foodData, saveState, todayKey } from "./state";
+
 Quagga.offDetected();
 Quagga.onDetected(result => {
     if (!scanning) return;
@@ -15,10 +17,10 @@ let editingIndex = null;
 // ---------- UTIL ----------
 const today = () => new Date().toISOString().split("T")[0];
 
-const getEntries = () => JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+const getEntries = () => foodData[todayKey()] || [];
 const saveEntries = data => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    syncCloud(data);
+    foodData[todayKey()] = data;
+    saveState();
 };
 
 const getGoals = () => JSON.parse(localStorage.getItem(GOAL_KEY)) || {protein:200, carbs:145, fat:45};
