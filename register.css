@@ -110,3 +110,29 @@ body {
     width: 100%;
     max-width: 350px;
 }
+
+/* Specific override for danger/logout actions */
+button[style*="background: #e74c3c"]:hover {
+    background: #c0392b !important;
+}
+
+.settings-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.secondary-link {
+    text-decoration: none;
+    color: #999;
+    font-size: 14px;
+}

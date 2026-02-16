@@ -74,6 +74,34 @@ export function saveGoals() {
     localStorage.setItem('fitness_settings', JSON.stringify(state.goals));
 
     alert(`Goals saved! ${isTrainingDay ? "Training (+300)" : "Rest"} mode active.`);
+
+    function updateAuthUI() {
+    const authZone = document.getElementById('auth-zone');
+    const isLoggedIn = localStorage.getItem('user_session') === 'active';
+
+    if (isLoggedIn) {
+        // Show Logout button instead of Login link
+        authZone.innerHTML = `
+            <button id="navLogoutBtn" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; font-weight: bold;">
+                Logout
+            </button>
+        `;
+
+        // Add the click event for the new logout button
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.removeItem('user_session');
+                window.location.href = 'login.html';
+            }
+        });
+    } else {
+        // Keep the login/register link if no session exists
+        authZone.innerHTML = `<a href="login.html" class="secondary-link">Login / Register</a>`;
+    }
+}
+
+// Run this when the script loads
+updateAuthUI();
 }
 
 // --- Appearance ---
