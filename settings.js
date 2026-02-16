@@ -1,4 +1,4 @@
-import { goals, saveState, updatePassword } from './state.js';
+import { goals, saveState, state, updatePassword } from './state.js';
 
 
 // Check if we are returning from a password reset email
@@ -145,3 +145,8 @@ window.exportDataToCSV = function() {
 
     // ... append your existing Food and Weight logic ...
 };
+
+// Add this line to "expose" it to the HTML:
+window.saveGoals = saveGoals;
+window.resetTiles = resetTiles;
+window.confirmWipeData = confirmWipeData;
