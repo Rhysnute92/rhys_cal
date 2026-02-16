@@ -1,5 +1,6 @@
 import { goals, saveState, updatePassword } from './state.js';
 
+
 // Check if we are returning from a password reset email
 window.onload = async () => {
     const hash = window.location.hash;
@@ -36,18 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Example inside saveGoals or addMeal
+const calorieInput = document.getElementById('goalKcal').value;
+goals.restCals = sanitizeInput(calorieInput); 
+// Now, even if the user typed "2,000 kcal", it saves as 2000.
+
 // --- Goal Management ---
 window.saveGoals = function() {
-    const newGoals = {
-        restCals: parseInt(document.getElementById('goalKcal').value),
-        trainCals: parseInt(document.getElementById('goalKcal').value) + 500, // Default buffer
-        protein: parseInt(document.getElementById('goalP').value),
-        carbs: parseInt(document.getElementById('goalC').value),
-        fats: parseInt(document.getElementById('goalF').value)
-    };
+    const rest = parseInt(document.getElementById('goalKcal').value) || 2000;
+    
+    goals.restCals = rest;
+    goals.protein = parseInt(document.getElementById('goalP').value) || 0;
+    goals.carbs = parseInt(document.getElementById('goalC').value) || 0;
+    goals.fats = parseInt(document.getElementById('goalF').value) || 0;
+    
+    // --- UPDATE THIS LINE ---
+    goals.trainCals = rest + 300; // Changed from 500 to 300
 
-    localStorage.setItem('userGoals', JSON.stringify(newGoals));
-    alert("Goals saved successfully!");
+    saveState(); 
+    alert("Goals updated! Training days now add 300 kcal.");
 };
 
 // --- Appearance ---

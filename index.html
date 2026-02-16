@@ -18,6 +18,7 @@
         <div class="header-content">
             <img src="rhys_logo.png" class="header-logo" alt="Logo">
             <h1>Fitness Tracker</h1>
+            <p id="currentDateDisplay" style="font-size: 0.8rem; opacity: 0.8;"></p>
         </div>
 
         <nav class="nav-wrapper">
@@ -100,11 +101,16 @@
 </div>
 
     <div class="stat-row">
-        <div class="card stat-card">
-            <div class="tile-header"><h4>Steps</h4> <span class="check-icon">✔️</span></div>
-            <div class="stat-val">4,099</div>
-            <small>Goal: 1,000 steps</small>
-            <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
+        <div class="card stat-card pedometer-active">
+            <div class="tile-header">
+                <h4>Live Activity</h4>
+                <div id="stepIndicator" class="pulse-dot"></div>
+            </div>
+            <div class="stat-val"><span id="liveSteps">0</span> <small>steps</small></div>
+            <div class="progress-bar">
+                <div id="stepFill" class="fill" style="width: 0%"></div>
+            </div>
+            <button onclick="requestSensorPermission()" class="btn-text-small">Enable Sensors</button>
         </div>
         <div class="card stat-card">
             <div class="tile-header"><h4>Exercise</h4> <span class="plus-icon">+</span></div>
@@ -114,34 +120,6 @@
     </div>
 </div>
 
- <!-- <div class="container">
-    <div class="card training-card">
-        <div class="training-info">
-            <h2 id="calorieGoal">-- kcal</h2>
-            <p id="dayStatus">Loading...</p>
-        </div>
-        <button id="trainingBtn" class="btn-primary" onclick="handleTrainingToggle()">
-            Mark Training
-        </button>
-    </div>
-
-    <section id="mainGrid" class="dashboard-grid">
-        </section>
-
-    <div class="card grid-tile full-width">
-        <h4>7-Day Weight Trend</h4>
-        <div class="chart-container">
-            <canvas id="weightComparisonChart"></canvas>
-        </div>
-    </div>
-    
-    <div class="card grid-tile">
-        <h4>Macro Split</h4>
-        <div class="chart-container" style="height: 150px;">
-            <canvas id="macroPieChart"></canvas>
-        </div>
-    </div>
-</div> -->
 <button class="icon-btn full-width no-print" onclick="window.print()" style="margin-top: 20px;">
     📑 Export PDF Report
 </button>

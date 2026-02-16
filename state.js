@@ -50,7 +50,9 @@ export async function saveState() {
 export const goals =  JSON.parse(localStorage.getItem('userGoals')) || {
     trainCals: 1800,
     restCals: 1500,
-    targetWeight: 80
+    protein: 200,
+    carbs: 145,
+    fats: 45
 };
 export const getToday = () => new Date().toISOString().split('T')[0];
 export const todayKey = getToday; // Alias for training.js compatibility
@@ -292,4 +294,24 @@ export async function updatePassword(newPassword) {
 
     if (error) throw error;
     return data;
+}
+
+export let dailySteps = JSON.parse(localStorage.getItem('dailySteps')) || 0;
+
+export async function saveState() {
+    localStorage.setItem('dailySteps', JSON.stringify(dailySteps));
+    // ... existing save logic ...
+    if (user) {
+        await supabase.from('fitness_data').upsert({
+            // ... existing fields ...
+            steps: dailySteps 
+        });
+    }
+}
+
+export function sanitizeInput(value) {
+    // Remove commas, spaces, and non-numeric characters except decimals
+    const clean = String(value).replace(/[^0-9.]/g, '');
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : num;
 }

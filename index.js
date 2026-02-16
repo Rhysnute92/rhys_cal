@@ -1,45 +1,30 @@
-import { goals, foodData, isTrainingDay, weightHistory, todayKey, saveState } from './state.js';
+import { goals, foodData, isTrainingDay, todayKey, saveState, customTilesHistory, customTileConfig, dailySteps } from './state.js';
+import { initPedometer } from './pedometer.js';
+
+let calorieChart;
 
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
-    initCharts();
+    initCalorieChart();
 });
 
 function initDashboard() {
-    // Display Date
+    // 1. Display Date (Matches the report header logic)
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    const dateElement = document.getElementById('currentDateDisplay');
-    if (dateElement) dateElement.innerText = new Date().toLocaleDateString(undefined, options);
+    const dateText = new Date().toLocaleDateString(undefined, options);
+    
+    // Use the printDate element if currentDateDisplay is missing
+    const dateEl = document.getElementById('currentDateDisplay') || document.getElementById('printDate');
+    if (dateEl) dateEl.innerText = dateText;
 
-    updateTrainingHeader();
+    // 2. Setup Toggle State
+    const toggle = document.getElementById('trainingToggle');
+    if (toggle) toggle.checked = isTrainingDay;
+
     renderDashboard();
 }
 
-function updateTrainingHeader() {
-    const today = todayKey();
-    const meals = foodData[today] || [];
-    const totalCals = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
-    
-    // Determine goal based on training status
-    const currentGoal = isTrainingDay ? goals.trainCals : goals.restCals;
-    const statusText = isTrainingDay ? "Training Day" : "Rest Day";
-
-    // Update Top Card
-    document.getElementById('calorieGoal').innerText = `${currentGoal} kcal`;
-    document.getElementById('dayStatus').innerText = statusText;
-    
-    const btn = document.getElementById('trainingBtn');
-    btn.innerText = isTrainingDay ? "Mark Rest Day" : "Mark Training Day";
-    btn.classList.toggle('active-training', isTrainingDay);
-}
-
-window.handleTrainingToggle = function() {
-    // Toggle state (import logic usually handles this, but here is the setter)
-    const newState = !isTrainingDay;
-    localStorage.setItem('isTrainingDay', JSON.stringify(newState));
-    location.reload(); 
-};
-
+// --- Dashboard Rendering ---
 window.renderDashboard = function() {
     const grid = document.getElementById('mainGrid');
     if (!grid) return;
@@ -47,10 +32,10 @@ window.renderDashboard = function() {
     const today = todayKey();
     const meals = foodData[today] || [];
     const totals = meals.reduce((acc, m) => ({
-        kcal: acc.kcal + (m.calories || 0),
-        p: acc.p + (m.protein || 0),
-        c: acc.c + (m.carbs || 0),
-        f: acc.f + (m.fats || 0)
+        kcal: acc.kcal + (Number(m.calories) || 0),
+        p: acc.p + (Number(m.protein) || 0),
+        c: acc.c + (Number(m.carbs) || 0),
+        f: acc.f + (Number(m.fats) || 0)
     }), { kcal: 0, p: 0, c: 0, f: 0 });
 
     const currentGoal = isTrainingDay ? goals.trainCals : goals.restCals;
@@ -70,15 +55,16 @@ window.renderDashboard = function() {
         </div>
     `;
 
-    // 2. Load Custom Dynamic Tiles (Water, Steps, etc.)
-    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
-    customTiles.forEach((tile, index) => {
+    // 2. Load Custom Dynamic Tiles from History
+    if (!customTilesHistory[today]) customTilesHistory[today] = {};
+    
+    customTileConfig.forEach((config, index) => {
+        const currentAmount = customTilesHistory[today][config.name] || 0;
         gridHTML += `
-            <div class="card grid-tile interactive-tile" onclick="incrementTile(${index})">
-                <button onclick="event.stopPropagation(); removeTile(${index})" class="delete-btn">×</button>
-                <div class="tile-header"><h4>${tile.name}</h4><span>✨</span></div>
-                <div class="tile-value">${tile.amount} <small>${tile.unit}</small></div>
-                <p style="font-size:0.7rem; color:gray;">Tap to add ${tile.step}</p>
+            <div class="card grid-tile interactive-tile" onclick="incrementTracker('${config.name}', ${index})">
+                <div class="tile-header"><h4>${config.name}</h4><span>${config.icon || '✨'}</span></div>
+                <div class="tile-value">${currentAmount} <small>${config.unit}</small></div>
+                <p style="font-size:0.7rem; color:gray;">Tap to add ${config.step}</p>
             </div>
         `;
     });
@@ -92,215 +78,52 @@ window.renderDashboard = function() {
     `;
 
     grid.innerHTML = gridHTML;
+    updateHeroStats(totals.kcal, currentGoal);
 };
 
-// --- Custom Tile Logic ---
-window.addNewTile = function() {
-    const type = document.getElementById('tileType').value;
-    const today = todayKey();
-    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
+// --- Hero Section Updates ---
+function updateHeroStats(totalFood, currentGoal) {
+    const remaining = Math.max(0, currentGoal - totalFood);
 
-    const presets = {
-        water: { name: 'Water', unit: 'ml', step: 250 },
-        steps: { name: 'Steps', unit: 'steps', step: 1000 },
-        sleep: { name: 'Sleep', unit: 'hrs', step: 1 },
-        gym:   { name: 'Gym', unit: 'sessions', step: 1 }
-    };
+    document.getElementById('displayGoal').innerText = currentGoal.toLocaleString();
+    document.getElementById('displayFood').innerText = totalFood.toLocaleString();
+    document.getElementById('displayRemaining').innerText = remaining.toLocaleString();
 
-    customTiles.push({ ...presets[type], amount: 0 });
-    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
-    closeModal();
-    renderDashboard();
-};
-
-window.incrementTile = function(index) {
-    const today = todayKey();
-    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
-    customTiles[index].amount += customTiles[index].step;
-    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
-    renderDashboard();
-    if (navigator.vibrate) navigator.vibrate(30);
-};
-
-window.removeTile = function(index) {
-    const today = todayKey();
-    const customTiles = JSON.parse(localStorage.getItem(`customTiles_${today}`)) || [];
-    customTiles.splice(index, 1);
-    localStorage.setItem(`customTiles_${today}`, JSON.stringify(customTiles));
-    renderDashboard();
-};
-
-// --- Charts ---
-function initCharts() {
-    const today = todayKey();
-    const meals = foodData[today] || [];
-    const totals = meals.reduce((acc, m) => ({
-        p: acc.p + (m.protein || 0),
-        c: acc.c + (m.carbs || 0),
-        f: acc.f + (m.fats || 0)
-    }), { p: 0, c: 0, f: 0 });
-
-    const pieCtx = document.getElementById('macroPieChart')?.getContext('2d');
-    if (pieCtx) {
-        new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Protein', 'Carbs', 'Fats'],
-                datasets: [{
-                    data: [totals.p, totals.c, totals.f],
-                    backgroundColor: ['#4CAF50', '#2196F3', '#FF9800'],
-                    borderWidth: 0
-                }]
-            },
-            options: { cutout: '70%', plugins: { legend: { display: false } } }
-        });
-    }
-
-    const weightCtx = document.getElementById('weightComparisonChart')?.getContext('2d');
-    if (weightCtx) {
-        const last7 = weightHistory.slice(-7);
-        new Chart(weightCtx, {
-            type: 'line',
-            data: {
-                labels: last7.map(d => d.date.split('-').slice(1).join('/')),
-                datasets: [{
-                    label: 'Weight',
-                    data: last7.map(d => d.weight),
-                    borderColor: '#4CAF50',
-                    tension: 0.3
-                }]
-            },
-            options: { maintainAspectRatio: false }
-        });
+    if (calorieChart) {
+        const progress = Math.min(100, (totalFood / currentGoal) * 100);
+        calorieChart.data.datasets[0].data = [progress, 100 - progress];
+        calorieChart.update();
     }
 }
 
-// Modal Controls
-window.openModal = () => document.getElementById('addTileModal').style.display = 'flex';
-window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
-
-
-window.onbeforeprint = () => {
-    // 1. Handle the Date header
-    const printDate = document.getElementById('printDate');
-    if (printDate) {
-        printDate.innerText = `Generated on: ${new Date().toLocaleDateString()}`;
-    }
-
-    // 2. Populate the Summary Table
-    const today = todayKey();
-    const meals = foodData[today] || [];
-    const tableBody = document.getElementById('foodSummaryBody');
-    const tableFoot = document.getElementById('foodSummaryFoot');
+// --- Event Handlers ---
+window.toggleTrainingMode = function() {
+    const toggle = document.getElementById('trainingToggle');
+    // Important: We update the actual variable in state.js memory via local storage
+    localStorage.setItem('isTrainingDay', toggle.checked);
     
-    if (!tableBody) return;
-
-    // Clear existing rows
-    tableBody.innerHTML = '';
-    
-    let totals = { kcal: 0, p: 0, c: 0, f: 0 };
-
-    if (meals.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5">No food logged for today.</td></tr>';
-    } else {
-        meals.forEach(item => {
-            const row = `
-                <tr>
-                    <td>${item.name || 'Unnamed Item'}</td>
-                    <td>${item.calories}</td>
-                    <td>${item.protein}g</td>
-                    <td>${item.carbs}g</td>
-                    <td>${item.fats}g</td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-            
-            // Calculate totals for the footer
-            totals.kcal += Number(item.calories);
-            totals.p += Number(item.protein);
-            totals.c += Number(item.carbs);
-            totals.f += Number(item.fats);
-        });
-
-        // Inject Totals
-        tableFoot.innerHTML = `
-            <tr>
-                <td>TOTAL</td>
-                <td>${totals.kcal}</td>
-                <td>${totals.p}g</td>
-                <td>${totals.c}g</td>
-                <td>${totals.f}g</td>
-            </tr>
-        `;
-    }
-};
-
-window.handleTrainingToggle = function() {
-    const newState = !isTrainingDay;
-    localStorage.setItem('isTrainingDay', JSON.stringify(newState));
+    // In a real app, you'd export a setter, but since we use location.reload in the past:
+    // We will just refresh the UI elements to reflect the new goal
     location.reload(); 
-};
-
-import { customTilesHistory, customTileConfig, todayKey, saveState } from './state.js';
-
-window.renderDashboard = function() {
-    const grid = document.getElementById('mainGrid');
-    const today = todayKey();
-    
-    // Ensure today's entry exists in history
-    if (!customTilesHistory[today]) {
-        customTilesHistory[today] = {};
-    }
-
-    let gridHTML = ``; // Add your core tiles here first...
-
-    customTileConfig.forEach((config, index) => {
-        // Get today's count, or 0 if it's a brand new day
-        const currentAmount = customTilesHistory[today][config.name] || 0;
-
-        gridHTML += `
-            <div class="card grid-tile interactive-tile" onclick="incrementTracker('${config.name}', ${index})">
-                <div class="tile-header"><h4>${config.name}</h4><span>${config.icon || '✨'}</span></div>
-                <div class="tile-value">${currentAmount} <small>${config.unit}</small></div>
-                <p style="font-size:0.7rem; color:gray;">Daily Reset Active</p>
-            </div>
-        `;
-    });
-
-    grid.innerHTML = gridHTML;
 };
 
 window.incrementTracker = function(name, configIndex) {
     const today = todayKey();
     const step = customTileConfig[configIndex].step;
-
-    // Update the value for TODAY specifically
     const current = customTilesHistory[today][name] || 0;
+    
     customTilesHistory[today][name] = current + step;
-
+    
+    if (navigator.vibrate) navigator.vibrate(30);
     saveState();
     renderDashboard();
 };
 
-function updateUI() {
-    const today = todayKey();
-    const meals = foodData[today] || [];
-    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
-    const goal = goals.restCals;
-    const remaining = goal - totalFood;
-
-    document.getElementById('displayGoal').innerText = goal.toLocaleString();
-    document.getElementById('displayFood').innerText = totalFood.toLocaleString();
-    document.getElementById('displayRemaining').innerText = remaining.toLocaleString();
-}
-
-let calorieChart;
-
+// --- Charts ---
 export function initCalorieChart() {
-    const ctx = document.getElementById('calorieChart').getContext('2d');
-    
-    // Initialize the toggle state from memory
-    document.getElementById('trainingToggle').checked = isTrainingDay;
+    const canvas = document.getElementById('calorieChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
     calorieChart = new Chart(ctx, {
         type: 'doughnut',
@@ -309,8 +132,6 @@ export function initCalorieChart() {
                 data: [0, 100],
                 backgroundColor: ['#0066ee', '#eef2f3'],
                 borderWidth: 0,
-                circumference: 360,
-                rotation: 0,
                 cutout: '85%'
             }]
         },
@@ -320,37 +141,105 @@ export function initCalorieChart() {
             animation: { duration: 1500, easing: 'easeOutQuart' }
         }
     });
-
-    updateDashboard();
+    renderDashboard();
 }
 
-window.toggleTrainingMode = function() {
-    // Update the state variable
-    const toggle = document.getElementById('trainingToggle');
-    // Direct assignment if using 'let' in state.js or via setter
-    // For this example, we assume we update the exported value
-    localStorage.setItem('isTrainingDay', toggle.checked);
-    updateDashboard();
-    saveState();
-};
+// --- Modal & Print Controls ---
+window.openModal = () => document.getElementById('addTileModal').style.display = 'flex';
+window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
 
-function updateDashboard() {
+window.onbeforeprint = () => {
     const today = todayKey();
     const meals = foodData[today] || [];
-    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
+    const tableBody = document.getElementById('foodSummaryBody');
+    const tableFoot = document.getElementById('foodSummaryFoot');
     
-    // Switch goal based on toggle
-    const isTrain = document.getElementById('trainingToggle').checked;
-    const currentGoal = isTrain ? goals.trainCals : goals.restCals;
-    const remaining = Math.max(0, currentGoal - totalFood);
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    
+    let totals = { kcal: 0, p: 0, c: 0, f: 0 };
 
-    // Update Text
-    document.getElementById('displayGoal').innerText = currentGoal;
-    document.getElementById('displayFood').innerText = totalFood;
-    document.getElementById('displayRemaining').innerText = remaining;
+    if (meals.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5">No food logged for today.</td></tr>';
+    } else {
+        meals.forEach(item => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${item.name || 'Unnamed Item'}</td>
+                    <td>${item.calories}</td>
+                    <td>${item.protein}g</td>
+                    <td>${item.carbs}g</td>
+                    <td>${item.fats}g</td>
+                </tr>`;
+            totals.kcal += Number(item.calories);
+            totals.p += Number(item.protein);
+            totals.c += Number(item.carbs);
+            totals.f += Number(item.fats);
+        });
 
-    // Update Chart Animation
-    const progress = Math.min(100, (totalFood / currentGoal) * 100);
-    calorieChart.data.datasets[0].data = [progress, 100 - progress];
-    calorieChart.update();
+        tableFoot.innerHTML = `
+            <tr>
+                <td>TOTAL</td>
+                <td>${totals.kcal}</td>
+                <td>${totals.p}g</td>
+                <td>${totals.c}g</td>
+                <td>${totals.f}g</td>
+            </tr>`;
+    }
+};
+
+import { initPedometer } from './pedometer.js';
+import { dailySteps, saveState } from './state.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Start the pedometer
+    initPedometer(() => {
+        dailySteps++;
+        updateStepUI();
+        // Save every 10 steps to prevent constant database hitting
+        if (dailySteps % 10 === 0) saveState();
+    });
+});
+
+function updateStepUI() {
+    const stepVal = document.getElementById('stepCountDisplay');
+    const stepFill = document.getElementById('stepProgressFill');
+    const stepGoal = 10000; // Professional standard goal
+
+    if (stepVal) stepVal.innerText = dailySteps.toLocaleString();
+    if (stepFill) {
+        const progress = (dailySteps / stepGoal) * 100;
+        stepFill.style.width = `${Math.min(progress, 100)}%`;
+    }
+}
+
+window.requestSensorPermission = async () => {
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        const permission = await DeviceMotionEvent.requestPermission();
+        if (permission === 'granted') {
+            startStepTracking();
+        }
+    } else {
+        // Non-iOS devices usually don't need explicit permission
+        startStepTracking();
+    }
+};
+
+function startStepTracking() {
+    startPedometer(() => {
+        // 1. Update Global State
+        dailySteps++; 
+        
+        // 2. Update UI immediately
+        document.getElementById('liveSteps').innerText = dailySteps;
+        document.getElementById('stepFill').style.width = (dailySteps / 10000 * 100) + '%';
+        
+        // 3. Visual pulse
+        const dot = document.getElementById('stepIndicator');
+        dot.classList.add('active');
+        setTimeout(() => dot.classList.remove('active'), 200);
+
+        // 4. Batch Save to Supabase (every 20 steps to save battery/data)
+        if (dailySteps % 20 === 0) saveState();
+    });
 }
