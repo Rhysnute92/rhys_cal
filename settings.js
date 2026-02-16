@@ -1,4 +1,20 @@
-import { goals, saveState } from './state.js';
+import { goals, saveState, updatePassword } from './state.js';
+
+// Check if we are returning from a password reset email
+window.onload = async () => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+        const newPass = prompt("Please enter your new password:");
+        if (newPass) {
+            try {
+                await updatePassword(newPass);
+                alert("Password updated successfully!");
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        }
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Load existing goals into inputs

@@ -225,3 +225,71 @@ export function saveState() {
     localStorage.setItem('customTilesHistory', JSON.stringify(customTilesHistory));
     localStorage.setItem('customTileConfig', JSON.stringify(customTileConfig));
 }
+
+// Function to handle Sign Up and Login
+export async function authenticate(email, password, type) {
+    let result;
+    if (type === 'signup') {
+        result = await supabase.auth.signUp({ email, password });
+    } else {
+        result = await supabase.auth.signInWithPassword({ email, password });
+    }
+
+    if (result.error) {
+        throw result.error;
+    }
+    
+    // Once logged in, immediately pull cloud data
+    await syncFromCloud();
+    return result.data.user;
+}
+
+// Check for existing session on page load
+export async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        console.log("User logged in:", user.email);
+        await syncFromCloud();
+    }
+    return user;
+}
+
+export async function saveState() {
+    // 1. Save locally for speed
+    localStorage.setItem('foodLogs', JSON.stringify(foodData));
+    localStorage.setItem('isTrainingDay', JSON.stringify(isTrainingDay));
+
+    // 2. Push to Supabase if logged in
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        await supabase.from('fitness_data').upsert({
+            id: user.id,
+            food_logs: foodData,
+            is_training_day: isTrainingDay, // Saves the toggle state!
+            goals: goals,
+            updated_at: new Date()
+        });
+    }
+}
+
+// state.js
+
+export async function resetPassword(email) {
+    // Supabase sends an email with a unique recovery link
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/settings.html', // Redirect to settings to change it
+    });
+
+    if (error) throw error;
+    return data;
+}
+
+// Logic to update the password once the user returns via the email link
+export async function updatePassword(newPassword) {
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+    });
+
+    if (error) throw error;
+    return data;
+}

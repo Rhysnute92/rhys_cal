@@ -37,10 +37,26 @@
             </div>
         </nav>
     </header>
-    <div id="auth-section">
-        <button id="loginBtn" onclick="handleLogin()">Login / Sign Up</button>
-        <span id="userEmail" style="display:none;"></span>
+<div id="authModal" class="modal-overlay" style="display: none;">
+    <div class="card auth-card">
+        <h2 id="authTitle">Welcome Back</h2>
+        <p id="authSubtitle">Log in to sync your fitness data</p>
+        
+        <input type="email" id="authEmail" placeholder="Email Address" class="input-field">
+        <input type="password" id="authPassword" placeholder="Password" class="input-field">
+        
+        <div class="auth-actions">
+            <button onclick="handleAuth('login')" class="btn-primary" id="loginBtn">Login</button>
+            <button onclick="handleAuth('signup')" class="btn-outline">Create Account</button>
+        </div>
+        
+        <button onclick="closeAuthModal()" class="btn-close">Cancel</button>
     </div>
+</div>
+
+<div class="auth-helper">
+    <a href="#" onclick="handleForgotPassword()" class="text-link">Forgot Password?</a>
+</div>
 
     <div class="header-spacer"></div>
 
