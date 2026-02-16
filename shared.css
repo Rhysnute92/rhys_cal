@@ -12,6 +12,9 @@
     --text-main: #4a4a4a;
     --border: #e1e4e8;
     --button: #1e90ff;
+    --bg-gray: #f8f9fa;
+    --text-main: #333;
+    --accent-blue: #0066ee;
 }
 
 * { box-sizing: border-box; }

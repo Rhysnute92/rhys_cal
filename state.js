@@ -1,6 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+
+const SUPABASE_URL='https://xlutwqwtecrlxadfaifu.supabase.co';
+const SUPABASE__ANON_KEY='sb_publishable_Kb2eAvRNrDqBGfmuv3ct3Q_2li9wW9p';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE__ANON_KEY);
 
 // Load data from Cloud on startup
 export async function loadUserSession() {

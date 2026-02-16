@@ -281,3 +281,15 @@ window.incrementTracker = function(name, configIndex) {
     saveState();
     renderDashboard();
 };
+
+function updateUI() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
+    const goal = goals.restCals;
+    const remaining = goal - totalFood;
+
+    document.getElementById('displayGoal').innerText = goal.toLocaleString();
+    document.getElementById('displayFood').innerText = totalFood.toLocaleString();
+    document.getElementById('displayRemaining').innerText = remaining.toLocaleString();
+}

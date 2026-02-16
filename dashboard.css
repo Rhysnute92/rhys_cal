@@ -167,3 +167,63 @@
 .print-only {
     display: none;
 }
+
+
+body { background-color: var(--bg-gray); font-family: 'Inter', sans-serif; }
+
+.calorie-hero {
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.ring-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+
+/* Simple CSS Circular Ring */
+.calorie-ring {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 8px solid #eee;
+    border-top: 8px solid var(--accent-blue); /* This represents progress */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.ring-center { text-align: center; }
+.ring-center h2 { font-size: 2rem; margin: 0; }
+.ring-center span { color: gray; font-size: 0.8rem; }
+
+.ring-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar .fill {
+    height: 100%;
+    background: var(--accent-blue);
+}
