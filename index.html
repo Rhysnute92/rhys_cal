@@ -125,6 +125,9 @@
                 <div id="stepFill" class="fill" style="width: 0%"></div>
             </div>
             <button onclick="requestSensorPermission()" class="btn-text-small">Enable Sensors</button>
+        <div class="live-activity">
+            <span id="step-count">0</span> steps
+            </div>
         </div>
         <div class="card stat-card">
             <div class="tile-header"><h4>Exercise</h4> <span class="plus-icon">+</span></div>
@@ -178,6 +181,7 @@
 </div>
     <script type="module" src="index.js"></script>
     <script type="module" src="settings.js"></script>
+    <script type="module" src="pedometer.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

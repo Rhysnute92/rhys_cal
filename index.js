@@ -210,17 +210,22 @@ function updateStepUI() {
     }
 }
 
-window.requestSensorPermission = async () => {
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        const permission = await DeviceMotionEvent.requestPermission();
-        if (permission === 'granted') {
-            startStepTracking();
+async function requestSensorPermission() {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+            const permission = await DeviceMotionEvent.requestPermission();
+            if (permission === 'granted') {
+                window.startPedometer();
+            }
+        } catch (error) {
+            console.error("Sensor permission denied", error);
         }
     } else {
-        // Non-iOS devices usually don't need explicit permission
-        startStepTracking();
+        // Non-iOS device or browser that doesn't require explicit permission
+        window.startPedometer();
     }
-};
+}
+window.requestSensorPermission = requestSensorPermission;
 
 function startStepTracking() {
     startPedometer(() => {

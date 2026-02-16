@@ -13,7 +13,16 @@ const supabase = createClient(SUPABASE_URL, SUPABASE__ANON_KEY);
 // Helpers for cleaner loading
 export const load = (key, fallback = null) => JSON.parse(localStorage.getItem(key)) ?? fallback;
 export const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-
+// You must explicitly export the variable
+export const state = {
+    goals: {
+        calories: 1500,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+    },
+    // ... other state properties
+};
 // Core Data Exports
 export let foodData = load('foodLogs', {});
 export let goals = load('userGoals', { trainCals: 1800, restCals: 1500, protein: 200, carbs: 145, fats: 45 });
