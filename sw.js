@@ -2,29 +2,29 @@ const CACHE_NAME = 'fitness-pro-v2'; // Incrementing version to v2 for the new f
 const ASSETS_TO_CACHE = [
     // Core HTML
     '/',
-    '/index.html',
-    '/settings.html',
-    '/log.html',
-    '/training.html',
+    './index.html',
+    './settings.html',
+    './log.html',
+    './training.html',
     
     // Logic & State
-    '/state.js',
-    '/index.js',
-    '/settings.js',
-    '/pedometer.js', 
+    './state.js',
+    './index.js',
+    './settings.js',
+    './pedometer.js', 
     
     // Styles
-    '/shared.css',
-    '/dashboard.css',
+    './shared.css',
+    './dashboard.css',
     
     // Assets & Config
-    '/manifest.json',
-    '/rhys_logo.png',
-    '/rhys_favicon.png',
-    '/apple-touch-icon.png',
-    '/dashboard.png',
-    '/diary.png',
-    '/training.png',
+    './manifest.json',
+    './rhys_logo.png',
+    './rhys_favicon.png',
+    './apple-touch-icon.png',
+    './dashboard.png',
+    './diary.png',
+    './training.png',
     
     // External CDN (Charts)
     'https://cdn.jsdelivr.net/npm/chart.js',

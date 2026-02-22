@@ -1,0 +1,94 @@
+<svg width="1000" height="750" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="750" fill="white"/>
+  <!-- Matrix Title -->
+  <text x="500" y="40" font-size="28" font-family="Arial" fill="#002147" text-anchor="middle" font-weight="bold">
+    Trade-off Matrix
+  </text>
+  <!-- Column Headers -->
+  <text x="200" y="100" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Accuracy</text>
+  <text x="320" y="100" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Privacy Guarantee</text>
+  <text x="440" y="100" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Resilience</text>
+  <text x="560" y="100" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Overhead</text>
+  <text x="680" y="100" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Communication Cost</text>
+  <!-- Row Headers (full names, not truncated) -->
+  <text x="150" y="150" font-size="12" font-family="Arial" fill="#002147" text-anchor="end">FedAvg (Baseline)</text>
+  <text x="150" y="200" font-size="12" font-family="Arial" fill="#002147" text-anchor="end">Adaptive Aggregation</text>
+  <text x="150" y="250" font-size="12" font-family="Arial" fill="#002147" text-anchor="end">Personalized FL</text>
+  <text x="150" y="300" font-size="12" font-family="Arial" fill="#002147" text-anchor="end">FL + Differential Privacy</text>
+  <text x="150" y="350" font-size="12" font-family="Arial" fill="#002147" text-anchor="end">FL + Gradient Compression</text>
+  <!-- Matrix Cells -->
+  <!-- Row 1 -->
+  <rect x="160" y="130" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="280" y="130" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="400" y="130" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="520" y="130" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="640" y="130" width="80" height="40" fill="#002147"/>
+  <text x="200" y="155" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="320" y="155" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="440" y="155" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="560" y="155" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="680" y="155" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <!-- Row 2 -->
+  <rect x="160" y="180" width="80" height="40" fill="#002147"/>
+  <rect x="280" y="180" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="400" y="180" width="80" height="40" fill="#002147"/>
+  <rect x="520" y="180" width="80" height="40" fill="#FFD700"/>
+  <rect x="640" y="180" width="80" height="40" fill="#FFD700"/>
+  <text x="200" y="205" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <text x="320" y="205" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="440" y="205" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <text x="560" y="205" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="680" y="205" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <!-- Row 3 -->
+  <rect x="160" y="230" width="80" height="40" fill="#002147"/>
+  <rect x="280" y="230" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="400" y="230" width="80" height="40" fill="#FFD700"/>
+  <rect x="520" y="230" width="80" height="40" fill="#002147"/>
+  <rect x="640" y="230" width="80" height="40" fill="#FFD700"/>
+  <text x="200" y="255" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <text x="320" y="255" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="440" y="255" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="560" y="255" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <text x="680" y="255" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <!-- Row 4 -->
+  <rect x="160" y="280" width="80" height="40" fill="#FFD700"/>
+  <rect x="280" y="280" width="80" height="40" fill="#002147"/>
+  <rect x="400" y="280" width="80" height="40" fill="#FFD700"/>
+  <rect x="520" y="280" width="80" height="40" fill="#FFD700"/>
+  <rect x="640" y="280" width="80" height="40" fill="#FFD700"/>
+  <text x="200" y="305" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="320" y="305" font-size="12" font-family="Arial" fill="white" text-anchor="middle">High</text>
+  <text x="440" y="305" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="560" y="305" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="680" y="305" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <!-- Row 5 -->
+  <rect x="160" y="330" width="80" height="40" fill="#FFD700"/>
+  <rect x="280" y="330" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="400" y="330" width="80" height="40" fill="#FFD700"/>
+  <rect x="520" y="330" width="80" height="40" fill="#D3D3D3"/>
+  <rect x="640" y="330" width="80" height="40" fill="#D3D3D3"/>
+  <text x="200" y="355" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="320" y="355" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="440" y="355" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Medium</text>
+  <text x="560" y="355" font-size="12" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <text x="680" y="355" font-size="1" font-family="Arial" fill="#002147" text-anchor="middle">Low</text>
+  <!-- Caption -->
+  <text x="500" y="430" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle" font-weight="bold">
+    Figure X. Trade-off matrix comparing federated learning approaches for IoT intrusion detection.
+  </text>
+  <text x="500" y="455" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle">
+    The matrix evaluates five algorithms—FedAvg (Baseline), Adaptive Aggregation, Personalized FL,
+  </text>
+  <text x="500" y="475" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle">
+    FL with Differential Privacy, and FL with Gradient Compression—across key criteria: detection accuracy,
+  </text>
+  <text x="500" y="495" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle">
+    privacy guarantee, resilience, computational overhead, and communication cost. Colour coding uses Oxford navy blue
+  </text>
+  <text x="500" y="515" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle">
+    for high, Oxford gold for medium, and Oxford light grey for low. This visualisation highlights the strengths and
+  </text>
+  <text x="500" y="535" font-size="14" font-family="Arial" fill="#002147" text-anchor="middle">
+    limitations of each approach, supporting evidence-based selection for deployment in heterogeneous IoT environments.
+  </text>
+</svg>
