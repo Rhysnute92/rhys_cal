@@ -275,3 +275,56 @@ if("serviceWorker" in navigator){
 
 // ---------- INIT ----------
 render();
+
+// 1. Create a hidden input to trigger the camera
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = 'image/*';
+fileInput.capture = 'environment'; // Opens the back camera on mobile
+
+document.getElementById('scanMealBtn').addEventListener('click', () => {
+    fileInput.click();
+});
+
+// 2. Handle the image selection
+fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show a loading state on the button
+    const btn = document.getElementById('scanMealBtn');
+    const originalText = btn.innerText;
+    btn.innerText = "⌛ Analyzing...";
+    btn.disabled = true;
+
+    try {
+        // Send file to your backend/API
+        const foodData = await analyzeImageWithAI(file);
+        
+        // 3. Auto-fill your form fields
+        document.querySelector('input[placeholder="Food name"]').value = foodData.name;
+        document.querySelector('input[placeholder="Calories"]').value = foodData.calories;
+        document.querySelector('input[placeholder="Protein"]').value = foodData.protein;
+        document.querySelector('input[placeholder="Carbs"]').value = foodData.carbs;
+        document.querySelector('input[placeholder="Fat"]').value = foodData.fat;
+
+    } catch (error) {
+        alert("Could not identify food. Please try again.");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+};
+
+// This is a placeholder for your actual API call (e.g., to Gemini or OpenAI)
+async function analyzeImageWithAI(imageFile) {
+    // You would typically use FormData to send the image to a server
+    // For now, returning mock data as an example:
+    return {
+        name: "Grilled Chicken Salad",
+        calories: 350,
+        protein: 35,
+        carbs: 12,
+        fat: 18
+    };
+}

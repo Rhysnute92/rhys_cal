@@ -206,7 +206,7 @@ body.scanning .nav-wrapper {
     padding: 12px;
     border: none;
     border-radius: 8px;
-    background-color: #5cb85c; /* Matches your Save/Add button green */
+    color: var(--primary); /* Matches your Save/Add button green */
     color: white;
     font-weight: bold;
     cursor: pointer;
@@ -221,4 +221,16 @@ body.scanning .nav-wrapper {
 /* Optional: Different color for Scan Meal to distinguish it */
 .scan-meal {
     background-color: #4a90e2; /* A nice blue, or keep it green if you prefer */
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.btn-scan:disabled {
+    animation: pulse 1.5s infinite;
+    cursor: wait;
+    background-color: #999;
 }
