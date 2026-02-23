@@ -48,7 +48,14 @@
 
 <div class="container">
 
-<button class="btn-primary full" onclick="startCamera()">📸 Scan Barcode</button>
+<div class="scan-container">
+    <button class="btn-scan scan-barcode">
+        📸 Scan Barcode
+    </button>
+    <button class="btn-scan scan-meal" id="scanMealBtn">
+        🥗 Scan Meal
+    </button>
+</div>
 
 <!-- scanner -->
 <div id="scannerOverlay" class="scanner-overlay">
@@ -111,5 +118,6 @@
 
 <script type="module" src="log.js"></script>
 <script type="module" src="state.js"></script>
+<script type="module" src="dashboard.js"></script>
 </body>
 </html>

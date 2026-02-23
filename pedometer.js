@@ -42,3 +42,5 @@ function updateStepUI(count) {
 
 // Crucial: Expose to the button in your HTML
 window.startPedometer = startPedometer;
+
+export { initPedonmeter };

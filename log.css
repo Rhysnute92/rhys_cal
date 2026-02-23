@@ -193,3 +193,32 @@ body.scanning .nav-wrapper {
     background: black;
     z-index: 9999;
 }
+
+.scan-container {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    justify-content: center;
+}
+
+.btn-scan {
+    flex: 1; /* Makes both buttons equal width */
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #5cb85c; /* Matches your Save/Add button green */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-scan:hover {
+    background-color: #4cae4c;
+}
+
+/* Optional: Different color for Scan Meal to distinguish it */
+.scan-meal {
+    background-color: #4a90e2; /* A nice blue, or keep it green if you prefer */
+}

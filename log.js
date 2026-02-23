@@ -23,6 +23,17 @@ const saveEntries = data => {
     saveState();
 };
 
+document.getElementById('scanMealBtn').addEventListener('click', function() {
+    // 1. Logic to open camera
+    alert("Opening camera for AI meal recognition...");
+    
+    // In a real app, you'd use:
+    // const imageCapture = new ImageCapture(videoTrack);
+    
+    // 2. Placeholder for API call
+    console.log("Identifying food from image...");
+});
+
 const getGoals = () => JSON.parse(localStorage.getItem(GOAL_KEY)) || {protein:200, carbs:145, fat:45};
 
 // ---------- CLOUD SYNC (Firebase ready) ----------
