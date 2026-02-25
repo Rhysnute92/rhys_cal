@@ -160,6 +160,22 @@ window.exportDataToCSV = function() {
     document.body.removeChild(link);
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+    const calorieInput = document.getElementById('dailyCalorieGoal');
+    const saveBtn = document.getElementById('saveSettingsBtn');
+
+    // ONLY execute if these elements exist (prevents the "null" error)
+    if (calorieInput && saveBtn) {
+        const savedGoal = localStorage.getItem('dailyGoal') || 2000;
+        calorieInput.value = savedGoal;
+
+        saveBtn.addEventListener('click', () => {
+            localStorage.setItem('dailyGoal', calorieInput.value);
+            alert('Goal Saved!');
+        });
+    }
+});
+
 window.confirmWipeData = function() {
     // First Confirmation
     const firstCheck = confirm("Are you sure you want to delete ALL data? This includes food logs, weight history, and settings.");

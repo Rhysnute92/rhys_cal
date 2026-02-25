@@ -43,4 +43,7 @@ function updateStepUI(count) {
 // Crucial: Expose to the button in your HTML
 window.startPedometer = startPedometer;
 
-export { initPedonmeter };
+export function initPedometer() {
+    console.log("Pedometer active");
+    // your sensor code...
+} // Check that this closing bracket exists! (Fixes your "Declaration expected" error)
