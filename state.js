@@ -125,6 +125,24 @@ export function toggleTrainingDay(date = getToday()) {
     return isTrainingDay;
 }
 
+function toggleTrainingMode() {
+    const isTraining = document.getElementById('trainingToggle').checked;
+    
+    // Use the values from your state/settings instead of hardcoded numbers
+    const currentGoal = isTraining ? (goals.restCals + 300) : goals.restCals;
+    const foodConsumed = parseInt(document.getElementById('displayFood').innerText) || 0;
+    const remaining = Math.max(0, currentGoal - foodConsumed);
+    
+    document.getElementById('displayGoal').innerText = currentGoal;
+    document.getElementById('displayRemaining').innerText = remaining;
+    
+    // Update the chart
+    if (calorieChart) {
+        calorieChart.data.datasets[0].data = [foodConsumed, remaining];
+        calorieChart.update();
+    }
+}
+
 export const gymDB = {
     Chest: { icon: "💪", exercises: ["Barbell Bench Press", "Incline DB Press", "Cable Flyes"] },
     Back: { icon: "🚣", exercises: ["Deadlift", "Lat Pulldown", "Bent Over Rows", "Pull Ups"] },

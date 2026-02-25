@@ -406,3 +406,143 @@ input:checked + .slider:before { transform: translateX(16px); }
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+:root {
+    --primary: #2ecc71;
+    --bg-light: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --bg-light: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-main: #ecf0f1;
+    --text-muted: #bdc3c7;
+    --shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica;
+    margin: 0;
+    padding-bottom: 80px; /* Space for fixed nav */
+}
+
+/* Dashboard Grid */
+.main-dashboard {
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+}
+
+/* Calorie Ring Section */
+.calorie-hero {
+    text-align: center;
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ring-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.chart-box {
+    position: relative;
+    width: 180px;
+    height: 180px;
+}
+
+.ring-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring-center h2 { margin: 0; font-size: 2rem; }
+.ring-center span { color: var(--text-muted); font-size: 0.8rem; }
+
+/* Stats Grid */
+.stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-val {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* Pedometer Pulse */
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(46, 204, 113, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+/* Progress Bars */
+.progress-bar {
+    background: #eee;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fill {
+    background: var(--primary);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+/* Splash Screen Overlay */
+#splash-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--primary);
+    color: white;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

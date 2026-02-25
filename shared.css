@@ -648,3 +648,9 @@ body.dark-mode .card {
 .text-link:hover {
     text-decoration: underline;
 }
+
+.logout-danger {
+    border: 1px solid #ff4757;
+    cursor: pointer;
+}
+.logout-danger h3 { color: #ff4757; }

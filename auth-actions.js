@@ -1,3 +1,25 @@
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const splash = document.getElementById('splash-screen');
+    const mainContent = document.querySelector('.main-dashboard');
+    const header = document.querySelector('.app-header');
+
+    if (!isLoggedIn) {
+        // Hide the app, show only the splash/login
+        if (splash) splash.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+        if (header) header.style.display = 'none';
+    } else {
+        // User is logged in, show the app
+        if (splash) splash.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        if (header) header.style.display = 'block';
+    }
+}
+
+// Run this immediately on every page load
+checkAuth();
+
 // Handle Password Reset
 document.getElementById('resetForm')?.addEventListener('submit', (e) => {
     e.preventDefault();

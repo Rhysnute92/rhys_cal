@@ -1,3 +1,25 @@
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const splash = document.getElementById('splash-screen');
+    const mainContent = document.querySelector('.main-dashboard');
+    const header = document.querySelector('.app-header');
+
+    if (!isLoggedIn) {
+        // Hide the app, show only the splash/login
+        if (splash) splash.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+        if (header) header.style.display = 'none';
+    } else {
+        // User is logged in, show the app
+        if (splash) splash.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        if (header) header.style.display = 'block';
+    }
+}
+
+// Run this immediately on every page load
+checkAuth();
+
 import { goals, foodData, isTrainingDay, todayKey, saveState } from './state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -151,15 +173,24 @@ async function handleAuth(action) {
 
 let calorieChart;
 
+// 1. Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    initChart(); // Initialize chart first
+    updateUI();  // Then populate with data
+    checkAuth(); // Check if we should show splash or dashboard
+});
+
 function initChart() {
-    const ctx = document.getElementById('calorieChart').getContext('2d');
+    const canvas = document.getElementById('calorieChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     
     calorieChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['Consumed', 'Remaining'],
             datasets: [{
-                data: [0, 2000], // Initial values [Food, Remaining]
+                data: [0, 2000],
                 backgroundColor: ['#2ecc71', '#f4f7f6'],
                 borderWidth: 0,
                 cutout: '80%'
@@ -168,13 +199,89 @@ function initChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false }
-            }
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
         }
     });
 }
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', initChart);
+// 2. Core UI Update
+function updateUI() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
+
+    // Get goal from state.js
+    const isTraining = document.getElementById('trainingToggle')?.checked || false;
+    const currentGoal = isTraining ? (goals.restCals + 300) : goals.restCals;
+    const remaining = Math.max(0, currentGoal - totalFood);
+
+    if (document.getElementById('displayGoal')) document.getElementById('displayGoal').innerText = currentGoal;
+    if (document.getElementById('displayFood')) document.getElementById('displayFood').innerText = totalFood;
+    if (document.getElementById('displayRemaining')) document.getElementById('displayRemaining').innerText = remaining;
+
+    if (calorieChart) {
+        calorieChart.data.datasets[0].data = [totalFood, remaining];
+        calorieChart.update();
+    }
+}
+
+// 3. Tile Management
+window.addNewTile = function() {
+    const tileType = document.getElementById('tileType').value;
+    const mainGrid = document.getElementById('mainGrid');
+    const card = document.createElement('div');
+    card.className = 'card stat-card animated-fade-in';
+    
+    let content = '';
+    switch(tileType) {
+        case 'water':
+            content = `<div class="tile-header"><h4>Water</h4> <span>💧</span></div>
+                       <div class="stat-val"><span id="waterCount">0</span> <small>ml</small></div>
+                       <button onclick="alert('Water tracking coming soon!')" class="btn-text-small">+ 250ml</button>`;
+            break;
+        case 'sleep':
+            content = `<div class="tile-header"><h4>Sleep</h4> <span>🌙</span></div>
+                       <div class="stat-val">0 <small>hrs</small></div>`;
+            break;
+        default:
+            content = `<div class="tile-header"><h4>Activity</h4></div><p>New tracker added!</p>`;
+    }
+    
+    card.innerHTML = content;
+    mainGrid.appendChild(card);
+    window.closeModal();
+};
+
+// 4. Auth & Splash Logic
+window.checkAuth = function() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const splash = document.getElementById('splash-screen');
+    const mainContent = document.querySelector('.main-dashboard');
+    const header = document.querySelector('.app-header');
+
+    if (!isLoggedIn) {
+        if (splash) splash.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+        if (header) header.style.display = 'none';
+    } else {
+        if (splash) splash.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        if (header) header.style.display = 'block';
+    }
+};
+
+// Expose functions to HTML
+window.toggleTrainingMode = updateUI; // Use updateUI for the toggle too
+window.closeModal = () => document.getElementById('addTileModal').style.display = 'none';
+window.handleAuth = (action) => {
+    if (action === 'login') {
+        localStorage.setItem('isLoggedIn', 'true');
+        window.checkAuth();
+    }
+};
+window.toggleTrainingMode = toggleTrainingMode;
+window.requestSensorPermission = requestSensorPermission;
+window.addNewTile = addNewTile;
+window.closeModal = closeModal;
+window.handleAuth = handleAuth;
+window.closeAuthModal = closeAuthModal;

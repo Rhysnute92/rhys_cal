@@ -1,3 +1,12 @@
+// At the top of your scripts, add this check
+document.addEventListener('DOMContentLoaded', () => {
+    const calorieInput = document.getElementById('dailyCalorieGoal');
+    if (calorieInput) { 
+        // Only run settings logic if the element actually exists on this page
+        calorieInput.value = localStorage.getItem('dailyGoal') || 2000;
+    }
+});
+
 import { goals, saveState, state, updatePassword } from './state.js';
 
 
