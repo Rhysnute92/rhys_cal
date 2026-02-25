@@ -328,3 +328,73 @@ async function analyzeImageWithAI(imageFile) {
         fat: 18
     };
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderLog();
+    document.getElementById('logDateDisplay').innerText = new Date().toLocaleDateString();
+});
+
+window.addEntry = function() {
+    const name = document.getElementById('foodName').value;
+    const cals = parseInt(document.getElementById('foodCals').value);
+    const protein = parseInt(document.getElementById('foodProtein').value) || 0;
+
+    if (!name || !cals) {
+        alert("Please enter a name and calories!");
+        return;
+    }
+
+    const dateKey = todayKey();
+    if (!state.foodLogs[dateKey]) state.foodLogs[dateKey] = [];
+
+    state.foodLogs[dateKey].push({
+        id: Date.now(),
+        name,
+        calories: cals,
+        protein
+    });
+
+    saveState();
+    renderLog();
+
+    // Clear inputs
+    document.getElementById('foodName').value = '';
+    document.getElementById('foodCals').value = '';
+    document.getElementById('foodProtein').value = '';
+};
+
+function renderLog() {
+    const list = document.getElementById('foodList');
+    const dayTotalDisplay = document.getElementById('dayTotal');
+    const dateKey = todayKey();
+    const entries = state.foodLogs[dateKey] || [];
+
+    if (entries.length === 0) {
+        list.innerHTML = `<p class="text-muted">No food logged yet today.</p>`;
+        dayTotalDisplay.innerText = "0 kcal";
+        return;
+    }
+
+    let totalCals = 0;
+    list.innerHTML = entries.map(item => {
+        totalCals += item.calories;
+        return `
+            <div class="food-item">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    <small>${item.calories} kcal | ${item.protein}g Protein</small>
+                </div>
+                <button onclick="deleteEntry(${item.id})" class="btn-delete">✕</button>
+            </div>
+        `;
+    }).join('');
+
+    dayTotalDisplay.innerText = `${totalCals} kcal`;
+}
+
+window.deleteEntry = function(id) {
+    const dateKey = todayKey();
+    state.foodLogs[dateKey] = state.foodLogs[dateKey].filter(item => item.id !== id);
+    saveState();
+    renderLog();
+};

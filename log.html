@@ -11,8 +11,6 @@
 <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-<link rel="manifest" href="manifest.json">
-
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="log.css">
 
@@ -46,21 +44,48 @@
     </nav>
 </header>
 
-<div class="container">
+<main class="main-dashboard">
+    <section class="card">
+        <h3>Add Food</h3>
+        <div class="input-group">
+            <input type="text" id="foodName" placeholder="e.g., Chicken Breast" class="input-field">
+            <div class="macro-inputs">
+                <input type="number" id="foodCals" placeholder="kcal" class="input-field">
+                <input type="number" id="foodProtein" placeholder="P (g)" class="input-field">
+            </div>
+            <button onclick="addEntry()" class="btn-primary full-width">Add to Diary</button>
+        </div>
+    </section>
 
-<div class="scan-container">
-    <button class="btn-scan scan-barcode">
-        📸 Scan Barcode
-    </button>
-    <button class="btn-scan scan-meal" id="scanMealBtn">
-        🥗 Scan Meal
-    </button>
+    <section class="card">
+        <div class="header-flex">
+            <h3>Today's Entries</h3>
+            <span id="dayTotal">0 kcal</span>
+        </div>
+        <div id="foodList" class="food-list">
+            <p class="text-muted">No food logged yet today.</p>
+        </div>
+    </section>
+</main>
+
+<nav class="nav-wrapper">
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><span>Home</span></a>
+        <a href="log.html" class="nav-item active"><span>Food</span></a>
+        <a href="training.html" class="nav-item"><span>Gym</span></a>
+    </div>
+</nav>
+
+<div class="scanner-actions">
+    <button onclick="startBarcodeScanner()" class="btn-outline-small">📷 Barcode</button>
+    <button onclick="startMealScan()" class="btn-outline-small">🥗 Scan Meal</button>
 </div>
 
-<!-- scanner -->
-<div id="scannerOverlay" class="scanner-overlay">
+<div id="cameraOverlay" class="camera-overlay">
     <div id="interactive" class="viewport"></div>
-    <button onclick="stopScanner()" class="btn-danger">Cancel</button>
+    <div class="scanner-controls">
+        <button onclick="stopScanner()" class="btn-secondary">Cancel</button>
+    </div>
 </div>
 
 <!-- goals -->
@@ -72,10 +97,6 @@
 <button class="btn-primary" onclick="saveGoals()">Save Goals</button>
 </div>
 
-<!-- manual entry -->
-<div id="entryForm" class="card">
-<input id="foodName" placeholder="Food name">
-
 <div class="grid">
 <input id="calories" type="number" placeholder="Calories">
 <input id="protein" type="number" placeholder="Protein">
@@ -83,13 +104,16 @@
 <input id="fat" type="number" placeholder="Fat">
 </div>
 
-<select id="mealType">
-<option>Breakfast</option>
-<option>Lunch</option>
-<option>Dinner</option>
-<option>Snacks</option>
-<option>Drinks</option>
-</select>
+<div class="form-group">
+    <label for="meal-type">Select meal type:</label>
+    <select id="meal-type" name="meal_category" class="custom-select">
+        <option>Breakfast</option>
+        <option>Lunch</option>
+        <option>Dinner</option>
+        <option>Snacks</option>
+        <option>Drinks</option>
+    </select>
+</div> 
 
 <button class="btn-primary" onclick="saveEntry()">Add</button>
 </div>
@@ -104,7 +128,7 @@
 <!-- log -->
 <div class="card">
 <h3>Daily Log</h3>
-<input type="date" id="datePicker">
+<input type="date" id="datePicker" placeholder="dd/mm/yyyy">
 <div id="logList"></div>
 </div>
 

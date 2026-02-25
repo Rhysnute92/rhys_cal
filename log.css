@@ -229,8 +229,102 @@ body.scanning .nav-wrapper {
     100% { opacity: 1; }
 }
 
-.btn-scan:disabled {
-    animation: pulse 1.5s infinite;
-    cursor: wait;
-    background-color: #999;
+.macro-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* Container for the action buttons */
+.scanner-actions {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+/* Outline button styling */
+.btn-outline-small {
+    padding: 8px 16px;
+    background-color: transparent;
+    border: 2px solid #4CAF50; /* Primary green color */
+    color: #4CAF50;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-small:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Full-screen camera overlay */
+.camera-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The video/scanner container */
+.viewport {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+}
+
+/* Controls inside the scanner */
+.scanner-controls {
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    padding: 10px 24px;
+    background-color: #f44336; /* Red for cancel */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-secondary:hover {
+    background-color: #d32f2f;
 }
