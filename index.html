@@ -2,57 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Dashboard</title>
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="register.css"
-    <link rel="icon" type="image/png" href="rhys_logo.png">
+    <link rel="stylesheet" href="register.css">
+    <link rel="stylesheet" href="style.css"> <link rel="icon" type="image/png" href="rhys_logo.png">
     <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; text-align: center;">
-    <div style="padding: 20px;">
-        <h1 style="color: #2ecc71; margin-bottom: 10px;">Welcome to Rhys Cal</h1>
-        <p style="color: #666; margin-bottom: 30px;">Track your macros and training days with ease.</p>
+
+<div id="splash-screen">
+    <div class="splash-content">
+        <h1 class="splash-title">Welcome to Rhys Cal</h1>
+        <p class="splash-text">Track your macros and training days with ease.</p>
         
-        <div style="display: flex; flex-direction: column; gap: 15px; width: 250px;">
-            <button onclick="window.location.href='register.html'" style="padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Get Started / Register</button>
-            <button onclick="window.location.href='login.html'" style="padding: 12px; background: transparent; color: #2ecc71; border: 2px solid #2ecc71; border-radius: 8px; font-weight: bold; cursor: pointer;">I have an account</button>
+        <div class="splash-buttons">
+            <button onclick="window.location.href='register.html'" class="btn-splash-primary">Get Started / Register</button>
+            <button onclick="window.location.href='login.html'" class="btn-splash-outline">I have an account</button>
         </div>
         
-        <p style="margin-top: 20px; font-size: 12px; color: #999;">Forgot your password? Click Get Started to reset via registration.</p>
+        <p class="forgot-password-footer">Forgot your password? Click Get Started to reset via registration.</p>
     </div>
 </div>
 
-    <header class="app-header">
-        <div class="header-content">
-            <img src="rhys_logo.png" class="header-logo" alt="Logo">
-            <h1>Fitness Tracker</h1>
-            <p id="currentDateDisplay" style="font-size: 0.8rem; opacity: 0.8;"></p>
-        </div>
+<header class="app-header">
+    <div class="header-content">
+        <img src="rhys_logo.png" class="header-logo" alt="Logo">
+        <h1>Fitness Tracker</h1>
+        <p id="currentDateDisplay"></p>
+    </div>
 
-        <nav class="nav-wrapper">
-            <div class="nav-bar">
-                <a href="index.html" class="nav-item">
-                    <img src="dashboard.png" alt="home">
-                    <span>Home</span>
-                </a>
-                <a href="log.html" class="nav-item">
-                    <img src="diary.png" alt="diary">
-                    <span>Food</span>
-                </a>
-                <a href="training.html" class="nav-item">
-                    <img src="training.png" alt="gym">
-                    <span>Gym</span>
-                </a>
-            </div>
-        </nav>
-    </header>
-<div id="authModal" class="modal-overlay" style="display: none;">
+    <nav class="nav-wrapper">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-item">
+                <img src="dashboard.png" alt="home">
+                <span>Home</span>
+            </a>
+            <a href="log.html" class="nav-item">
+                <img src="diary.png" alt="diary">
+                <span>Food</span>
+            </a>
+            <a href="training.html" class="nav-item">
+                <img src="training.png" alt="gym">
+                <span>Gym</span>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div id="authModal" class="modal-overlay">
     <div class="card auth-card">
         <h2 id="authTitle">Welcome Back</h2>
         <p id="authSubtitle">Log in to sync your fitness data</p>
@@ -73,46 +75,46 @@
     <a href="#" onclick="handleForgotPassword()" class="text-link">Forgot Password?</a>
 </div>
 
-    <div class="header-spacer"></div>
+<div class="header-spacer"></div>
 
-    <div class="card settings-tile" onclick="location.href='settings.html'">
-        <span class="gear-icon">⚙️</span>
-        <h3>Settings</h3>
-        <p>Account & Goals</p>
-    </div>
+<div class="card settings-tile" onclick="location.href='settings.html'">
+    <span class="gear-icon">⚙️</span>
+    <h3>Settings</h3>
+    <p>Account & Goals</p>
+</div>
 
-    <div class="main-dashboard">
-<div class="card calorie-hero">
-    <div class="header-flex">
-        <h3>Calories</h3>
-        <label class="switch-label">
-            <span>Training Day</span>
-            <input type="checkbox" id="trainingToggle" onchange="toggleTrainingMode()">
-            <span class="slider"></span>
-        </label>
-    </div>
-    
-    <div class="ring-container">
-        <div class="chart-box">
-            <canvas id="calorieChart"></canvas>
-            <div class="ring-center">
-                <h2 id="displayRemaining">0</h2>
-                <span>Remaining</span>
-            </div>
+<div class="main-dashboard">
+    <div class="card calorie-hero">
+        <div class="header-flex">
+            <h3>Calories</h3>
+            <label class="switch-label">
+                <span>Training Day</span>
+                <input type="checkbox" id="trainingToggle" onchange="toggleTrainingMode()">
+                <span class="slider"></span>
+            </label>
         </div>
         
-        <div class="ring-stats">
-            <div class="stat-item">
-                <span class="icon">🏁</span>
-                <div><small>Goal</small><br><strong id="displayGoal">0</strong></div>
+        <div class="ring-container">
+            <div class="chart-box">
+                <canvas id="calorieChart"></canvas>
+                <div class="ring-center">
+                    <h2 id="displayRemaining">0</h2>
+                    <span>Remaining</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="icon">🍴</span>
-                <div><small>Food</small><br><strong id="displayFood">0</strong></div>
+            
+            <div class="ring-stats">
+                <div class="stat-item">
+                    <span class="icon">🏁</span>
+                    <div><small>Goal</small><br><strong id="displayGoal">0</strong></div>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">🍴</span>
+                    <div><small>Food</small><br><strong id="displayFood">0</strong></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="stat-row">
         <div class="card stat-card pedometer-active">
@@ -122,11 +124,11 @@
             </div>
             <div class="stat-val"><span id="liveSteps">0</span> <small>steps</small></div>
             <div class="progress-bar">
-                <div id="stepFill" class="fill" style="width: 0%"></div>
+                <div id="stepFill" class="fill"></div>
             </div>
             <button onclick="requestSensorPermission()" class="btn-text-small">Enable Sensors</button>
-        <div class="live-activity">
-            <span id="step-count">0</span> steps
+            <div class="live-activity">
+                <span id="step-count">0</span> steps
             </div>
         </div>
         <div class="card stat-card">
@@ -137,31 +139,37 @@
     </div>
 </div>
 
-<button class="icon-btn full-width no-print" onclick="window.print()" style="margin-top: 20px;">
+<button class="icon-btn full-width no-print export-btn" onclick="window.print()">
     📑 Export PDF Report
 </button>
 
 <div class="print-only-header">
     <h1>Fitness Progress Report</h1>
     <p id="printDate"></p>
-</div>        <div id="mainGrid" class="dashboard-grid">
-        </div>
-        <div id="addTileModal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h3>Add New Tile</h3>
-                <select id="tileType">
-                    <option value="water">Water Tracker</option>
-                    <option value="steps">Step Counter</option>
-                    <option value="sleep">Sleep Log</option>
-                    <option value="gym">Gym Progress</option>
-                </select>
-                <button onclick="addNewTile()" class="btn-primary">Add to Dashboard</button>
-                <button onclick="closeModal()" class="btn-text">Cancel</button>
-            </div>
-        </div>
-    </div>
+</div>
 
-    <div id="printFoodTableContainer" class="print-only">
+<div id="mainGrid" class="dashboard-grid"></div>
+
+<button class="btn-primary full-width" onclick="document.getElementById('addTileModal').style.display='flex'">
+    + Add Progress Tile
+</button>
+
+<div id="addTileModal" class="modal">
+    <div class="modal-content">
+        <h3>Add New Tile</h3>
+        <label for="tileType" class="visually-hidden">Select Tile Type</label>
+        <select id="tileType" title="Select a new dashboard tile to add">
+            <option value="water">Water Tracker</option>
+            <option value="steps">Step Counter</option>
+            <option value="sleep">Sleep Log</option>
+            <option value="gym">Gym Progress</option>
+        </select>
+        <button onclick="addNewTile()" class="btn-primary">Add to Dashboard</button>
+        <button onclick="closeModal()" class="btn-text">Cancel</button>
+    </div>
+</div>
+
+<div id="printFoodTableContainer" class="print-only">
     <h3>Daily Food Log</h3>
     <table id="foodSummaryTable">
         <thead>
@@ -173,24 +181,23 @@
                 <th>F (g)</th>
             </tr>
         </thead>
-        <tbody id="foodSummaryBody">
-            </tbody>
-        <tfoot id="foodSummaryFoot">
-            </tfoot>
+        <tbody id="foodSummaryBody"></tbody>
+        <tfoot id="foodSummaryFoot"></tfoot>
     </table>
 </div>
-    <script type="module" src="index.js"></script>
-    <script type="module" src="settings.js"></script>
-    <script type="module" src="pedometer.js"></script>
-    <script type="module" src="state.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
-            });
-        }
-    </script>
+
+<script type="module" src="index.js"></script>
+<script type="module" src="settings.js"></script>
+<script type="module" src="pedometer.js"></script>
+<script type="module" src="state.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('Service Worker Failed', err));
+        });
+    }
+</script>
 </body>
 </html>
