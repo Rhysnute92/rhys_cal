@@ -4,13 +4,46 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI();
 });
 
-window.toggleTrainingMode = function () {
-    const toggle = document.getElementById('trainingToggle');
-    // Important: We must update the value in state.js logic
-    localStorage.setItem('isTrainingDay', toggle.checked);
-    // Reload page or re-run updateUI to see changes
-    location.reload();
-};
+// Training Day Toggle logic
+function toggleTrainingMode() {
+    const isTraining = document.getElementById('trainingToggle').checked;
+    const foodConsumed = parseInt(document.getElementById('displayFood').innerText) || 0;
+    
+    // Set goals based on mode
+    const baseGoal = 1500;
+    const trainingGoal = 1800;
+    const currentGoal = isTraining ? trainingGoal : baseGoal;
+    
+    // Calculate remaining
+    const remaining = Math.max(0, currentGoal - foodConsumed);
+    
+    // 1. Update Text Displays
+    document.getElementById('displayGoal').innerText = currentGoal;
+    document.getElementById('displayRemaining').innerText = remaining;
+    
+    // 2. Update Chart Visuals
+    calorieChart.data.datasets[0].data = [foodConsumed, remaining];
+    calorieChart.update();
+    
+    console.log(`Goal updated to ${currentGoal} for ${isTraining ? 'Training' : 'Rest'} day.`);
+}
+
+// Pedometer Permission
+async function requestSensorPermission() {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+            const response = await DeviceMotionEvent.requestPermission();
+            if (response === 'granted') {
+                alert("Sensors enabled! Walking data will now sync.");
+                // Initialize your pedometer logic here
+            }
+        } catch (err) {
+            console.error("Sensor permission denied", err);
+        }
+    } else {
+        alert("Sensor API not supported on this browser or already enabled.");
+    }
+}
 
 function updateUI() {
     const today = todayKey();
@@ -74,3 +107,74 @@ function addNewTile() {
 function closeModal() {
     document.getElementById('addTileModal').style.display = 'none';
 }
+
+// Toggle the splash screen visibility
+function toggleSplash(show) {
+    const splash = document.getElementById('splash-screen');
+    splash.style.display = show ? 'flex' : 'none';
+}
+
+// Open/Close Auth Modal
+function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+}
+
+// Handle the "Forgot Password" link
+function handleForgotPassword() {
+    alert("Redirecting to password reset... (or use the Registration flow as noted).");
+}
+
+async function handleAuth(action) {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+
+    if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+    }
+
+    if (action === 'login') {
+        console.log("Attempting login for:", email);
+        // Simulate a successful login
+        alert("Welcome back! Syncing your data...");
+        closeAuthModal();
+        toggleSplash(false); // Hide splash if it's up
+    } else if (action === 'signup') {
+        console.log("Creating account for:", email);
+        window.location.href = 'register.html';
+    }
+}
+
+let calorieChart;
+
+function initChart() {
+    const ctx = document.getElementById('calorieChart').getContext('2d');
+    
+    calorieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Consumed', 'Remaining'],
+            datasets: [{
+                data: [0, 2000], // Initial values [Food, Remaining]
+                backgroundColor: ['#2ecc71', '#f4f7f6'],
+                borderWidth: 0,
+                cutout: '80%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', initChart);
