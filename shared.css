@@ -689,3 +689,24 @@ label {
     outline: none;
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+
+.profile-form label {
+    font-size: 0.8rem;
+    color: #bbb;
+    margin-bottom: -5px;
+}
+
+.profile-form input, .profile-form select {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+}

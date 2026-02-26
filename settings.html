@@ -35,19 +35,57 @@
       <p>Connecting to Fitness Vault...</p>
   </div>
 
-  <div id="login-container" style="display: none;">
-      <form id="login-form">
-          <h2>Welcome Back</h2>
-          <input type="email" id="login-email" placeholder="Email" required>
-          <input type="password" id="login-pass" placeholder="Password" required>
-          <button type="submit">Login</button>
-          <p id="auth-error" style="color: #ff4d4d;"></p>
-      </form>
-  </div>
+  <div id="auth-overlay">
+    <div id="splash-screen">
+        <img src="rhys_logo.png" alt="Logo" class="pulse">
+        <p>Connecting to Fitness Vault...</p>
+    </div>
+
+    <div id="login-container" style="display: none;">
+        <form id="auth-form">
+            <h2 id="auth-title">Welcome Back</h2>
+            
+            <input type="email" id="auth-email" placeholder="Email" required>
+            
+            <div id="password-wrapper">
+                <input type="password" id="auth-pass" placeholder="Password">
+                <p style="text-align: right; font-size: 0.8rem; margin-top: 5px;">
+                    <a href="#" id="link-forgot" style="color: #bbb;">Forgot Password?</a>
+                </p>
+            </div>
+            
+            <button type="submit" id="auth-submit-btn">Login</button>
+            
+            <div id="auth-footer-links">
+                <p id="toggle-text">Don't have an account? <a href="#" id="toggle-auth">Sign Up</a></p>
+                <a href="#" id="link-back-to-login" style="display:none;">← Back to Login</a>
+            </div>
+            
+            <p id="auth-error" style="color: #ff4d4d; margin-top: 10px;"></p>
+        </form>
+    </div>
 </div>
 
-<main id="main-content" style="display: none;">
-  </main>
+<main id="main-content">
+  <div class="card settings-tile">
+    <h3><span class="gear-icon">👤</span> Profile Settings</h3>
+    <div class="profile-form">
+        <label for="display-name">Full Name</label>
+        <input type="text" id="display-name" placeholder="Loading...">
+        
+        <label for="fitness-goal">Current Fitness Goal</label>
+        <select id="fitness-goal">
+            <option value="Weight Loss">Weight Loss</option>
+            <option value="Muscle Gain">Muscle Gain</option>
+            <option value="Endurance">Endurance Training</option>
+            <option value="General Health">General Health</option>
+        </select>
+        
+        <button id="save-profile-btn" style="margin-top: 15px;">Save Changes</button>
+        <p id="save-status" style="font-size: 0.8rem; margin-top: 5px;"></p>
+    </div>
+  </div>
+</main>
 
 <div class="card settings-tile logout-danger" onclick="handleLogout()">
     <span class="gear-icon">🚪</span>

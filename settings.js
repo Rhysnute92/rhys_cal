@@ -245,13 +245,85 @@ function showLogin() {
 }
 
 // Transition to Main App
-function showApp() {
+async function showApp() {
+    // 1. Get the current logged-in user
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    // 2. Fetch their profile from the public table
+    const { data: profile, error } = await _supabase
+        .from('profiles')
+        .select('full_name, fitness_goal')
+        .eq('id', user.id)
+        .single();
+
+    if (profile) {
+        // Update your UI (e.g., a welcome message)
+        document.querySelector('h1').innerText = `Welcome, ${profile.full_name}`;
+    }
+
+    // 3. Reveal the app
     authOverlay.style.opacity = '0';
     setTimeout(() => {
         authOverlay.style.display = 'none';
         mainContent.style.display = 'block';
     }, 500);
 }
+
+// Add these to your existing settings.js
+
+async function showApp() {
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    // 1. Fetch existing profile data
+    const { data: profile, error } = await _supabase
+        .from('profiles')
+        .select('full_name, fitness_goal')
+        .eq('id', user.id)
+        .single();
+
+    if (profile) {
+        document.getElementById('display-name').value = profile.full_name || "";
+        document.getElementById('fitness-goal').value = profile.fitness_goal || "General Health";
+        document.querySelector('h1').innerText = `Settings for ${profile.full_name || 'User'}`;
+    }
+
+    // 2. Reveal the UI
+    authOverlay.style.opacity = '0';
+    setTimeout(() => {
+        authOverlay.style.display = 'none';
+        mainContent.style.display = 'block';
+    }, 500);
+}
+
+// 3. Handle Saving Changes
+document.getElementById('save-profile-btn').onclick = async () => {
+    const status = document.getElementById('save-status');
+    const newName = document.getElementById('display-name').value;
+    const newGoal = document.getElementById('fitness-goal').value;
+    
+    status.innerText = "Saving...";
+    status.style.color = "white";
+
+    const { data: { user } } = await _supabase.auth.getUser();
+
+    const { error } = await _supabase
+        .from('profiles')
+        .upsert({
+            id: user.id,
+            full_name: newName,
+            fitness_goal: newGoal,
+            updated_at: new Date()
+        });
+
+    if (error) {
+        status.innerText = "Error: " + error.message;
+        status.style.color = "#ff4d4d";
+    } else {
+        status.innerText = "Changes saved successfully!";
+        status.style.color = "#4bb543";
+        document.querySelector('h1').innerText = `Settings for ${newName}`;
+    }
+};
 
 // --- HANDLE LOGIN SUBMIT ---
 document.getElementById('login-form').onsubmit = async (e) => {
@@ -278,3 +350,75 @@ async function handleLogout() {
 window.saveGoals = saveGoals;
 window.resetTiles = resetTiles;
 window.confirmWipeData = confirmWipeData;
+
+// State variables
+let currentMode = 'login'; // Modes: 'login', 'signup', 'reset'
+
+const authTitle = document.getElementById('auth-title');
+const passwordWrapper = document.getElementById('password-wrapper');
+const submitBtn = document.getElementById('auth-submit-btn');
+const toggleText = document.getElementById('toggle-text');
+const backToLogin = document.getElementById('link-back-to-login');
+const authError = document.getElementById('auth-error');
+
+// --- UI MODE SWITCHER ---
+function setAuthMode(mode) {
+    currentMode = mode;
+    authError.innerText = ""; // Clear errors
+    
+    if (mode === 'reset') {
+        authTitle.innerText = "Reset Password";
+        submitBtn.innerText = "Send Recovery Email";
+        passwordWrapper.style.display = 'none';
+        toggleText.style.display = 'none';
+        backToLogin.style.display = 'inline-block';
+    } else if (mode === 'signup') {
+        authTitle.innerText = "Create Account";
+        submitBtn.innerText = "Sign Up";
+        passwordWrapper.style.display = 'block';
+        toggleText.innerHTML = 'Already have an account? <a href="#" id="toggle-auth">Login</a>';
+        backToLogin.style.display = 'none';
+        // Re-attach toggle listener because we replaced the HTML
+        document.getElementById('toggle-auth').onclick = () => setAuthMode('login');
+    } else {
+        authTitle.innerText = "Welcome Back";
+        submitBtn.innerText = "Login";
+        passwordWrapper.style.display = 'block';
+        toggleText.innerHTML = 'Don\'t have an account? <a href="#" id="toggle-auth">Sign Up</a>';
+        backToLogin.style.display = 'none';
+        document.getElementById('toggle-auth').onclick = () => setAuthMode('signup');
+    }
+}
+
+// Event Listeners for switching
+document.getElementById('link-forgot').onclick = (e) => { e.preventDefault(); setAuthMode('reset'); };
+backToLogin.onclick = (e) => { e.preventDefault(); setAuthMode('login'); };
+document.getElementById('toggle-auth').onclick = () => setAuthMode('signup');
+
+// --- UNIFIED FORM SUBMISSION ---
+document.getElementById('auth-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-pass').value;
+
+    if (currentMode === 'reset') {
+        const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.href, // Returns user here to set new pass
+        });
+        if (error) authError.innerText = error.message;
+        else alert("Check your email for the reset link!");
+        
+    } else if (currentMode === 'signup') {
+        const { error } = await _supabase.auth.signUp({ 
+            email, password, 
+            options: { data: { full_name: "New User" } } // This triggers your SQL function
+        });
+        if (error) authError.innerText = error.message;
+        else alert("Signup successful! Please confirm your email.");
+        
+    } else {
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) authError.innerText = error.message;
+        else showApp(); // Function from previous steps to hide splash and show dashboard
+    }
+};
