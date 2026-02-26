@@ -217,6 +217,63 @@ window.exportDataToCSV = function() {
     // ... append your existing Food and Weight logic ...
 };
 
+const _supabase = supabase.createClient('https://xlutwqwtecrlxadfaifu.supabase.co', 'YOUR_KEYsb_publishable_Kb2eAvRNrDqBGfmuv3ct3Q_2li9wW9p');
+
+// Elements
+const authOverlay = document.getElementById('auth-overlay');
+const splash = document.getElementById('splash-screen');
+const loginContainer = document.getElementById('login-container');
+const mainContent = document.getElementById('main-content');
+
+window.addEventListener('DOMContentLoaded', async () => {
+    // 1. Check for existing session
+    const { data: { session } } = await _supabase.auth.getSession();
+
+    setTimeout(() => {
+        if (session) {
+            showApp();
+        } else {
+            showLogin();
+        }
+    }, 2000); // 2-second splash for branding
+});
+
+// Transition to Login
+function showLogin() {
+    splash.style.display = 'none';
+    loginContainer.style.display = 'block';
+}
+
+// Transition to Main App
+function showApp() {
+    authOverlay.style.opacity = '0';
+    setTimeout(() => {
+        authOverlay.style.display = 'none';
+        mainContent.style.display = 'block';
+    }, 500);
+}
+
+// --- HANDLE LOGIN SUBMIT ---
+document.getElementById('login-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-pass').value;
+
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        document.getElementById('auth-error').innerText = error.message;
+    } else {
+        showApp();
+    }
+};
+
+// --- HANDLE LOGOUT (Triggered by your Logout Card) ---
+async function handleLogout() {
+    await _supabase.auth.signOut();
+    location.reload(); // Re-triggers the splash and shows login
+}
+
 // Add this line to "expose" it to the HTML:
 window.saveGoals = saveGoals;
 window.resetTiles = resetTiles;

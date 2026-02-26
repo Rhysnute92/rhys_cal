@@ -29,6 +29,26 @@
   </div>
 </header>
 
+<div id="auth-overlay">
+  <div id="splash-screen">
+      <img src="rhys_logo.png" alt="Logo" class="pulse">
+      <p>Connecting to Fitness Vault...</p>
+  </div>
+
+  <div id="login-container" style="display: none;">
+      <form id="login-form">
+          <h2>Welcome Back</h2>
+          <input type="email" id="login-email" placeholder="Email" required>
+          <input type="password" id="login-pass" placeholder="Password" required>
+          <button type="submit">Login</button>
+          <p id="auth-error" style="color: #ff4d4d;"></p>
+      </form>
+  </div>
+</div>
+
+<main id="main-content" style="display: none;">
+  </main>
+
 <div class="card settings-tile logout-danger" onclick="handleLogout()">
     <span class="gear-icon">🚪</span>
     <h3>Logout</h3>
