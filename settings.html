@@ -1,72 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitness Dashboard</title>
-  <link rel="stylesheet" href="shared.css">
-  <link rel="stylesheet" href="dashboard.css">
-  <link referrerpolicy="stylesheet" href="register.css">
-  <script src="settings.js"></script>
-  <script src="state.js"></script>
-  <link rel="icon" type="image/png" href="rhys_logo.png">
-  <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4CAF50">
+
+    <title>Fitness Tracker Pro | Settings</title>
+
+    <!-- PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fitness">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="rhys_logo.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="register.css">
+
+    <!-- External -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+
 <header class="app-header">
   <div class="header-content">
     <h1>Settings</h1>
-<nav class="settings-nav">
-    <a href="index.html" class="nav-link">← Dashboard</a>
-    
-    <div id="auth-zone">
-        <a href="login.html" class="secondary-link">Login</a>
-    </div>
-</nav>
+    <nav class="settings-nav">
+        <a href="index.html" class="nav-link">← Dashboard</a>
+        <div id="auth-zone">
+            <a href="login.html" class="secondary-link">Login</a>
+        </div>
+    </nav>
   </div>
 </header>
 
+<!-- AUTH OVERLAY -->
 <div id="auth-overlay">
   <div id="splash-screen">
       <img src="rhys_logo.png" alt="Logo" class="pulse">
       <p>Connecting to Fitness Vault...</p>
   </div>
 
-  <div id="auth-overlay">
-    <div id="splash-screen">
-        <img src="rhys_logo.png" alt="Logo" class="pulse">
-        <p>Connecting to Fitness Vault...</p>
-    </div>
-
-    <div id="login-container" style="display: none;">
-        <form id="auth-form">
-            <h2 id="auth-title">Welcome Back</h2>
-            
-            <input type="email" id="auth-email" placeholder="Email" required>
-            
-            <div id="password-wrapper">
-                <input type="password" id="auth-pass" placeholder="Password">
-                <p style="text-align: right; font-size: 0.8rem; margin-top: 5px;">
-                    <a href="#" id="link-forgot" style="color: #bbb;">Forgot Password?</a>
-                </p>
-            </div>
-            
-            <button type="submit" id="auth-submit-btn">Login</button>
-            
-            <div id="auth-footer-links">
-                <p id="toggle-text">Don't have an account? <a href="#" id="toggle-auth">Sign Up</a></p>
-                <a href="#" id="link-back-to-login" style="display:none;">← Back to Login</a>
-            </div>
-            
-            <p id="auth-error" style="color: #ff4d4d; margin-top: 10px;"></p>
-        </form>
-    </div>
+  <div id="login-container" class="hidden">
+      <form id="auth-form">
+          <h2 id="auth-title">Welcome Back</h2>
+          
+          <input type="email" id="auth-email" placeholder="Email" required>
+          
+          <div id="password-wrapper">
+              <input type="password" id="auth-pass" placeholder="Password">
+              <p class="forgot-wrapper">
+                  <a href="#" id="link-forgot" class="muted-link">Forgot Password?</a>
+              </p>
+          </div>
+          
+          <button type="submit" id="auth-submit-btn">Login</button>
+          
+          <div id="auth-footer-links">
+              <p id="toggle-text">
+                  Don't have an account? 
+                  <a href="#" id="toggle-auth">Sign Up</a>
+              </p>
+              <a href="#" id="link-back-to-login" class="hidden">← Back to Login</a>
+          </div>
+          
+          <p id="auth-error" class="error-text"></p>
+      </form>
+  </div>
 </div>
 
 <main id="main-content">
+
   <div class="card settings-tile">
     <h3><span class="gear-icon">👤</span> Profile Settings</h3>
     <div class="profile-form">
@@ -81,62 +93,68 @@
             <option value="General Health">General Health</option>
         </select>
         
-        <button id="save-profile-btn" style="margin-top: 15px;">Save Changes</button>
-        <p id="save-status" style="font-size: 0.8rem; margin-top: 5px;"></p>
+        <button id="save-profile-btn" class="mt-15">Save Changes</button>
+        <p id="save-status" class="small-text"></p>
     </div>
   </div>
+
+  <div class="card settings-tile logout-danger" onclick="handleLogout()">
+      <span class="gear-icon">🚪</span>
+      <h3>Logout</h3>
+      <p>Sign out</p>
+  </div>
+
+  <div class="settings-card">
+      <label for="sizeSlider">Adjust Tile Size</label>
+      <input type="range" id="sizeSlider" min="120" max="250" value="160" oninput="changeTileSize(this.value)">
+      <span id="sizeValue">160px</span>
+  </div>
+
+  <div class="card settings-container">
+      <label>Appearance</label>
+      <button class="btn-primary" onclick="toggleDarkMode()" id="darkBtn">
+          🌙 Switch to Dark Mode
+      </button>
+  </div>
+
+  <div class="container">
+
+    <section class="card">
+      <h3>Daily Macro Goals</h3>
+      <div class="input-group">
+        <label>Calories</label>
+        <input type="number" id="goalKcal" placeholder="2000">
+      </div>
+
+      <div class="macro-grid">
+        <div><label>P</label><input type="number" id="goalP" placeholder="Update protein"></div>
+        <div><label>C</label><input type="number" id="goalC" placeholder="Update carbs"></div>
+        <div><label>F</label><input type="number" id="goalF" placeholder="Update fats"></div>
+      </div>
+
+      <button onclick="saveGoals()" class="btn-primary">Save Goals</button>
+    </section>
+
+    <section class="card">
+      <h3>Manage Dashboard</h3>
+      <button onclick="resetTiles()" class="btn-clear">Reset Tiles to Default</button>
+    </section>
+
+    <section class="card">
+      <h3>Data Management</h3>
+      <p>Download your history as a spreadsheet file.</p>
+      <button onclick="exportDataToCSV()" class="btn-primary">Export All Data (CSV)</button>
+    </section>
+
+    <section class="card danger-zone">
+      <h3>Danger Zone</h3>
+      <p>This will permanently erase all your logs, goals, and history. This cannot be undone.</p>
+      <button onclick="confirmWipeData()" class="btn-delete-all">Clear All App Data</button>
+    </section>
+
+  </div>
+
 </main>
 
-<div class="card settings-tile logout-danger" onclick="handleLogout()">
-    <span class="gear-icon">🚪</span>
-    <h3>Logout</h3>
-    <p>Sign out</p>
-</div>
-
-<div class="settings-card">
-    <label for="sizeSlider">Adjust Tile Size</label>
-    <input type="range" id="sizeSlider" min="120" max="250" value="160" oninput="changeTileSize(this.value)">
-    <span id="sizeValue">160px</span>
-</div>
-
-<div class="card settings-container">
-    <label>Appearance</label>
-    <button class="btn-primary" onclick="toggleDarkMode()" id="darkBtn">
-        🌙 Switch to Dark Mode
-    </button>
-</div>
-
-<div class="container">
-  <section class="card">
-    <h3>Daily Macro Goals</h3>
-    <div class="input-group">
-      <label>Calories</label>
-      <input type="number" id="goalKcal" placeholder="2000">
-    </div>
-    <div class="macro-grid">
-      <div><label>P</label><input type="number" id="goalP" placeholder="Update protein"></div>
-      <div><label>C</label><input type="number" id="goalC" placeholder="Update calories"></div>
-      <div><label>F</label><input type="number" id="goalF" placeholder="Update fats"></div>
-    </div>
-    <button onclick="saveGoals()" class="btn-primary">Save Goals</button>
-  </section>
-
-  <section class="card">
-    <h3>Manage Dashboard</h3>
-    <button onclick="resetTiles()" class="btn-clear">Reset Tiles to Default</button>
-  </section>
-
-  <section class="card">
-    <h3>Data Management</h3>
-    <p>Download your history as a spreadsheet file.</p>
-    <button onclick="exportDataToCSV()" class="btn-primary">Export All Data (CSV)</button>
-  </section>
-
-  <section class="card danger-zone">
-    <h3>Danger Zone</h3>
-    <p>This will permanently erase all your logs, goals, and history. This cannot be undone.</p>
-    <button onclick="confirmWipeData()" class="btn-delete-all">Clear All App Data</button>
-</section>
-</div>
 </body>
 </html>

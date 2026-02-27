@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gym Tracker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4CAF50">
 
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="rhys_logo.png">
+    <title>Fitness Tracker Pro | Training</title>
 
-<link rel="icon" type="image/x-icon" href="rhys_favicon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fitness">
+    <link rel="manifest" href="manifest.json">
 
-<link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="rhys_logo.png">
+    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-<link rel="stylesheet" href="shared.css">
-<link rel="stylesheet" href="log.css">
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="training.css">
+    <link rel="stylesheet" href="layout-fixes.css">
 
-<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -49,14 +52,14 @@
 <main class="container">
     <section class="card">
         <h3>Select Category</h3>
-        <div id="categoryGrid" class="category-grid" style="background-color: var(--secondary);"></div>
+        <div id="categoryGrid" class="category-grid"></div>
 
         <div class="input-group">
-            <label>Exercise</label>
+            <label for="exerciseSelect">Exercise</label>
             <select id="exerciseSelect" class="full-width-select"></select>
         </div>
 
-        <div class="input-row" style="margin-top: 15px;">
+        <div class="input-row-margin">
             <div class="input-group">
                 <label>Weight (kg)</label>
                 <input type="number" id="weightLifted" oninput="showLive1RM()" placeholder="0">
@@ -68,7 +71,7 @@
         </div>
         <p id="live1RM" class="live-1rm-display"></p>
 
-        <div class="input-group" style="margin-top: 15px;">
+        <div class="input-group-margin">
             <label>Rest Duration</label>
             <div class="rest-toggle-group">
                 <button type="button" class="rest-btn" onclick="setRest(30)">30s</button>
@@ -77,37 +80,36 @@
             </div>
         </div>
 
-        <div id="timerContainer" class="timer-container" style="display: none;">
+        <div id="timerContainer" class="timer-container timer-hidden">
             <div class="timer-display">Resting: <span id="timerClock">00:00</span></div>
             <button onclick="stopTimer()" class="btn-text">Skip</button>
         </div>
 
-        <button onclick="saveExercise()" class="btn-primary" style="width: 100%; margin-top: 15px;">Log Set</button>
+        <button onclick="saveExercise()" class="btn-primary full-width-btn-margin">Log Set</button>
     </section>
 
     <section class="card">
-        <h3>Strength Progress</h3>
+        <label for="chartExerciseSelector">Strength Progress</label>
         <select id="chartExerciseSelector" onchange="renderStrengthChart()" class="full-width-select"></select>
-        <div class="graph-container" style="height: 200px; margin-top: 15px;">
+        <div class="graph-container graph-small">
             <canvas id="strengthChart"></canvas>
         </div>
     </section>
 
     <section class="card">
         <h3>Weekly Energy Balance</h3>
-        <div class="graph-container" style="height: 220px; margin-top: 15px;">
+        <div class="graph-container graph-medium">
             <canvas id="weeklySummaryChart"></canvas>
         </div>
-        <div id="weeklyStatusMsg" style="font-size: 0.85rem; margin-top: 10px; text-align: center; font-weight: bold;"></div>
+        <div id="weeklyStatusMsg" class="status-msg"></div>
     </section>
 
     <section class="card">
         <h3>Weekly Macro Split</h3>
-        <div class="graph-container" style="height: 220px; margin-top: 15px;">
+        <div class="graph-container graph-medium">
             <canvas id="macroPieChart"></canvas>
         </div>
-        <div id="macroAnalysis" style="font-size: 0.85rem; margin-top: 10px; line-height: 1.4;">
-            </div>
+        <div id="macroAnalysis" class="analysis-text"></div>
     </section>
 
     <section class="card">
@@ -116,7 +118,7 @@
             <input type="number" id="bodyWeight" step="0.1" placeholder="kg" class="full-width-select">
             <button onclick="saveBodyWeight()" class="btn-secondary">Log</button>
         </div>
-        <div class="graph-container" style="height: 200px; margin-top: 15px;">
+        <div class="graph-container graph-small">
             <canvas id="weightChart"></canvas>
         </div>
     </section>

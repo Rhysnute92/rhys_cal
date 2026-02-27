@@ -710,3 +710,32 @@ label {
     padding: 10px;
     border-radius: 6px;
 }
+
+/* Utility */
+.hidden {
+    display: none;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.small-text {
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.error-text {
+    color: #ff4d4d;
+    margin-top: 10px;
+}
+
+.forgot-wrapper {
+    text-align: right;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.muted-link {
+    color: #bbb;
+}

@@ -136,3 +136,55 @@
 #macroAnalysis strong {
     color: var(--primary);
 }
+
+/* Layout & Container Fixes */
+.category-grid {
+    background-color: var(--secondary);
+}
+
+.input-row-margin {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.input-group-margin {
+    margin-top: 15px;
+}
+
+.full-width-btn-margin {
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Timer Visibility */
+.timer-hidden {
+    display: none;
+}
+
+/* Graph Dimensions */
+.graph-container {
+    margin-top: 15px;
+}
+
+.graph-small {
+    height: 200px;
+}
+
+.graph-medium {
+    height: 220px;
+}
+
+/* Typography & Messaging */
+.status-msg {
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.analysis-text {
+    font-size: 0.85rem;
+    margin-top: 10px;
+    line-height: 1.4;
+}
