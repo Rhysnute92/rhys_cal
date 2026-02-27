@@ -244,33 +244,6 @@ function showLogin() {
     loginContainer.style.display = 'block';
 }
 
-// Transition to Main App
-async function showApp() {
-    // 1. Get the current logged-in user
-    const { data: { user } } = await _supabase.auth.getUser();
-
-    // 2. Fetch their profile from the public table
-    const { data: profile, error } = await _supabase
-        .from('profiles')
-        .select('full_name, fitness_goal')
-        .eq('id', user.id)
-        .single();
-
-    if (profile) {
-        // Update your UI (e.g., a welcome message)
-        document.querySelector('h1').innerText = `Welcome, ${profile.full_name}`;
-    }
-
-    // 3. Reveal the app
-    authOverlay.style.opacity = '0';
-    setTimeout(() => {
-        authOverlay.style.display = 'none';
-        mainContent.style.display = 'block';
-    }, 500);
-}
-
-// Add these to your existing settings.js
-
 async function showApp() {
     const { data: { user } } = await _supabase.auth.getUser();
 
