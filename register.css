@@ -51,6 +51,7 @@ body {
 /* Shared Button Styles */
 .btn-green {
     width: 100%;
+    display: flex;
     padding: 12px;
     background: #2ecc71;
     color: white;
@@ -60,6 +61,7 @@ body {
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s;
+    margin-top: 10px;
 }
 
 .btn-green:hover {
