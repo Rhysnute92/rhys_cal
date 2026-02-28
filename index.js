@@ -20,10 +20,24 @@ function checkAuth() {
 // Run this immediately on every page load
 checkAuth();
 
-import { goals, foodData, isTrainingDay, todayKey, saveState } from './state.js';
+import { goals, foodData, isTrainingDay, todayKey, auth, saveState } from './state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     updateUI();
+});
+
+import { auth } from './state.js';
+
+window.addEventListener('DOMContentLoaded', () => {
+    const splash = document.getElementById('splash-screen');
+    
+    if (auth.isAuthenticated()) {
+        // User is already logged in, skip the splash screen
+        splash.style.display = 'none';
+    } else {
+        // User is NOT logged in, keep splash screen visible
+        splash.style.display = 'flex';
+    }
 });
 
 // Training Day Toggle logic

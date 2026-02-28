@@ -201,10 +201,41 @@ body {
         transition: opacity 0.2s;
     }
 
+    .auth-login {
+        margin-bottom: 20px;
+    }
+
+    .macros {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .welcome {
+        color: #2ecc71;
+        margin: 0;
+    }
+
+
+
     .icon-btn full-width {
         margin-top: 20px;
         background: #1e90ff;
         color: white;
+    }
+
+    .nav-link {
+        font-size: 14px;
+    }
+
+    .password-new {
+        margin-top: 25px; 
+        border-top: 1px solid #eee; 
+        padding-top: 15px;
+    }
+
+    .secondary-link {
+        display: block;
+        margin-bottom: 20px;
     }
 
     .btn-primary {
