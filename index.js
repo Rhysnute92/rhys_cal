@@ -67,6 +67,20 @@ async function requestSensorPermission() {
     }
 }
 
+function updateUI() {
+    const today = todayKey();
+    const meals = foodData[today] || [];
+    const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
+
+    // Logic: If isTrainingDay is true, use trainCals, else use restCals
+    const currentGoal = isTrainingDay ? (goals.restCals + 300) : goals.restCals;
+    const remaining = Math.max(0, currentGoal - totalFood);
+
+    if (document.getElementById('displayGoal')) document.getElementById('displayGoal').innerText = currentGoal;
+    if (document.getElementById('displayFood')) document.getElementById('displayFood').innerText = totalFood;
+    if (document.getElementById('displayRemaining')) document.getElementById('displayRemaining').innerText = remaining;
+}
+
 function addNewTile() {
     const tileType = document.getElementById('tileType').value;
     const mainGrid = document.getElementById('mainGrid');
@@ -191,7 +205,7 @@ function initChart() {
 }
 
 // 2. Core UI Update
-function updateUI() {
+function refreshDashboard() {
     const today = todayKey();
     const meals = foodData[today] || [];
     const totalFood = meals.reduce((sum, item) => sum + Number(item.calories), 0);
