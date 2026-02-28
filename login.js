@@ -21,3 +21,21 @@ document.getElementById('loginForm').addEventListener('submit', (e) => {
         alert("Invalid email. (For local testing, use the email you registered with).");
     }
 });
+
+function safeLogin() {
+    try {
+        // 1. Set the session flag FIRST so the dashboard knows you're allowed in
+        localStorage.setItem('isLoggedIn', 'true');
+        console.log("Login flag set.");
+
+        // 2. Perform the redirect
+        // Using window.location.replace is often better for PWAs as it doesn't 
+        // keep the login page in the back-button history.
+        window.location.replace("./index.html");
+        
+    } catch (error) {
+        console.error("Login redirect failed:", error);
+        // Fallback redirect if the above fails
+        window.location.href = "index.html";
+    }
+}

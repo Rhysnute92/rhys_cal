@@ -279,6 +279,16 @@ window.handleAuth = (action) => {
         window.checkAuth();
     }
 };
+
+window.addEventListener('load', () => {
+    const loggedIn = localStorage.getItem('isLoggedIn');
+    
+    if (!loggedIn) {
+        // If no flag is found, go back to splash/login
+        window.location.href = "register.html"; 
+    }
+});
+
 window.toggleTrainingMode = toggleTrainingMode;
 window.requestSensorPermission = requestSensorPermission;
 window.addNewTile = addNewTile;

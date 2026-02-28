@@ -46,6 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// WRAP EVERYTHING IN A DOMCONTENTLOADED LISTENER
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Safety check for line 32 (example: weight input)
+    const weightInput = document.getElementById('bodyWeight');
+    if (weightInput) {
+        weightInput.value = localStorage.getItem('userWeight') || "";
+    } else {
+        console.warn("Element 'bodyWeight' not found on this page. Skipping.");
+    }
+
+    // Safety check for line 57 (example: a display element)
+    const statusMsg = document.getElementById('weeklyStatusMsg');
+    if (statusMsg) {
+        statusMsg.textContent = "Loading data...";
+    }
+});
+
 // Example fix for settings.js
 const weightInput = document.getElementById('bodyWeight');
 if (weightInput) {

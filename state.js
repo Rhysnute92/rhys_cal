@@ -143,6 +143,16 @@ function toggleTrainingMode() {
     }
 }
 
+function loginUser() {
+    // ... your validation logic ...
+    
+    // 1. Set the flag so the app knows you are allowed in
+    localStorage.setItem('isLoggedIn', 'true');
+
+    // 2. Redirect to the dashboard
+    window.location.href = "index.html"; 
+}
+
 export const gymDB = {
     Chest: { icon: "💪", exercises: ["Barbell Bench Press", "Incline DB Press", "Cable Flyes"] },
     Back: { icon: "🚣", exercises: ["Deadlift", "Lat Pulldown", "Bent Over Rows", "Pull Ups"] },
