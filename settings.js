@@ -10,6 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
 import { goals, saveState, state, updatePassword } from './state.js';
 
 
+function handleRegistration() {
+    // 1. Save user data if needed
+    const email = document.getElementById('emailAddr')?.value;
+    
+    // 2. Set the login session flag
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    // 3. Redirect to the main dashboard
+    window.location.href = 'index.html';
+}
+
 // Check if we are returning from a password reset email
 window.onload = async () => {
     const hash = window.location.hash;
@@ -447,3 +458,21 @@ document.getElementById('auth-form').onsubmit = async (e) => {
         else showApp(); // Function from previous steps to hide splash and show dashboard
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Helper to update elements safely without crashing
+    const safeUpdate = (id, value, type = 'value') => {
+        const el = document.getElementById(id);
+        if (el) {
+            el[type] = value;
+            return true;
+        }
+        return false; // Silently fails if element is missing
+    };
+
+    // Safe updates for dashboard elements
+    safeUpdate('bodyWeight', localStorage.getItem('userWeight') || "");
+    safeUpdate('weeklyStatusMsg', "Ready to train!", 'textContent');
+    
+    console.log("UI elements initialized safely.");
+});
