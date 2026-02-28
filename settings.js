@@ -46,6 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Example fix for settings.js
+const weightInput = document.getElementById('bodyWeight');
+if (weightInput) {
+    // Only run this if the element is actually on the page
+    console.log(weightInput.value);
+}
+
 // Example inside saveGoals or addMeal
 const calorieInput = document.getElementById('goalKcal').value;
 goals.restCals = sanitizeInput(calorieInput); 
