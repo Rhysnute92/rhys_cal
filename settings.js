@@ -476,3 +476,120 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log("UI elements initialized safely.");
 });
+
+// settings.js
+
+// 1. Safety Check Function
+const updateElement = (id, callback) => {
+    const el = document.getElementById(id);
+    if (el) {
+        callback(el);
+    } else {
+        // Soft warning instead of a hard crash
+        console.warn(`Element #${id} not found on this page.`);
+    }
+};
+
+// 2. Wrap initialization in DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Handle Weight Input
+    updateElement('bodyWeight', (el) => {
+        el.value = localStorage.getItem('userWeight') || "";
+        
+        // Save automatically when changed
+        el.addEventListener('input', (e) => {
+            localStorage.setItem('userWeight', e.target.value);
+        });
+    });
+
+    // Handle Status Message
+    updateElement('weeklyStatusMsg', (el) => {
+        el.textContent = "Profile Settings Active";
+    });
+});
+
+// 3. Fix for the "ReferenceErrors" in your console
+// Attach these to window so your HTML buttons can always find them
+window.requestSensorPermission = function() {
+    console.log("Requesting pedometer permissions...");
+    // Add your sensor logic here
+};
+
+window.saveSettings = function() {
+    alert("Settings Saved!");
+};
+
+// Function to update the UI based on the mode
+window.toggleTrainingMode = function(checkbox) {
+    const isTraining = checkbox.checked;
+    
+    // 1. Define targets
+    const target = isTraining ? 1800 : 1500;
+    const label = isTraining ? "Training Day" : "Rest Day";
+
+    // 2. Update the UI elements
+    const calorieDisplay = document.getElementById('calorie-goal');
+    const dayTypeDisplay = document.getElementById('day-type-text');
+
+    if (calorieDisplay) calorieDisplay.textContent = target;
+    if (dayTypeDisplay) dayTypeDisplay.textContent = label;
+
+    // 3. PERMANENT SAVE: Store the 'true' or 'false' value
+    localStorage.setItem('trainingModeActive', isTraining);
+    console.log(`Saved: ${label} mode active.`);
+};
+
+// 4. AUTO-LOAD: Run this when the page starts
+document.addEventListener('DOMContentLoaded', () => {
+    const savedMode = localStorage.getItem('trainingModeActive');
+    const toggle = document.querySelector('.training-toggle-input'); // Add this class to your checkbox
+    
+    if (savedMode !== null && toggle) {
+        // Convert the string "true"/"false" back to a real boolean
+        const isTraining = (savedMode === 'true');
+        
+        // Set the checkbox state
+        toggle.checked = isTraining;
+        
+        // Trigger the function once to update the numbers on screen
+        window.toggleTrainingMode(toggle);
+    }
+});
+
+// Global variable for demonstration (this would usually come from your food logs)
+let caloriesConsumed = 650; 
+
+window.updateProgressBar = function() {
+    const isTraining = document.querySelector('.training-toggle-input').checked;
+    const goal = isTraining ? 1800 : 1500;
+    
+    // Calculate percentage (capped at 100%)
+    let percentage = (caloriesConsumed / goal) * 100;
+    if (percentage > 100) percentage = 100;
+
+    // Update the Bar width
+    const bar = document.getElementById('calorie-bar');
+    if (bar) {
+        bar.style.width = percentage + "%";
+        
+        // Change color to red if they go over the limit
+        bar.style.background = percentage >= 100 ? "#e74c3c" : "#2ecc71";
+    }
+
+    // Update the max label
+    const maxLabel = document.getElementById('max-goal-label');
+    if (maxLabel) maxLabel.textContent = goal + " kcal";
+};
+
+// Integrate this into your existing toggle function
+const originalToggle = window.toggleTrainingMode;
+window.toggleTrainingMode = function(checkbox) {
+    originalToggle(checkbox); // Run the existing 1800/1500 logic
+    window.updateProgressBar(); // Then update the bar
+};
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.updateProgressBar, 100); // Small delay to ensure DOM is ready
+});

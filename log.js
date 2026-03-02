@@ -334,6 +334,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logDateDisplay').innerText = new Date().toLocaleDateString();
 });
 
+// log.js - Run this on your Food Log page
+window.addFoodToLog = function() {
+    const mealInput = document.getElementById('meal-input');
+    const calories = parseFloat(mealInput.value);
+
+    if (!isNaN(calories) && calories > 0) {
+        // 1. Get current total from storage (default to 0 if empty)
+        let currentTotal = parseFloat(localStorage.getItem('totalConsumed')) || 0;
+
+        // 2. Add the new meal
+        currentTotal += calories;
+
+        // 3. Save it back to storage
+        localStorage.setItem('totalConsumed', currentTotal);
+
+        // 4. Optional: Clear input and give feedback
+        mealInput.value = '';
+        alert(`Added ${calories} kcal to your daily total!`);
+        
+        // 5. If the ring is on the SAME page, update it immediately
+        if (typeof window.updateProgressBar === 'function') {
+            window.updateProgressBar(currentTotal);
+        }
+    }
+};
+
 window.addEntry = function() {
     const name = document.getElementById('foodName').value;
     const cals = parseInt(document.getElementById('foodCals').value);

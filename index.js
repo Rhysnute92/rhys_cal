@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI();
 });
 
-import { auth } from './state.js';
-
 window.addEventListener('DOMContentLoaded', () => {
     const splash = document.getElementById('splash-screen');
     
@@ -94,6 +92,104 @@ function updateUI() {
     if (document.getElementById('displayFood')) document.getElementById('displayFood').innerText = totalFood;
     if (document.getElementById('displayRemaining')) document.getElementById('displayRemaining').innerText = remaining;
 }
+
+// Open the Modal
+window.addNewTile = function() {
+    const modal = document.getElementById('addTileModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+};
+
+// Close the Modal
+window.closeModal = function() {
+    const modal = document.getElementById('addTileModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+// Handle Saving
+window.saveNewTile = function() {
+    const type = document.getElementById('tileType').value;
+    console.log("Adding tile type:", type);
+    // Add your logic to append a new card to the dashboard here!
+    window.closeModal();
+};
+
+window.toggleTrainingMode = function(checkbox) {
+    // 1. Define our targets
+    const TRAINING_CALORIES = 1800;
+    const REST_CALORIES = 1500;
+
+    // 2. Find the element that displays the calories
+    // (Ensure your HTML has id="calorie-goal")
+    const calorieDisplay = document.getElementById('calorie-goal');
+    const dayTypeDisplay = document.getElementById('day-type-text');
+
+    if (checkbox.checked) {
+        // It's a Training Day
+        console.log("Mode: Training Day (1800 kcal)");
+        if (calorieDisplay) calorieDisplay.textContent = TRAINING_CALORIES;
+        if (dayTypeDisplay) dayTypeDisplay.textContent = "Training Day";
+    } else {
+        // It's a Rest Day
+        console.log("Mode: Rest Day (1500 kcal)");
+        if (calorieDisplay) calorieDisplay.textContent = REST_CALORIES;
+        if (dayTypeDisplay) dayTypeDisplay.textContent = "Rest Day";
+    }
+};
+
+// Example of how to handle the math
+let consumed = 400; // This would normally come from your Food tracker
+let target = checkbox.checked ? 1800 : 1500;
+let remaining = target - consumed;
+
+document.getElementById('calorie-goal').textContent = remaining;
+
+// 2. DOM CONTENT LOADED: For initial setup and data loading
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Fitness Tracker Initialized");
+
+    // Safety check for bodyWeight (settings.js logic)
+    const weightInput = document.getElementById('bodyWeight');
+    if (weightInput) {
+        weightInput.value = localStorage.getItem('userWeight') || "";
+    }
+
+    // Safety check for status message
+    const statusMsg = document.getElementById('weeklyStatusMsg');
+    if (statusMsg) {
+        statusMsg.textContent = "Data Synced";
+    }
+});
+
+// home.js - Run this on your Dashboard
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Fetch the data we saved from the Log page
+    const totalConsumed = parseFloat(localStorage.getItem('totalConsumed')) || 0;
+    
+    // 2. Determine the goal based on the Training Mode toggle
+    const isTraining = localStorage.getItem('trainingModeActive') === 'true';
+    const goal = isTraining ? 1800 : 1500;
+
+    // 3. Update the UI
+    const calorieGoalText = document.getElementById('calorie-goal');
+    const bar = document.getElementById('calorie-bar');
+
+    if (calorieGoalText) {
+        const remaining = goal - totalConsumed;
+        calorieGoalText.textContent = remaining > 0 ? remaining : 0;
+    }
+
+    if (bar) {
+        let percentage = (totalConsumed / goal) * 100;
+        if (percentage > 100) percentage = 100;
+        
+        bar.style.width = `${percentage}%`;
+        bar.style.backgroundColor = (totalConsumed > goal) ? "#e74c3c" : "#2ecc71";
+    }
+});
 
 function addNewTile() {
     const tileType = document.getElementById('tileType').value;
