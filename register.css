@@ -138,3 +138,25 @@ button[style*="background: #e74c3c"]:hover {
     color: #999;
     font-size: 14px;
 }
+
+.login-options {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2ecc71; /* Matches your green theme */
+    cursor: pointer;
+}

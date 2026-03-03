@@ -593,3 +593,10 @@ window.toggleTrainingMode = function(checkbox) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(window.updateProgressBar, 100); // Small delay to ensure DOM is ready
 });
+
+window.handleLogout = function() {
+    // Clear the login flag
+    localStorage.removeItem('isLoggedIn');
+    // Send them back to the login page
+    window.location.href = 'login.html';
+};

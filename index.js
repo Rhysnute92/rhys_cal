@@ -405,3 +405,8 @@ window.addNewTile = addNewTile;
 window.closeModal = closeModal;
 window.handleAuth = handleAuth;
 window.closeAuthModal = closeAuthModal;
+
+// Add this to your dashboard script
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+    window.location.href = 'login.html';
+}

@@ -961,3 +961,14 @@ label {
 .muted-link {
     color: #bbb;
 }
+
+.btn-logout {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+}}

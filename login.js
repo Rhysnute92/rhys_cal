@@ -39,3 +39,51 @@ function safeLogin() {
         window.location.href = "index.html";
     }
 }
+
+// login.js
+(function() {
+    // 1. Check if the user is already marked as logged in
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+    if (isLoggedIn === 'true') {
+        // 2. Immediate redirect to the dashboard
+        console.log("Session found! Redirecting...");
+        window.location.href = 'index.html'; // Change this to your main dashboard filename
+    }
+})();
+
+window.handleLogin = function(event) {
+    event.preventDefault();
+    
+    // Your actual login validation logic here...
+    const success = true; // Placeholder for your validation
+
+    if (success) {
+        // SAVE the session
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Optional: Save user info to display on the dashboard ring
+        localStorage.setItem('userName', 'Rhys'); 
+        
+        window.location.href = 'index.html';
+    }
+};
+
+window.handleLogin = function(event) {
+    event.preventDefault();
+    
+    const rememberMe = document.getElementById('remember-me').checked;
+    const success = true; // Your validation here
+
+    if (success) {
+        if (rememberMe) {
+            // Persistent: Stays even after closing the browser
+            localStorage.setItem('isLoggedIn', 'true');
+        } else {
+            // Temporary: Clears when the tab/browser is closed
+            sessionStorage.setItem('isLoggedIn', 'true');
+        }
+        
+        window.location.href = 'index.html';
+    }
+};
