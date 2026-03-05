@@ -32,7 +32,7 @@
 </head>
 <body>
 
-<div id="splash-screen">
+<!-- <div id="splash-screen">
     <div class="splash-content">
         <h1 class="splash-title">Welcome to Fitness Tracker Pro</h1>
         <p class="splash-text">Track your macros and training days with ease.</p>
@@ -48,7 +48,7 @@
         
         <p class="forgot-password-footer">Forgot your password? Click Get Started to reset via registration.</p>
     </div>
-</div>
+</div> -->
 
 <header class="app-header">
     <div class="header-content">
@@ -87,18 +87,21 @@
     <div class="card calorie-hero">
         <div class="header-flex">
             <h3>Calories</h3>
-<div class="tile-card">
-    <div class="header-row">
+<div class="card">
+    <div class="header-flex">
         <h3 id="day-type-text">Training Day</h3>
-
         <label class="switch">
-            <input type="checkbox"
-                   class="training-toggle-input"
-                   checked
-                   onchange="window.toggleTrainingMode(this)">
+            <input type="checkbox" aria-label="Toggle training mode" class="training-toggle-input" checked onchange="window.toggleTrainingMode(this)">
             <span class="slider round"></span>
         </label>
     </div>
+
+    <div class="calorie-info">
+        <span id="calorie-goal">1800</span>
+        <p class="remaining-label">REMAINING</p>
+    </div>
+</div>
+
 
     <div class="calorie-info">
         <span id="calorie-goal">1800</span>
