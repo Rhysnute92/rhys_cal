@@ -11,6 +11,11 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
     <link rel="stylesheet" href="shared.css">
+<<<<<<< HEAD
+=======
+    <!-- <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="register.css"> -->
+>>>>>>> d0f123c38def397d8cf4dc4e51ceb9f3f62e6f71
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -32,6 +37,7 @@
     <p id="currentDateDisplay" class="text-muted"></p>
 </header>
 
+<<<<<<< HEAD
 <main class="container">
     <div class="card settings-shortcut" onclick="location.href='settings.html'">
         <div class="shortcut-content">
@@ -39,6 +45,60 @@
             <div class="text-stack">
                 <h3>Settings</h3>
                 <small class="text-muted">Account & Goals</small>
+=======
+<div class="header-spacer"></div>
+
+<div class="card settings-tile" onclick="location.href='settings.html'">
+    <span class="gear-icon">⚙️</span>
+    <h3>Settings</h3>
+    <p>Account & Goals</p>
+</div>
+
+<div class="main-dashboard">
+    <div class="card calorie-hero">
+        <div class="header-flex">
+            <h3>Calories</h3>
+<div class="card">
+    <div class="header-flex">
+        <h3 id="day-type-text">Training Day</h3>
+        <label class="switch">
+            <input type="checkbox" aria-label="Toggle training mode" class="training-toggle-input" checked onchange="window.toggleTrainingMode(this)">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <div class="calorie-info">
+        <span id="calorie-goal">1800</span>
+        <p class="remaining-label">REMAINING</p>
+    </div>
+</div>
+
+
+    <div class="calorie-info">
+        <span id="calorie-goal">1800</span>
+        <p class="remaining-label">REMAINING</p>
+    </div>
+</div>
+        
+        <div class="ring-container">
+            <div class="chart-box">
+                <canvas id="calorieChart"></canvas>
+                <div class="ring-center">
+                    <h2 id="displayRemaining">0</h2>
+                    <span>Remaining</span>
+                </div>
+            </div>
+            
+            <div class="ring-stats">
+                <div class="stat-item">
+                    <span class="icon">🏁</span>
+                    <div><small>Goal</small><br><strong id="displayGoal">0</strong></div>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">🍴</span>
+                    <div><small>Food</small><br><strong id="displayFood">0</strong></div>
+                </div>
+>>>>>>> d0f123c38def397d8cf4dc4e51ceb9f3f62e6f71
             </div>
         </div>
         <span class="arrow">→</span>
