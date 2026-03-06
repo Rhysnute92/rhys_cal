@@ -971,4 +971,101 @@ label {
     cursor: pointer;
     font-weight: bold;
     margin-top: 20px;
+}
+
+/* Layout Utilities */
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.text-muted { color: var(--secondary); font-size: 0.85rem; opacity: 0.8; }
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* Settings Shortcut */
+.settings-shortcut {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+.shortcut-content { display: flex; align-items: center; gap: 12px; }
+.settings-shortcut h3 { margin: 0; font-size: 1rem; }
+.settings-shortcut .arrow { color: var(--primary); font-weight: bold; }
+
+/* Nutrition Hero */
+.nutrition-tile {
+    background: linear-gradient(135deg, var(--primary), #2ecc71);
+    color: white;
+    border: none;
+}
+.ring-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 20px auto;
+}
+.ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.ring-text h2 { margin: 0; font-size: 2rem; }
+.ring-text span { font-size: 0.75rem; opacity: 0.8; }
+
+.stat-split {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+.stat-block { text-align: center; }
+.stat-block small { display: block; opacity: 0.8; }
+
+/* Progress Bars in Tiles */
+.progress-track {
+    background: #eee;
+    height: 6px;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+}
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+.modal-card { width: 90%; max-width: 400px; padding: 25px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+/* Buttons */
+.btn-mini {
+    background: none;
+    border: 1px solid var(--border);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--secondary);
+}
+.action-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
 }}
