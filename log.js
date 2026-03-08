@@ -1,426 +1,185 @@
-import { foodData, saveState, todayKey } from "./state";
+import { state, saveState, todayKey } from "./state.js";
 
-Quagga.offDetected();
-Quagga.onDetected(result => {
-    if (!scanning) return;
-    scanning = false;
-    stopScanner();
-    lookupBarcode(result.codeResult.code);
-});
-
-// ---------- STORAGE ----------
-const STORAGE_KEY = "foodEntries";
+// ---------- CONFIG & GLOBALS ----------
 const GOAL_KEY = "macroGoals";
-
 let editingIndex = null;
-
-// ---------- UTIL ----------
-const today = () => new Date().toISOString().split("T")[0];
-
-const getEntries = () => foodData[todayKey()] || [];
-const saveEntries = data => {
-    foodData[todayKey()] = data;
-    saveState();
-};
-
-document.getElementById('scanMealBtn').addEventListener('click', function() {
-    // 1. Logic to open camera
-    alert("Opening camera for AI meal recognition...");
-    
-    // In a real app, you'd use:
-    // const imageCapture = new ImageCapture(videoTrack);
-    
-    // 2. Placeholder for API call
-    console.log("Identifying food from image...");
-});
-
-const getGoals = () => JSON.parse(localStorage.getItem(GOAL_KEY)) || {protein:200, carbs:145, fat:45};
-
-// ---------- CLOUD SYNC (Firebase ready) ----------
-function syncCloud(data){
-    // INSERT Firebase or Supabase sync here
-}
-
-// ---------- DATE ----------
-datePicker.value = today();
-datePicker.onchange = render;
-
-// ---------- SCANNER ----------
-let scanning=false;
-
-window.startCamera=()=>{
-    document.body.classList.add("scanning");    
-    scannerOverlay.style.display="block";
-
-Quagga.init({
-    inputStream: {
-        type: "LiveStream",
-        target: document.querySelector("#interactive"),
-        willReadFrequently: true,
-        constraints: {
-            facingMode: "environment"
-        }
-    },
-    locator: {
-        patchSize: "medium",
-        halfSample: true
-    },
-    numOfWorkers: navigator.hardwareConcurrency || 4,
-    frequency: 10,
-    decoder: {
-        readers: ["ean_reader", "ean_8_reader", "upc_reader"]
-    },
-    locate: true
-}, err => {
-    if (!err) {
-        Quagga.start();
-        scanning = true;
-    }
-});
-
-
- Quagga.onDetected(async res=>{
-  stopScanner();
-  lookupBarcode(res.codeResult.code);
- });
-};
-
-Quagga.offDetected();   // prevents stacking listeners
-Quagga.onDetected(result => {
-    stopScanner();
-    lookupBarcode(result.codeResult.code);
-});
-
-window.stopScanner=()=>{
-    document.body.classList.remove("scanning");
- scannerOverlay.style.display="none";
-
- if(scanning) {
-    Quagga.stop();
-    scanning = false;
-};
-}
-
-// ---------- BARCODE LOOKUP ----------
-async function lookupBarcode(code){
- const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
- const data = await res.json();
-
- if(data.status===1){
-  const p=data.product;
-  foodName.value=p.product_name || "";
-  calories.value=p.nutriments["energy-kcal_100g"] || 0;
-  protein.value=p.nutriments.proteins_100g || 0;
-  carbs.value=p.nutriments.carbohydrates_100g || 0;
-  fat.value=p.nutriments.fat_100g || 0;
- }
-
- entryForm.classList.remove("hidden");
-}
-
-// ---------- SAVE ENTRY ----------
-window.saveEntry=()=>{
- const entry={
-  name:foodName.value,
-  calories:+calories.value,
-  protein:+protein.value,
-  carbs:+carbs.value,
-  fat:+fat.value,
-  meal:mealType.value,
-  date:datePicker.value
- };
-
- let entries=getEntries();
-
- if(editingIndex!==null){
-  entries[editingIndex]=entry;
-  editingIndex=null;
- }else{
-  entries.push(entry);
- }
-
- saveEntries(entries);
- entryForm.classList.add("hidden");
- render();
-};
-
-// ---------- EDIT / DELETE ----------
-function editEntry(i){
- const e=getEntries()[i];
- editingIndex=i;
-
- foodName.value=e.name;
- calories.value=e.calories;
- protein.value=e.protein;
- carbs.value=e.carbs;
- fat.value=e.fat;
- mealType.value=e.meal;
-
- entryForm.classList.remove("hidden");
-}
-
-function deleteEntry(i){
- let entries=getEntries();
- entries.splice(i,1);
- saveEntries(entries);
- render();
-}
-
-// ---------- GOALS ----------
-window.saveGoals=()=>{
- const goals={
-  protein:+goalP.value,
-  carbs:+goalC.value,
-  fat:+goalF.value
- };
- localStorage.setItem(GOAL_KEY,JSON.stringify(goals));
- render();
-};
-
-// ---------- RENDER ----------
+let scanning = false;
 let pieChart, weekChart;
 
-function render(){
- const date=datePicker.value;
- const entries=getEntries().filter(e=>e.date===date);
- logList.innerHTML="";
-
- let totals={cal:0,p:0,c:0,f:0};
-
- entries.forEach((e,i)=>{
-  totals.cal+=e.calories;
-  totals.p+=e.protein;
-  totals.c+=e.carbs;
-  totals.f+=e.fat;
-
-  const div=document.createElement("div");
-  div.className="log-item";
-  div.innerHTML=`
-   <strong>${e.name}</strong>
-   <small>${e.calories} kcal</small>
-   <button onclick="editEntry(${i})">✏️</button>
-   <button onclick="deleteEntry(${i})">🗑</button>
-  `;
-  logList.appendChild(div);
- });
-
- updateMacroDisplay(totals);
- drawPie(totals);
- drawWeekly();
-}
-
-// ---------- MACROS ----------
-function updateMacroDisplay(totals) {
-    const goals = getGoals();
-
-    if (!goals) return;
-
-    const remainP = Math.max(goals.protein - totals.p, 0);
-    const remainC = Math.max(goals.carbs - totals.c, 0);
-    const remainF = Math.max(goals.fat - totals.f, 0);
-
-    document.getElementById("pConsumed").textContent = totals.p.toFixed(0) + "g";
-    document.getElementById("cConsumed").textContent = totals.c.toFixed(0) + "g";
-    document.getElementById("fConsumed").textContent = totals.f.toFixed(0) + "g";
-
-    document.getElementById("pRemaining").textContent = remainP + "g left";
-    document.getElementById("cRemaining").textContent = remainC + "g left";
-    document.getElementById("fRemaining").textContent = remainF + "g left";
-}
-
-// ---------- PIE CHART ----------
-function drawPie(t){
- if(pieChart) pieChart.destroy();
-
- pieChart=new Chart(macroPie,{
-  type:"pie",
-  data:{
-   labels:["Protein","Carbs","Fat"],
-   datasets:[{data:[t.p,t.c,t.f]}]
-  }
- });
-}
-
-// ---------- WEEKLY ----------
-function drawWeekly(){
- const entries=getEntries();
- const days=[];
- const values=[];
-
- for(let i=6;i>=0;i--){
-  const d=new Date();
-  d.setDate(d.getDate()-i);
-  const ds=d.toISOString().split("T")[0];
-
-  const total=entries
-   .filter(e=>e.date===ds)
-   .reduce((s,e)=>s+e.calories,0);
-
-  days.push(d.getDate());
-  values.push(total);
- }
-
- if(weekChart) weekChart.destroy();
-
- weekChart=new Chart(weeklyChart,{
-  type:"bar",
-  data:{labels:days,datasets:[{data:values}]}
- });
-}
-
-// ---------- PWA INSTALL ----------
-if("serviceWorker" in navigator){
- navigator.serviceWorker.register("sw.js");
-}
-
-// ---------- INIT ----------
-render();
-
-// 1. Create a hidden input to trigger the camera
-const fileInput = document.createElement('input');
-fileInput.type = 'file';
-fileInput.accept = 'image/*';
-fileInput.capture = 'environment'; // Opens the back camera on mobile
-
-document.getElementById('scanMealBtn').addEventListener('click', () => {
-    fileInput.click();
-});
-
-// 2. Handle the image selection
-fileInput.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Show a loading state on the button
-    const btn = document.getElementById('scanMealBtn');
-    const originalText = btn.innerText;
-    btn.innerText = "⌛ Analyzing...";
-    btn.disabled = true;
-
-    try {
-        // Send file to your backend/API
-        const foodData = await analyzeImageWithAI(file);
-        
-        // 3. Auto-fill your form fields
-        document.querySelector('input[placeholder="Food name"]').value = foodData.name;
-        document.querySelector('input[placeholder="Calories"]').value = foodData.calories;
-        document.querySelector('input[placeholder="Protein"]').value = foodData.protein;
-        document.querySelector('input[placeholder="Carbs"]').value = foodData.carbs;
-        document.querySelector('input[placeholder="Fat"]').value = foodData.fat;
-
-    } catch (error) {
-        alert("Could not identify food. Please try again.");
-    } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }
+// DOM Elements
+const elements = {
+    foodList: document.getElementById('foodList'),
+    dayTotal: document.getElementById('dayTotal'),
+    datePicker: document.getElementById('datePicker'),
+    macroPie: document.getElementById('macroPie'),
+    weeklyChart: document.getElementById('weeklyChart'),
+    cameraOverlay: document.getElementById('cameraOverlay')
 };
 
-// This is a placeholder for your actual API call (e.g., to Gemini or OpenAI)
-async function analyzeImageWithAI(imageFile) {
-    // You would typically use FormData to send the image to a server
-    // For now, returning mock data as an example:
-    return {
-        name: "Grilled Chicken Salad",
-        calories: 350,
-        protein: 35,
-        carbs: 12,
-        fat: 18
-    };
-}
-
+// ---------- INITIALIZATION ----------
 document.addEventListener('DOMContentLoaded', () => {
-    renderLog();
-    document.getElementById('logDateDisplay').innerText = new Date().toLocaleDateString();
+    elements.datePicker.value = todayKey();
+    render();
 });
 
-// log.js - Run this on your Food Log page
-window.addFoodToLog = function() {
-    const mealInput = document.getElementById('meal-input');
-    const calories = parseFloat(mealInput.value);
+elements.datePicker.onchange = render;
 
-    if (!isNaN(calories) && calories > 0) {
-        // 1. Get current total from storage (default to 0 if empty)
-        let currentTotal = parseFloat(localStorage.getItem('totalConsumed')) || 0;
+// ---------- CORE LOGIC ----------
 
-        // 2. Add the new meal
-        currentTotal += calories;
-
-        // 3. Save it back to storage
-        localStorage.setItem('totalConsumed', currentTotal);
-
-        // 4. Optional: Clear input and give feedback
-        mealInput.value = '';
-        alert(`Added ${calories} kcal to your daily total!`);
-        
-        // 5. If the ring is on the SAME page, update it immediately
-        if (typeof window.updateProgressBar === 'function') {
-            window.updateProgressBar(currentTotal);
-        }
-    }
-};
-
-window.addEntry = function() {
+window.saveEntry = () => {
     const name = document.getElementById('foodName').value;
-    const cals = parseInt(document.getElementById('foodCals').value);
-    const protein = parseInt(document.getElementById('foodProtein').value) || 0;
+    const cals = parseInt(document.getElementById('calories').value) || 0;
+    const p = parseInt(document.getElementById('protein').value) || 0;
+    const c = parseInt(document.getElementById('carbs').value) || 0;
+    const f = parseInt(document.getElementById('fat').value) || 0;
+    const meal = document.getElementById('meal-type').value;
 
-    if (!name || !cals) {
-        alert("Please enter a name and calories!");
+    if (!name || cals <= 0) {
+        alert("Please enter a food name and calories.");
         return;
     }
 
-    const dateKey = todayKey();
+    const dateKey = elements.datePicker.value;
     if (!state.foodLogs[dateKey]) state.foodLogs[dateKey] = [];
 
-    state.foodLogs[dateKey].push({
-        id: Date.now(),
-        name,
-        calories: cals,
-        protein
-    });
+    const entry = { id: Date.now(), name, calories: cals, protein: p, carbs: c, fat: f, meal };
 
-    saveState();
-    renderLog();
-
-    // Clear inputs
-    document.getElementById('foodName').value = '';
-    document.getElementById('foodCals').value = '';
-    document.getElementById('foodProtein').value = '';
-};
-
-function renderLog() {
-    const list = document.getElementById('foodList');
-    const dayTotalDisplay = document.getElementById('dayTotal');
-    const dateKey = todayKey();
-    const entries = state.foodLogs[dateKey] || [];
-
-    if (entries.length === 0) {
-        list.innerHTML = `<p class="text-muted">No food logged yet today.</p>`;
-        dayTotalDisplay.innerText = "0 kcal";
-        return;
+    if (editingIndex !== null) {
+        const idx = state.foodLogs[dateKey].findIndex(e => e.id === editingIndex);
+        state.foodLogs[dateKey][idx] = entry;
+        editingIndex = null;
+    } else {
+        state.foodLogs[dateKey].push(entry);
     }
 
-    let totalCals = 0;
-    list.innerHTML = entries.map(item => {
-        totalCals += item.calories;
-        return `
-            <div class="food-item">
-                <div>
-                    <strong>${item.name}</strong><br>
-                    <small>${item.calories} kcal | ${item.protein}g Protein</small>
-                </div>
-                <button onclick="deleteEntry(${item.id})" class="btn-delete">✕</button>
-            </div>
-        `;
-    }).join('');
+    saveState();
+    clearInputs();
+    render();
+};
 
-    dayTotalDisplay.innerText = `${totalCals} kcal`;
-}
-
-window.deleteEntry = function(id) {
-    const dateKey = todayKey();
+window.deleteEntry = (id) => {
+    const dateKey = elements.datePicker.value;
     state.foodLogs[dateKey] = state.foodLogs[dateKey].filter(item => item.id !== id);
     saveState();
-    renderLog();
+    render();
 };
+
+const clearInputs = () => {
+    ['foodName', 'calories', 'protein', 'carbs', 'fat'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+};
+
+// ---------- SCANNING LOGIC ----------
+
+window.startBarcodeScanner = () => {
+    elements.cameraOverlay.style.display = "block";
+    Quagga.init({
+        inputStream: { type: "LiveStream", target: "#interactive", constraints: { facingMode: "environment" } },
+        decoder: { readers: ["ean_reader", "upc_reader", "ean_8_reader"] }
+    }, (err) => {
+        if (err) return console.error(err);
+        Quagga.start();
+        scanning = true;
+    });
+
+    Quagga.onDetected(res => {
+        stopScanner();
+        lookupBarcode(res.codeResult.code);
+    });
+};
+
+window.stopScanner = () => {
+    Quagga.stop();
+    scanning = false;
+    elements.cameraOverlay.style.display = "none";
+};
+
+async function lookupBarcode(code) {
+    try {
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
+        const data = await res.json();
+        if (data.status === 1) {
+            const p = data.product;
+            document.getElementById('foodName').value = p.product_name || "";
+            document.getElementById('calories').value = p.nutriments["energy-kcal_100g"] || 0;
+            document.getElementById('protein').value = p.nutriments.proteins_100g || 0;
+            document.getElementById('carbs').value = p.nutriments.carbohydrates_100g || 0;
+            document.getElementById('fat').value = p.nutriments.fat_100g || 0;
+        }
+    } catch (e) { alert("Barcode search failed."); }
+}
+
+// AI Meal Scan (File Input Approach)
+const aiInput = document.createElement('input');
+aiInput.type = 'file'; aiInput.accept = 'image/*'; aiInput.capture = 'environment';
+
+window.startMealScan = () => aiInput.click();
+
+aiInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Placeholder for AI API
+    const mockData = { name: "AI Identified Meal", calories: 450, protein: 30, carbs: 40, fat: 15 };
+    
+    document.getElementById('foodName').value = mockData.name;
+    document.getElementById('calories').value = mockData.calories;
+    document.getElementById('protein').value = mockData.protein;
+    document.getElementById('carbs').value = mockData.carbs;
+    document.getElementById('fat').value = mockData.fat;
+};
+
+// ---------- RENDERING & CHARTS ----------
+
+function render() {
+    const dateKey = elements.datePicker.value;
+    const entries = state.foodLogs[dateKey] || [];
+    let totals = { cal: 0, p: 0, c: 0, f: 0 };
+
+    // Update List
+    elements.foodList.innerHTML = entries.length ? '' : '<p class="text-muted">No food logged yet.</p>';
+    entries.forEach(e => {
+        totals.cal += e.calories; totals.p += e.protein; totals.c += e.carbs; totals.f += e.fat;
+        const div = document.createElement('div');
+        div.className = 'food-item';
+        div.innerHTML = `
+            <div><strong>${e.name}</strong><br><small>${e.calories}kcal | P:${e.protein}g</small></div>
+            <button onclick="deleteEntry(${e.id})" class="btn-delete">✕</button>`;
+        elements.foodList.appendChild(div);
+    });
+
+    elements.dayTotal.innerText = `${totals.cal} kcal`;
+    
+    updateCharts(totals);
+}
+
+function updateCharts(t) {
+    // Pie Chart
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(elements.macroPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['P', 'C', 'F'],
+            datasets: [{ data: [t.p, t.c, t.f], backgroundColor: ['#4CAF50', '#2196F3', '#FFC107'] }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Weekly Chart Logic
+    const last7Days = [...Array(7)].map((_, i) => {
+        const d = new Date(); d.setDate(d.getDate() - (6 - i));
+        const key = d.toISOString().split('T')[0];
+        const dayTotal = (state.foodLogs[key] || []).reduce((s, e) => s + e.calories, 0);
+        return { label: d.getDate(), value: dayTotal };
+    });
+
+    if (weekChart) weekChart.destroy();
+    weekChart = new Chart(elements.weeklyChart, {
+        type: 'bar',
+        data: {
+            labels: last7Days.map(d => d.label),
+            datasets: [{ label: 'Calories', data: last7Days.map(d => d.value), backgroundColor: '#4CAF50' }]
+        }
+    });
+}

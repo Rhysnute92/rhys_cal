@@ -1,164 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#4CAF50">
-
-    <!-- Title -->
     <title>Fitness Tracker Pro | Food Diary</title>
 
-    <!-- PWA / Mobile -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fitness">
     <link rel="manifest" href="manifest.json">
 
-    <!-- Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="rhys_logo.png">
-    <link rel="icon" type="image/x-icon" href="rhys_favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="log.css">
 
-    <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <header class="app-header">
     <div class="header-content">
-            <img src="rhys_logo.png" class="header-logo" alt="Logo">
-            <h1>Food Diary</h1>
+        <img src="rhys_logo.png" class="header-logo" alt="Logo">
+        <h1>Food Diary</h1>
     </div>
-
-
-    <nav class="nav-wrapper">
-        <div class="nav-bar">
-            <a href="index.html" class="nav-item">
-                <img src="dashboard.png" alt="home">
-                <span>Home</span>
-            </a>
-            <a href="log.html" class="nav-item">
-                <img src="diary.png" alt="diary">
-                <span>Food</span>
-            </a>
-            <a href="training.html" class="nav-item">
-                <img src="training.png" alt="gym">
-                <span>Gym</span>
-            </a>
-        </div>
-    </nav>
 </header>
 
 <main class="main-dashboard">
+    
     <section class="card">
-        <h3>Add Food</h3>
-        <div class="input-group">
-            <input type="text" id="foodName" placeholder="e.g., Chicken Breast" class="input-field">
-            <div class="macro-inputs">
-                <input type="number" id="foodCals" placeholder="kcal" class="input-field">
-                <input type="number" id="foodProtein" placeholder="P (g)" class="input-field">
+        <h3>Daily Targets</h3>
+        <div class="grid-3-col">
+            <div class="input-group">
+                <label>Protein (g)</label>
+                <input id="goalP" type="number" placeholder="0" class="input-field">
             </div>
-            <button onclick="addEntry()" class="btn-primary full-width">Add to Diary</button>
+            <div class="input-group">
+                <label>Carbs (g)</label>
+                <input id="goalC" type="number" placeholder="0" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>Fat (g)</label>
+                <input id="goalF" type="number" placeholder="0" class="input-field">
+            </div>
         </div>
+        <button class="btn-secondary full-width" onclick="saveGoals()">Update Goals</button>
+    </section>
+
+    <section class="card">
+        <h3>Log Meal</h3>
+        <div class="input-group">
+            <input type="text" id="foodName" placeholder="Meal Name (e.g. Oats)" class="input-field">
+            
+            <div class="form-group">
+                <select id="meal-type" class="custom-select">
+                    <option>Breakfast</option>
+                    <option>Lunch</option>
+                    <option>Dinner</option>
+                    <option>Snack</option>
+                </select>
+            </div>
+
+            <div class="grid-4-col">
+                <input id="calories" type="number" placeholder="kcal" class="input-field">
+                <input id="protein" type="number" placeholder="P" class="input-field">
+                <input id="carbs" type="number" placeholder="C" class="input-field">
+                <input id="fat" type="number" placeholder="F" class="input-field">
+            </div>
+
+            <div class="scanner-actions">
+                <button onclick="startBarcodeScanner()" class="btn-outline-small">📷 Barcode</button>
+                <button onclick="startMealScan()" class="btn-outline-small">🥗 AI Scan</button>
+            </div>
+
+            <button onclick="saveEntry()" class="btn-primary full-width">Add to Diary</button>
+        </div>
+    </section>
+
+    <section class="card progress-section">
+        <div class="header-flex">
+            <h3>Macros Today</h3>
+            <span id="dayTotal" class="total-badge">0 / 2500 kcal</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="macroPie"></canvas>
+        </div>
+        <div id="macroText" class="text-center"></div>
     </section>
 
     <section class="card">
         <div class="header-flex">
-            <h3>Today's Entries</h3>
-            <span id="dayTotal">0 kcal</span>
+            <h3>History</h3>
+            <input type="date" id="datePicker" class="date-input">
         </div>
         <div id="foodList" class="food-list">
             <p class="text-muted">No food logged yet today.</p>
         </div>
     </section>
+
+    <section class="card">
+        <h3>Last 7 Days</h3>
+        <canvas id="weeklyChart"></canvas>
+    </section>
+
 </main>
 
-<nav class="nav-wrapper">
-    <div class="nav-bar">
-        <a href="index.html" class="nav-item"><span>Home</span></a>
-        <a href="log.html" class="nav-item active"><span>Food</span></a>
-        <a href="training.html" class="nav-item"><span>Gym</span></a>
-    </div>
-</nav>
-
-<div class="scanner-actions">
-    <button onclick="startBarcodeScanner()" class="btn-outline-small">📷 Barcode</button>
-    <button onclick="startMealScan()" class="btn-outline-small">🥗 Scan Meal</button>
-</div>
-
-<div id="cameraOverlay" class="camera-overlay">
+<div id="cameraOverlay" class="camera-overlay" style="display:none;">
     <div id="interactive" class="viewport"></div>
     <div class="scanner-controls">
         <button onclick="stopScanner()" class="btn-secondary">Cancel</button>
     </div>
 </div>
 
-<!-- goals -->
-<div class="card">
-<h3>Macro Goals</h3>
-<input id="goalP" type="number" placeholder="Protein">
-<input id="goalC" type="number" placeholder="Carbs">
-<input id="goalF" type="number" placeholder="Fat">
-<button class="btn-primary" onclick="saveGoals()">Save Goals</button>
-</div>
+<nav class="nav-wrapper">
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item">
+            <img src="dashboard.png" alt="home">
+            <span>Home</span>
+        </a>
+        <a href="log.html" class="nav-item active">
+            <img src="diary.png" alt="diary">
+            <span>Food</span>
+        </a>
+        <a href="training.html" class="nav-item">
+            <img src="training.png" alt="gym">
+            <span>Gym</span>
+        </a>
+    </div>
+</nav>
 
-<div class="grid">
-<input id="calories" type="number" placeholder="Calories">
-<input id="protein" type="number" placeholder="Protein">
-<input id="carbs" type="number" placeholder="Carbs">
-<input id="fat" type="number" placeholder="Fat">
-</div>
-
-<div class="form-group">
-    <label for="meal-type">Select meal type:</label>
-    <select id="meal-type" name="meal_category" class="custom-select">
-        <option>Breakfast</option>
-        <option>Lunch</option>
-        <option>Dinner</option>
-        <option>Snacks</option>
-        <option>Drinks</option>
-    </select>
-</div> 
-
-<button class="btn-primary" onclick="saveEntry()">Add</button>
-</div>
-
-<!-- macro progress -->
-<div class="card">
-<h3>Macros</h3>
-<div id="macroText"></div>
-<canvas id="macroPie"></canvas>
-</div>
-
-<!-- log -->
-<div class="card">
-<h3>Daily Log</h3>
-<input type="date" id="datePicker" placeholder="dd/mm/yyyy">
-<div id="logList"></div>
-</div>
-
-<!-- weekly chart -->
-<div class="card">
-<h3>Last 7 Days</h3>
-<canvas id="weeklyChart"></canvas>
-</div>
-
-</div>
-
-<script type="module" src="index.js"></script>
-<script type="module" src="settings.js"></script>
-<script type="module" src="pedometer.js"></script>
 <script type="module" src="state.js"></script>
-<script type="module" src="login.js"></script>
-<script type="module" src="training.js"></script>
-<script type="module" src="auth-actions.js"></script>
-<script type="module" src="server.js"></script>
+<script type="module" src="log-logic.js"></script> 
 <script type="module" src="sw.js"></script>
-<script type="module" src="settings.js"></script>
+
 </body>
 </html>

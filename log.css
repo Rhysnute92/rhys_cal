@@ -1,330 +1,159 @@
 /* ===============================
-   PAGE LAYOUT
+   GLOBAL & VARIABLES
 ================================= */
-
-.container {
-    max-width: 520px;
-    margin: auto;
-    padding: 16px 14px 40px;
+:root {
+    --primary: #4CAF50;
+    --primary-dark: #388E3C;
+    --danger: #e74c3c;
+    --card: #ffffff;
+    --text: #333333;
+    --muted: #888888;
+    --border: #eeeeee;
+    --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 14px;
 }
 
-/* header spacing handled globally */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+    color: var(--text);
+    margin: 0;
+}
+
+.main-dashboard {
+    max-width: 520px;
+    margin: auto;
+    padding: 16px 14px 100px; /* Space for bottom nav */
+}
 
 /* ===============================
-   CARDS
+   CARDS & LAYOUT
 ================================= */
-
 .card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 16px;
-    margin-top: 14px;
+    padding: 18px;
+    margin-top: 16px;
     box-shadow: var(--shadow);
 }
 
 .card h3 {
+    margin: 0 0 14px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ===============================
+   INPUTS & GRIDS
+================================= */
+.input-field, .custom-select, .date-input {
+    width: 100%;
+    padding: 12px;
     margin-bottom: 12px;
-    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.grid-4-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.grid-3-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 /* ===============================
    BUTTONS
 ================================= */
-
-button {
-    font: inherit;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.18s ease;
-}
-
 .btn-primary {
     background: var(--primary);
     color: white;
     padding: 14px;
-    font-weight: 600;
-}
-
-.btn-primary.full {
-    width: 100%;
-}
-
-.btn-primary:hover {
-    opacity: 0.9;
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-    padding: 12px 16px;
-    margin-top: 10px;
-}
-
-button:hover {
-    transform: translateY(-1px);
-}
-
-/* ===============================
-   FORM CONTROLS
-================================= */
-
-input,
-select {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    font-size: 15px;
-    background: transparent;
-    color: var(--text);
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-/* grid layout for macro inputs */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.hidden {
-    display: none;
-}
-
-/* ===============================
-   DAILY LOG
-================================= */
-
-.log-item {
-    background: rgba(0,0,0,0.02);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.log-item strong {
-    font-size: 15px;
-}
-
-.log-item small {
-    color: var(--muted);
-}
-
-/* edit/delete buttons */
-.log-item button {
-    align-self: flex-end;
-    margin-left: 6px;
-    background: transparent;
-    font-size: 16px;
-}
-
-/* ===============================
-   MACROS
-================================= */
-
-#macroText {
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-canvas {
-    width: 100% !important;
-    height: auto !important;
-}
-
-/* ===============================
-   SCANNER OVERLAY
-================================= */
-
-.scanner-overlay {
-    position: fixed;
-    inset: 0;
-    background: black;
-    display: none;
-    z-index: 999;
-    color: white;
-    text-align: center;
-    padding-top: 10px;
-}
-
-.viewport {
-    width: 100%;
-    height: 70vh;
-}
-
-/* ===============================
-   DATE PICKER
-================================= */
-
-#datePicker {
-    margin-bottom: 10px;
-}
-
-/* ===============================
-   DESKTOP ENHANCEMENT
-================================= */
-
-@media (min-width: 768px) {
-    .container {
-        max-width: 680px;
-    }
-}
-
-body.scanning header,
-body.scanning nav,
-body.scanning .nav-wrapper {
-    display: none !important;
-}
-
-.scanner-overlay {
-    position: fixed;
-    inset: 0;
-    background: black;
-    z-index: 9999;
-}
-
-.scan-container {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    justify-content: center;
-}
-
-.btn-scan {
-    flex: 1; /* Makes both buttons equal width */
-    padding: 12px;
     border: none;
-    border-radius: 8px;
-    color: var(--primary); /* Matches your Save/Add button green */
-    color: white;
-    font-weight: bold;
+    border-radius: 12px;
+    font-weight: 600;
+    width: 100%;
     cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease;
+    transition: transform 0.1s;
 }
 
-.btn-scan:hover {
-    background-color: #4cae4c;
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-outline-small {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    flex: 1;
+    cursor: pointer;
 }
 
-/* Optional: Different color for Scan Meal to distinguish it */
-.scan-meal {
-    background-color: #4a90e2; /* A nice blue, or keep it green if you prefer */
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
-}
-
-.macro-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.scanner-actions {
+    display: flex;
     gap: 10px;
-    margin: 10px 0;
+    margin-bottom: 12px;
 }
 
+/* ===============================
+   FOOD LOG ITEMS
+================================= */
 .food-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
+
+.food-item:last-child { border-bottom: none; }
 
 .btn-delete {
     background: none;
     border: none;
-    color: #e74c3c;
+    color: var(--danger);
     font-size: 1.2rem;
-    cursor: pointer;
+    padding: 8px;
 }
 
-.nav-item.active {
-    color: var(--primary);
-    font-weight: bold;
-}
-
-/* Container for the action buttons */
-.scanner-actions {
-    display: flex;
-    gap: 12px;
-    margin: 20px 0;
-    justify-content: center;
-}
-
-/* Outline button styling */
-.btn-outline-small {
-    padding: 8px 16px;
-    background-color: transparent;
-    border: 2px solid #4CAF50; /* Primary green color */
-    color: #4CAF50;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-outline-small:hover {
-    background-color: #4CAF50;
-    color: white;
-}
-
-/* Full-screen camera overlay */
+/* ===============================
+   SCANNER OVERLAY
+================================= */
 .camera-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 1000;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* The video/scanner container */
 .viewport {
-    width: 100%;
-    max-width: 500px;
-    height: 300px;
-    border: 2px solid #ffffff;
-    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    aspect-ratio: 1;
+    border: 2px solid white;
+    border-radius: 20px;
     overflow: hidden;
-    position: relative;
     background: #000;
 }
 
-/* Controls inside the scanner */
-.scanner-controls {
-    margin-top: 20px;
-}
-
-.btn-secondary {
-    padding: 10px 24px;
-    background-color: #f44336; /* Red for cancel */
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn-secondary:hover {
-    background-color: #d32f2f;
-}
+/* Hidden state for JS toggle */
+.hidden { display: none !important; }
