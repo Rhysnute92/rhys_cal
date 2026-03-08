@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#4CAF50">
     <title>Fitness Tracker Pro | Food Diary</title>
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
 
     <link rel="icon" type="image/png" sizes="32x32" href="rhys_logo.png">
@@ -67,11 +67,14 @@
 
     <section class="card">
         <h3>Log Meal</h3>
+        <button class="btn-outline-small full-width" onclick="copyFromYesterday()">
+            🕒 Copy from Yesterday
+        </button>
         <div class="input-group">
             <input type="text" id="foodName" placeholder="Meal Name (e.g. Oats)" class="input-field">
             
             <div class="form-group">
-                <select id="meal-type" class="custom-select">
+                <select id="meal-type" title="Meal Type" class="custom-select">
                     <option>Breakfast</option>
                     <option>Lunch</option>
                     <option>Dinner</option>
@@ -93,6 +96,16 @@
 
             <button onclick="saveEntry()" class="btn-primary full-width">Add to Diary</button>
         </div>
+    </section>
+
+    <section class="card">
+        <h3>Quick Add</h3>
+            <div class="quick-add-grid">
+                <button class="btn-chip" onclick="quickAdd('Protein Shake', 25, 3, 2)">🥤 Shake</button>
+                <button class="btn-chip" onclick="quickAdd('Apple', 0, 25, 0)">🍎 Apple</button>
+                <button class="btn-chip" onclick="quickAdd('Chicken Breast (150g)', 46, 0, 5)">🍗 Chicken</button>
+                <button class="btn-chip" onclick="quickAdd('Greek Yogurt', 15, 6, 0)">🍦 Yogurt</button>
+            </div>
     </section>
 
     <section class="card progress-section">
@@ -119,11 +132,27 @@
     <section class="card">
         <div class="header-flex">
             <h3>History</h3>
-            <input type="date" id="datePicker" class="date-input">
+            <input type="date" placeholder="Date" id="datePicker" class="date-input">
         </div>
         <div id="foodList" class="food-list">
             <p class="text-muted">No food logged yet today.</p>
         </div>
+    </section>
+
+    <section class="card">
+            <h3>Nutrition Summary</h3>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Macro</th>
+                            <th>Goal</th>
+                            <th>Actual</th>
+                            <th>Left</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-body">
+                    </tbody>
+            </table>
     </section>
 
     <section class="card">
@@ -133,7 +162,7 @@
 
 </main>
 
-<div id="cameraOverlay" class="camera-overlay" style="display:none;">
+<div id="cameraOverlay" class="camera-overlay">
     <div id="interactive" class="viewport"></div>
     <div class="scanner-controls">
         <button onclick="stopScanner()" class="btn-secondary">Cancel</button>
