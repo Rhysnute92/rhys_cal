@@ -46,6 +46,10 @@ body {
     justify-content: center;
 }
 
+.header-content h1 {
+    text-align: center;
+}
+
 /* Logo Styling */
 .header-logo {
     width: 200px;
