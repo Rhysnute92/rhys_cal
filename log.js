@@ -183,3 +183,65 @@ function updateCharts(t) {
         }
     });
 }
+
+// DOM Elements
+const elements = {
+    cameraOverlay: document.getElementById('cameraOverlay'),
+    dayTotal: document.getElementById('dayTotal'),
+    progressCircle: document.querySelector('.progress-ring__circle'),
+    datePicker: document.getElementById('datePicker')
+};
+
+// ---------- CAMERA MANAGEMENT ----------
+window.startBarcodeScanner = () => {
+    // Reveal overlay only when button is clicked
+    elements.cameraOverlay.classList.remove('hidden'); 
+    
+    Quagga.init({
+        inputStream: { type: "LiveStream", target: "#interactive", constraints: { facingMode: "environment" } },
+        decoder: { readers: ["ean_reader", "upc_reader"] }
+    }, (err) => {
+        if (err) return console.error(err);
+        Quagga.start();
+    });
+
+    Quagga.onDetected(res => {
+        stopScanner();
+        lookupBarcode(res.codeResult.code);
+    });
+};
+
+window.stopScanner = () => {
+    Quagga.stop();
+    elements.cameraOverlay.classList.add('hidden'); // Hide it again
+};
+
+// ---------- PROGRESS RING ANIMATION ----------
+function updateProgressRing(current, goal = 2500) {
+    const circle = elements.progressCircle;
+    if (!circle) return;
+
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+    
+    const percent = Math.min((current / goal) * 100, 100);
+    const offset = circumference - (percent / 100) * circumference;
+    
+    circle.style.strokeDashoffset = offset;
+}
+
+// ---------- UPDATED RENDER ----------
+function render() {
+    const dateKey = elements.datePicker.value;
+    const entries = state.foodLogs[dateKey] || [];
+    const totalCals = entries.reduce((s, e) => s + e.calories, 0);
+
+    elements.dayTotal.innerText = `${totalCals} kcal`;
+    
+    // Update the visual ring
+    updateProgressRing(totalCals, state.dailyGoal || 2500);
+    
+    // ... existing list rendering logic ...
+}
