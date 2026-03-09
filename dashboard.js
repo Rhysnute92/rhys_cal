@@ -5,6 +5,7 @@ import {
     todayKey, 
     getCurrentCalorieGoal, 
     toggleTrainingDay 
+    auth
 } from './state.js';
 
 let calorieChart;

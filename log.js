@@ -7,7 +7,8 @@ import {
     todayKey, 
     getCurrentCalorieGoal,
     foodData,   // This is your log storage
-    goals       // This contains trainCals, restCals, protein, etc.
+    goals,       // This contains trainCals, restCals, protein, etc.
+    auth
 } from "./state.js";
 
 /* =========================================
