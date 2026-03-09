@@ -1,63 +1,63 @@
-import { state, saveState, todayKey } from "./state.js";
+/* =========================================
+   1. IMPORTS FROM YOUR STATE.JS
+   ========================================= */
+import { 
+    state, 
+    saveState, 
+    todayKey, 
+    getCurrentCalorieGoal,
+    foodData,   // This is your log storage
+    goals       // This contains trainCals, restCals, protein, etc.
+} from "./state.js";
 
-/* -------------------------------------------------------
- * 1. UI CACHE (populated after DOMContentLoaded)
- * -----------------------------------------------------*/
+/* =========================================
+   2. UI & SCANNER GLOBALS
+   ========================================= */
 let ui = {};
-let allData = JSON.parse(localStorage.getItem('fitnessData')) || {};
+let scanData100g = null; 
 
-/* -------------------------------------------------------
- * 2. HELPERS
- * -----------------------------------------------------*/
-const getActiveDate = () =>
-    ui.datePicker?.value || todayKey();
+// Helper to get selected date or today
+const getActiveDate = () => ui.datePicker?.value || todayKey();
 
+/* =========================================
+   3. BARCODE SCANNER
+   ========================================= */
 window.startBarcodeScanner = function() {
     const overlay = document.getElementById('cameraOverlay');
-    overlay.style.display = 'flex'; // Show the overlay
+    overlay.style.display = 'flex';
 
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#interactive'), // Target the div
-            constraints: {
-                facingMode: "environment" // Use back camera
-            },
+            target: document.querySelector('#interactive'),
+            constraints: { facingMode: "environment" },
+            willReadFrequently: true 
         },
         decoder: {
             readers: ["ean_reader", "ean_8_reader", "upc_reader", "code_128_reader"] 
         }
     }, function (err) {
-        if (err) {
-            console.error(err);
-            alert("Camera initialization failed.");
-            return;
-        }
+        if (err) return console.error(err);
         Quagga.start();
-
-    Quagga.onDetected(handleDetection);
+        Quagga.onDetected(handleDetection);
     });
-}
+};
 
 function handleDetection(data) {
     const code = data.codeResult.code;
-    console.log("Barcode detected:", code);
-    stopScanner();
+    window.stopScanner();
     lookupBarcode(code);
 }
 
 window.stopScanner = function() {
     Quagga.stop();
     document.getElementById('cameraOverlay').style.display = 'none';
-}
+};
 
 async function lookupBarcode(code) {
-    // 1. Give the user some visual feedback
     const nameInput = document.getElementById("foodName");
-    const originalPlaceholder = nameInput.placeholder;
-    nameInput.placeholder = "Searching database...";
-    nameInput.value = "";
+    nameInput.placeholder = "Searching...";
 
     try {
         const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
@@ -65,263 +65,180 @@ async function lookupBarcode(code) {
 
         if (data.status === 1) {
             const p = data.product;
-            const nutriments = p.nutriments || {};
+            const n = p.nutriments || {};
 
-            // Update UI with found data (falling back to 0 if null)
+            scanData100g = {
+                kcal: n["energy-kcal_100g"] || 0,
+                p: n.proteins_100g || 0,
+                c: n.carbohydrates_100g || 0,
+                f: n.fat_100g || 0
+            };
+
             nameInput.value = p.product_name || "Unknown Product";
-            document.getElementById("calories").value = Math.round(nutriments["energy-kcal_100g"] || 0);
-            document.getElementById("protein").value = nutriments.proteins_100g || 0;
-            document.getElementById("carbs").value = nutriments.carbohydrates_100g || 0;
-            document.getElementById("fat").value = nutriments.fat_100g || 0;
-            
-            console.log(`Success: Found ${p.product_name}`);
+            window.recalculateMacros(); 
         } else {
-            alert("Product not found in database.");
-            nameInput.placeholder = originalPlaceholder;
+            alert("Product not found.");
         }
     } catch (e) {
-        console.error("Lookup failed", e);
-        alert("Network error. Check your connection.");
+        alert("Search failed.");
     }
 }
 
-function recalculateMacros() {
-    // If we haven't scanned anything yet, or the weight is empty, stop.
-    if (!rawData) return;
-
-    let weight = parseFloat(document.getElementById("servingWeight").value);
-    
-    // Safety check: if weight is 0 or not a number, default to 0 for calculations
-    if (isNaN(weight) || weight < 0) weight = 0;
-
+window.recalculateMacros = function() {
+    if (!scanData100g) return;
+    const weight = parseFloat(document.getElementById("servingWeight")?.value) || 100;
     const factor = weight / 100;
 
-    // Apply the factor to the 100g base data
-    document.getElementById("calories").value = Math.round(rawData.kcal * factor);
-    document.getElementById("protein").value = (rawData.p * factor).toFixed(1);
-    document.getElementById("carbs").value = (rawData.c * factor).toFixed(1);
-    document.getElementById("fat").value = (rawData.f * factor).toFixed(1);
-}
+    document.getElementById("calories").value = Math.round(scanData100g.kcal * factor);
+    document.getElementById("protein").value = (scanData100g.p * factor).toFixed(1);
+    document.getElementById("carbs").value = (scanData100g.c * factor).toFixed(1);
+    document.getElementById("fat").value = (scanData100g.f * factor).toFixed(1);
+};
 
-/* -------------------------------------------------------
- * 4. ENTRY MANAGEMENT
- * -----------------------------------------------------*/
+/* =========================================
+   4. ENTRY MANAGEMENT (Updated for foodData)
+   ========================================= */
 window.saveEntry = function () {
     const name = document.getElementById("foodName").value;
     const cals = parseInt(document.getElementById("calories").value) || 0;
-    const p = parseInt(document.getElementById("protein").value) || 0;
-    const c = parseInt(document.getElementById("carbs").value) || 0;
-    const f = parseInt(document.getElementById("fat").value) || 0;
 
-    if (!name || cals <= 0) {
-        alert("Please enter a name and calories.");
-        return;
-    }
+    if (!name || cals <= 0) return alert("Enter name and calories.");
 
     const dateKey = getActiveDate();
-    if (!state.foodLogs[dateKey]) state.foodLogs[dateKey] = [];
+    
+    // Ensure the date array exists in foodData (from state.js)
+    if (!foodData[dateKey]) foodData[dateKey] = [];
 
-    state.foodLogs[dateKey].push({
+    foodData[dateKey].push({
         id: Date.now(),
         name,
         calories: cals,
-        protein: p,
-        carbs: c,
-        fat: f
+        protein: parseFloat(document.getElementById("protein").value) || 0,
+        carbs: parseFloat(document.getElementById("carbs").value) || 0,
+        fat: parseFloat(document.getElementById("fat").value) || 0
     });
 
-    saveState();
+    saveState(); // This now saves locally AND to Supabase
     resetInputs();
     render();
 };
 
+function resetInputs() {
+    ["foodName", "calories", "protein", "carbs", "fat"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    document.getElementById("servingWeight").value = "100";
+    scanData100g = null;
+}
+
 window.deleteEntry = function (id) {
     const dateKey = getActiveDate();
-    state.foodLogs[dateKey] = state.foodLogs[dateKey].filter(
-        item => item.id !== id
-    );
+    foodData[dateKey] = (foodData[dateKey] || []).filter(item => item.id !== id);
     saveState();
     render();
 };
 
-/* -------------------------------------------------------
- * 5. PROGRESS RING
- * -----------------------------------------------------*/
-function updateProgressRing(current, goal = state.dailyGoal || 1800) {
-    const circle = document.querySelector(".progress-ring__circle");
-    if (!circle) return;
-
-    const radius = circle.r.baseVal.value;
-    const circumference = 2 * Math.PI * radius;
-
-    circle.style.strokeDasharray = `${circumference} ${circumference}`;
-
-    const percent = Math.min((current / goal) * 100, 100);
-    const offset = circumference - (percent / 100) * circumference;
-
-    circle.style.strokeDashoffset = offset;
-}
-
-/* -------------------------------------------------------
- * 6. RENDER
- * -----------------------------------------------------*/
+/* =========================================
+   5. RENDERING (Updated for goals)
+   ========================================= */
 function render() {
-    const todayDate = new Date().toISOString().split('T')[0];
+    const dateKey = getActiveDate();
+    const entries = foodData[dateKey] || [];
     
-    // Safety check: If allData exists but today's date doesn't, default to empty
-    const dayEntries = (allData && allData[todayDate]) ? allData[todayDate] : [];
-    
-    // Now you can map/loop through dayEntries without it crashing
-    const foodList = document.getElementById("foodList");
-    if (dayEntries.length === 0) {
-        foodList.innerHTML = '<p class="text-muted">No food logged yet today.</p>';
-        return;
-    }
-    // ... rest of your render logic
-}
-    const dayEntries = allData[todayDate] || [];
-    const goals = state.macroGoals || {
-        protein: 200,
-        carbs: 150,
-        fat: 50
-    };
+    // Use goals from state.js (handles train vs rest)
+    const currentGoal = getCurrentCalorieGoal();
 
     const totals = { cal: 0, p: 0, c: 0, f: 0 };
 
-    /* --- LIST --- */
     if (ui.foodList) {
-        ui.foodList.innerHTML = entries.length
-            ? ""
-            : `<p class="text-muted">No food logged yet.</p>`;
-
+        ui.foodList.innerHTML = entries.length ? "" : `<p class="text-muted">No food logged today.</p>`;
         entries.forEach(item => {
             totals.cal += item.calories;
-            totals.p += item.protein || 0;
-            totals.c += item.carbs || 0;
-            totals.f += item.fat || 0;
+            totals.p += item.protein;
+            totals.c += item.carbs;
+            totals.f += item.fat;
 
             const div = document.createElement("div");
             div.className = "food-item";
             div.innerHTML = `
-                <div>
-                    <strong>${item.name}</strong><br>
-                    <small>${item.calories} kcal</small>
-                </div>
-                <button onclick="deleteEntry(${item.id})" class="btn-delete">✕</button>
-            `;
+                <div><strong>${item.name}</strong><br><small>${item.calories} kcal</small></div>
+                <button onclick="deleteEntry(${item.id})" class="btn-delete">✕</button>`;
             ui.foodList.appendChild(div);
         });
     }
 
-    /* --- TOTAL CALS --- */
-    if (ui.dayTotalText) ui.dayTotalText.innerText = `${totals.cal} kcal`;
+    if (ui.dayTotalText) ui.dayTotalText.innerText = `${totals.cal} / ${currentGoal} kcal`;
+    
+    updateProgressRing(totals.cal, currentGoal);
+    renderSummaryTable(totals);
+}
 
-    updateProgressRing(totals.cal);
-
-    /* --- SUMMARY TABLE --- */
+function renderSummaryTable(totals) {
     const summaryBody = document.getElementById("summary-body");
-    if (summaryBody) {
-        const rows = [
-            { label: "Protein", goal: goals.protein, actual: totals.p },
-            { label: "Carbs", goal: goals.carbs, actual: totals.c },
-            { label: "Fat", goal: goals.fat, actual: totals.f }
-        ];
+    if (!summaryBody) return;
 
-        summaryBody.innerHTML = rows
-            .map(r => {
-                const left = Math.max(r.goal - r.actual, 0);
-                return `
-                    <tr>
-                        <td><strong>${r.label}</strong></td>
-                        <td>${r.goal}g</td>
-                        <td>${r.actual}g</td>
-                        <td class="${left === 0 ? "text-success" : ""}">${left}g</td>
-                    </tr>
-                `;
-            })
-            .join("");
-    }
+    // Mapping rows to the 'goals' object from state.js
+    const rows = [
+        { label: "Protein", goal: goals.protein, actual: totals.p },
+        { label: "Carbs", goal: goals.carbs, actual: totals.c },
+        { label: "Fat", goal: goals.fats, actual: totals.f } // Note: your state uses 'fats'
+    ];
 
-/* -------------------------------------------------------
- * 7. GOALS
- * -----------------------------------------------------*/
-window.toggleGoals = function () {
-    const editor = document.getElementById("goals-editor");
-    if (editor) editor.classList.toggle("hidden");
-};
+    summaryBody.innerHTML = rows.map(r => {
+        const left = Math.max(r.goal - Math.round(r.actual), 0);
+        return `<tr>
+            <td><strong>${r.label}</strong></td>
+            <td>${r.goal}g</td>
+            <td>${Math.round(r.actual)}g</td>
+            <td class="${left === 0 ? 'text-success' : ''}">${left}g</td>
+        </tr>`;
+    }).join("");
+}
 
-window.saveGoals = function () {
-    const p = parseInt(document.getElementById("goalP").value) || 200;
-    const c = parseInt(document.getElementById("goalC").value) || 150;
-    const f = parseInt(document.getElementById("goalF").value) || 50;
+function updateProgressRing(current, goal) {
+    const circle = document.querySelector(".progress-ring__circle");
+    if (!circle) return;
+    const circumference = 2 * Math.PI * 50; 
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+    const percent = Math.min((current / goal) * 100, 100);
+    circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
+}
 
-    const newCalGoal = p * 4 + c * 4 + f * 9;
-
-    state.dailyGoal = newCalGoal;
-    state.macroGoals = { protein: p, carbs: c, fat: f };
-
-    saveState();
-    window.toggleGoals();
-    render();
-
-    alert(`Goal updated to ${newCalGoal} kcal!`);
-};
-
-/* -------------------------------------------------------
- * 8. QUICK ADD
- * -----------------------------------------------------*/
+/* =========================================
+   6. QUICK ACTIONS
+   ========================================= */
 window.quickAdd = function (name, p, c, f) {
-    const calories = p * 4 + c * 4 + f * 9;
-
     const dateKey = getActiveDate();
-    if (!state.foodLogs[dateKey]) state.foodLogs[dateKey] = [];
-
-    state.foodLogs[dateKey].push({
+    if (!foodData[dateKey]) foodData[dateKey] = [];
+    foodData[dateKey].push({
         id: Date.now(),
         name,
-        calories,
-        protein: p,
-        carbs: c,
-        fat: f
+        calories: (p * 4) + (c * 4) + (f * 9),
+        protein: p, carbs: c, fat: f
     });
-
     saveState();
     render();
 };
 
-/* -------------------------------------------------------
- * 9. COPY FROM YESTERDAY
- * -----------------------------------------------------*/
 window.copyFromYesterday = function () {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
-    const yesterdayData = allData[yesterdayStr] || [];
+    const yKey = yesterday.toISOString().split('T')[0];
+    const yData = foodData[yKey] || [];
 
-    if (yesterdayData.length === 0) {
-        alert("No entries found for yesterday!");
-        return;
-    }
-
-    if (currentItems.length > 0) {
-        if (!confirm("Add yesterday's items to today?")) return;
-    }
-
-    const cloned = yesterdayData.map(item => ({
-        ...item,
-        id: Date.now() + Math.random()
-    }));
-
-    state.foodLogs[currentDate] = [...currentItems, ...cloned];
+    if (yData.length === 0) return alert("Nothing to copy!");
+    
+    const targetKey = getActiveDate();
+    const cloned = yData.map(item => ({ ...item, id: Date.now() + Math.random() }));
+    foodData[targetKey] = [...(foodData[targetKey] || []), ...cloned];
+    
     saveState();
     render();
-
-    alert(`Copied ${cloned.length} items from ${yesterdayKey}`);
 };
 
-/* -------------------------------------------------------
- * 10. INIT
- * -----------------------------------------------------*/
+/* =========================================
+   7. INIT
+   ========================================= */
 document.addEventListener("DOMContentLoaded", () => {
     ui = {
         datePicker: document.getElementById("datePicker"),
@@ -333,18 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ui.datePicker.value = todayKey();
         ui.datePicker.addEventListener("change", render);
     }
-
-    /* --- Macro auto-calculation --- */
-    ["protein", "carbs", "fat"].forEach(id => {
-        document.getElementById(id)?.addEventListener("input", () => {
-            const p = parseInt(document.getElementById("protein").value) || 0;
-            const c = parseInt(document.getElementById("carbs").value) || 0;
-            const f = parseInt(document.getElementById("fat").value) || 0;
-
-            document.getElementById("calories").value =
-                p * 4 + c * 4 + f * 9;
-        });
-    });
 
     render();
 });
