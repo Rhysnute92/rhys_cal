@@ -4,6 +4,7 @@ import { state, saveState, todayKey } from "./state.js";
  * 1. UI CACHE (populated after DOMContentLoaded)
  * -----------------------------------------------------*/
 let ui = {};
+let allData = JSON.parse(localStorage.getItem('fitnessData')) || {};
 
 /* -------------------------------------------------------
  * 2. HELPERS
@@ -166,6 +167,18 @@ function updateProgressRing(current, goal = state.dailyGoal || 1800) {
  * -----------------------------------------------------*/
 function render() {
     const todayDate = new Date().toISOString().split('T')[0];
+    
+    // Safety check: If allData exists but today's date doesn't, default to empty
+    const dayEntries = (allData && allData[todayDate]) ? allData[todayDate] : [];
+    
+    // Now you can map/loop through dayEntries without it crashing
+    const foodList = document.getElementById("foodList");
+    if (dayEntries.length === 0) {
+        foodList.innerHTML = '<p class="text-muted">No food logged yet today.</p>';
+        return;
+    }
+    // ... rest of your render logic
+}
     const dayEntries = allData[todayDate] || [];
     const goals = state.macroGoals || {
         protein: 200,
