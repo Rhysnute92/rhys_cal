@@ -11,79 +11,93 @@ let ui = {};
 const getActiveDate = () =>
     ui.datePicker?.value || todayKey();
 
-const resetInputs = () => {
-    ["foodName", "calories", "protein", "carbs", "fat"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
-    });
-};
+function startBarcodeScanner() {
+    const overlay = document.getElementById('cameraOverlay');
+    overlay.style.display = 'flex'; // Show the overlay
 
-/* -------------------------------------------------------
- * 3. BARCODE SCANNER
- * -----------------------------------------------------*/
-window.startBarcodeScanner = function () {
-    const overlay = document.getElementById("cameraOverlay");
-    if (!overlay) return;
-
-    overlay.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-
-    Quagga.init(
-        {
-            inputStream: {
-                type: "LiveStream",
-                target: document.querySelector("#interactive"),
-                constraints: { facingMode: "environment" }
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#interactive'), // Target the div
+            constraints: {
+                facingMode: "environment" // Use back camera
             },
-            decoder: {
-                readers: ["ean_reader", "upc_reader", "ean_8_reader"]
-            }
         },
-        err => {
-            if (err) {
-                console.error("Quagga Init Error:", err);
-                return;
-            }
-            Quagga.start();
+        decoder: {
+            readers: ["ean_reader", "ean_8_reader", "upc_reader", "code_128_reader"] 
         }
-    );
+    }, function (err) {
+        if (err) {
+            console.error(err);
+            alert("Camera initialization failed.");
+            return;
+        }
+        Quagga.start();
 
-    Quagga.onDetected(res => {
-        window.stopScanner();
-        lookupBarcode(res.codeResult.code);
-    });
-};
+    Quagga.onDetected((data) => {
+                const code = data.codeResult.code;
+                stopScanner(); // Stop camera immediately
+                lookupBarcode(code); // Fetch the data
+            });
+        });
+    }
 
-window.stopScanner = function () {
+function stopScanner() {
     Quagga.stop();
-    const overlay = document.getElementById("cameraOverlay");
-    if (overlay) overlay.classList.add("hidden");
-    document.body.style.overflow = "auto";
-};
+    const overlay = document.getElementById('cameraOverlay');
+    overlay.style.display = 'none';
+}
 
 async function lookupBarcode(code) {
+    // 1. Give the user some visual feedback
+    const nameInput = document.getElementById("foodName");
+    const originalPlaceholder = nameInput.placeholder;
+    nameInput.placeholder = "Searching database...";
+    nameInput.value = "";
+
     try {
-        const res = await fetch(
-            `https://world.openfoodfacts.org/api/v0/product/${code}.json`
-        );
+        const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
         const data = await res.json();
 
         if (data.status === 1) {
             const p = data.product;
-            document.getElementById("foodName").value =
-                p.product_name || "";
-            document.getElementById("calories").value =
-                p.nutriments["energy-kcal_100g"] || 0;
-            document.getElementById("protein").value =
-                p.nutriments.proteins_100g || 0;
-            document.getElementById("carbs").value =
-                p.nutriments.carbohydrates_100g || 0;
-            document.getElementById("fat").value =
-                p.nutriments.fat_100g || 0;
+            const nutriments = p.nutriments || {};
+
+            // Update UI with found data (falling back to 0 if null)
+            nameInput.value = p.product_name || "Unknown Product";
+            document.getElementById("calories").value = Math.round(nutriments["energy-kcal_100g"] || 0);
+            document.getElementById("protein").value = nutriments.proteins_100g || 0;
+            document.getElementById("carbs").value = nutriments.carbohydrates_100g || 0;
+            document.getElementById("fat").value = nutriments.fat_100g || 0;
+            
+            console.log(`Success: Found ${p.product_name}`);
+        } else {
+            alert("Product not found in database.");
+            nameInput.placeholder = originalPlaceholder;
         }
     } catch (e) {
         console.error("Lookup failed", e);
+        alert("Network error. Check your connection.");
     }
+}
+
+function recalculateMacros() {
+    // If we haven't scanned anything yet, or the weight is empty, stop.
+    if (!rawData) return;
+
+    let weight = parseFloat(document.getElementById("servingWeight").value);
+    
+    // Safety check: if weight is 0 or not a number, default to 0 for calculations
+    if (isNaN(weight) || weight < 0) weight = 0;
+
+    const factor = weight / 100;
+
+    // Apply the factor to the 100g base data
+    document.getElementById("calories").value = Math.round(rawData.kcal * factor);
+    document.getElementById("protein").value = (rawData.p * factor).toFixed(1);
+    document.getElementById("carbs").value = (rawData.c * factor).toFixed(1);
+    document.getElementById("fat").value = (rawData.f * factor).toFixed(1);
 }
 
 /* -------------------------------------------------------

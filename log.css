@@ -76,6 +76,34 @@ body {
     margin-bottom: 12px;
 }
 
+.grid-5-col {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.mini-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mini-input small {
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Ensure inputs don't overflow on small screens */
+.grid-5-col .input-field {
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
 /* ===============================
    BUTTONS
 ================================= */
@@ -134,30 +162,46 @@ body {
 /* ===============================
    SCANNER OVERLAY
 ================================= */
+/* Camera Overlay Styles */
 .camera-overlay {
+    display: none; /* Hidden by default */
     position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
-    z-index: 9999;
-    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    display: none;
+    align-items: center;
 }
 
-.viewport {
-    width: 90%;
-    max-width: 400px;
-    aspect-ratio: 1;
-    border: 2px solid white;
-    border-radius: 20px;
+/* This is where the video feed actually appears */
+#interactive.viewport {
+    width: 100%;
+    max-width: 600px;
+    height: 70vh;
     overflow: hidden;
-    background: #000;
+    position: relative;
 }
 
-/* Hidden state for JS toggle */
-.hidden { display: none !important; }
+#interactive.viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* The red scanning line effect */
+#interactive.viewport canvas.drawingBuffer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.scanner-controls {
+    padding: 20px;
+}
 
 .progress-container {
     position: relative;

@@ -89,6 +89,32 @@
                 <input id="fat" type="number" placeholder="F" class="input-field">
             </div>
 
+            <div class="input-group">
+                <label>Log Meal Details</label>
+                <div class="grid-5-col">
+                    <div class="mini-input">
+                        <small>Weight(g)</small>
+                        <input id="servingWeight" type="number" placeholder="Serving Weight" value="100" class="input-field" oninput="recalculateMacros()">
+                    </div>
+                    <div class="mini-input">
+                        <small>kcal</small>
+                        <input id="calories" type="number" placeholder="0" class="input-field">
+                    </div>
+                    <div class="mini-input">
+                        <small>P</small>
+                        <input id="protein" type="number" placeholder="0" class="input-field">
+                    </div>
+                    <div class="mini-input">
+                        <small>C</small>
+                        <input id="carbs" type="number" placeholder="0" class="input-field">
+                    </div>
+                    <div class="mini-input">
+                        <small>F</small>
+                        <input id="fat" type="number" placeholder="0" class="input-field">
+                    </div>
+                </div>
+            </div>
+
             <div class="scanner-actions">
                 <button onclick="startBarcodeScanner()" class="btn-outline-small">📷 Barcode</button>
                 <button onclick="startMealScan()" class="btn-outline-small">🥗 AI Scan</button>
