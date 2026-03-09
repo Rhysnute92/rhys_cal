@@ -11,7 +11,7 @@ let ui = {};
 const getActiveDate = () =>
     ui.datePicker?.value || todayKey();
 
-function startBarcodeScanner() {
+window.startBarcodeScanner = function() {
     const overlay = document.getElementById('cameraOverlay');
     overlay.style.display = 'flex'; // Show the overlay
 
@@ -35,18 +35,20 @@ function startBarcodeScanner() {
         }
         Quagga.start();
 
-    Quagga.onDetected((data) => {
-                const code = data.codeResult.code;
-                stopScanner(); // Stop camera immediately
-                lookupBarcode(code); // Fetch the data
-            });
-        });
-    }
+    Quagga.onDetected(handleDetection);
+    });
+}
 
-function stopScanner() {
+function handleDetection(data) {
+    const code = data.codeResult.code;
+    console.log("Barcode detected:", code);
+    stopScanner();
+    lookupBarcode(code);
+}
+
+window.stopScanner = function() {
     Quagga.stop();
-    const overlay = document.getElementById('cameraOverlay');
-    overlay.style.display = 'none';
+    document.getElementById('cameraOverlay').style.display = 'none';
 }
 
 async function lookupBarcode(code) {
@@ -163,8 +165,8 @@ function updateProgressRing(current, goal = state.dailyGoal || 1800) {
  * 6. RENDER
  * -----------------------------------------------------*/
 function render() {
-    const dateKey = getActiveDate();
-    const entries = state.foodLogs[dateKey] || [];
+    const todayDate = new Date().toISOString().split('T')[0];
+    const dayEntries = allData[todayDate] || [];
     const goals = state.macroGoals || {
         protein: 200,
         carbs: 150,
@@ -279,17 +281,13 @@ window.quickAdd = function (name, p, c, f) {
  * 9. COPY FROM YESTERDAY
  * -----------------------------------------------------*/
 window.copyFromYesterday = function () {
-    const currentDate = getActiveDate();
-    const currentItems = state.foodLogs[currentDate] || [];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    const yesterdayData = allData[yesterdayStr] || [];
 
-    const d = new Date(currentDate);
-    d.setDate(d.getDate() - 1);
-    const yesterdayKey = d.toISOString().split("T")[0];
-
-    const yesterdayItems = state.foodLogs[yesterdayKey] || [];
-
-    if (yesterdayItems.length === 0) {
-        alert("No entries found for " + yesterdayKey);
+    if (yesterdayData.length === 0) {
+        alert("No entries found for yesterday!");
         return;
     }
 
@@ -297,7 +295,7 @@ window.copyFromYesterday = function () {
         if (!confirm("Add yesterday's items to today?")) return;
     }
 
-    const cloned = yesterdayItems.map(item => ({
+    const cloned = yesterdayData.map(item => ({
         ...item,
         id: Date.now() + Math.random()
     }));
