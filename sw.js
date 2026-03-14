@@ -37,8 +37,18 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
 
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(STATIC_ASSETS))
+        caches.open(CACHE_NAME).then((cache) => {
+            // We map the assets to individual catch blocks to see which one fails
+            return Promise.all(
+                STATIC_ASSETS.map((url) => {
+                    return cache.add(url).catch((err) => {
+                        console.error(`[SW] Failed to cache: ${url}`, err);
+                    });
+                })
+            );
+        }).then(() => {
+            console.log('[SW] Pre-caching complete!');
+        })
     );
 });
 
@@ -70,24 +80,20 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     if (url.origin !== location.origin) return;
 
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+        const networkFetch = fetch(event.request).then((response) => {
+            if (response && response.status === 200) {
+                const cloned = response.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, cloned);
+                });
+            }
+            return response;
+        }).catch(() => cachedResponse);
 
-            const networkFetch = fetch(event.request)
-                .then(response => {
-
-                    // Only cache successful responses
-                    if (response.status === 200) {
-                        const cloned = response.clone();
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.put(event.request, cloned));
-                    }
-
-                    return response;
-                })
-                .catch(() => cachedResponse); // fallback offline
-
-            return cachedResponse || networkFetch;
-        })
-    );
+        // Return the cache immediately, or wait for network if cache is empty
+        return cachedResponse || networkFetch;
+    })
+);
 });
