@@ -34,20 +34,13 @@ const STATIC_ASSETS = [
 
 // INSTALL
 self.addEventListener('install', (event) => {
-    self.skipWaiting();
-
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            // We map the assets to individual catch blocks to see which one fails
-            return Promise.all(
-                STATIC_ASSETS.map((url) => {
-                    return cache.add(url).catch((err) => {
-                        console.error(`[SW] Failed to cache: ${url}`, err);
-                    });
-                })
+            return Promise.allSettled(
+                STATIC_ASSETS.map(url => 
+                    cache.add(url).catch(err => console.error(`Failed to cache: ${url}`, err))
+                )
             );
-        }).then(() => {
-            console.log('[SW] Pre-caching complete!');
         })
     );
 });
