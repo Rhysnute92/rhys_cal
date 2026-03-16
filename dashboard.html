@@ -6,11 +6,64 @@
     <title>Fitness Flow | Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="log.css">
+    <link rel="stylesheet" href="training.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
 <body>
 
-    <div id="splash-screen" class="splash-overlay">
+<header class="app-header">
+    <div class="header-content">
+        <img src="rhys_logo.png" class="header-logo" alt="Logo">
+        <h1>Dashboard</h1>
+        <button id="logoutBtn" class="btn-chip">Logout</button>
+    </div>
+    <nav class="nav-wrapper">
+        <div class="nav-bar">
+            <a href="index.html" class="nav-item active"><span>Home</span></a>
+            <a href="log.html" class="nav-item"><span>Food</span></a>
+            <a href="training.html" class="nav-item"><span>Gym</span></a>
+        </div>
+    </nav>
+</header>
+
+<main class="main-dashboard">
+    <section id="authSection" class="card">
+        <h3>Welcome</h3>
+        <input type="email" id="email" placeholder="Email" class="input-field">
+        <input type="password" id="password" placeholder="Password" class="input-field">
+        <div class="scanner-actions">
+            <button onclick="handleLogin()" class="btn-primary">Login</button>
+            <button onclick="handleRegister()" class="btn-outline-small">Register</button>
+        </div>
+    </section>
+
+    <div id="dashboardContent" class="hidden">
+        <section class="card">
+            <h3>Daily Calories</h3>
+            <div class="progress-container">
+                <svg class="progress-ring" width="120" height="120">
+                    <circle class="progress-ring__background" stroke="#eee" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                    <circle id="dashCircle" class="progress-ring__circle" stroke="#4CAF50" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                </svg>
+                <div class="progress-text">
+                    <span id="dashKcal">0</span>
+                    <small>remaining</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Recent Strength</h3>
+            <canvas id="dashStrengthChart" style="height:150px;"></canvas>
+        </section>
+    </div>
+</main>
+
+<script type="module" src="dashboard.js"></script>
+<script type="module" src="state.js"></script>
+</body>
+</html>
+    <!-- <div id="splash-screen" class="splash-overlay">
         <div class="splash-content">
             <div class="logo-emoji">🔥</div>
             <h1>Fitness Flow</h1>
@@ -121,4 +174,4 @@
     <script type="module" src="dashboard.js"></script>
     <script type="module" src="state.js"></script>
 </body>
-</html>
+</html> -->

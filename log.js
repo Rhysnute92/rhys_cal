@@ -157,7 +157,7 @@ function render() {
             totals.cal += item.calories;
             totals.p += item.protein;
             totals.c += item.carbs;
-            totals.f += item.fat;
+            totals.f += item.fats;
 
             const div = document.createElement("div");
             div.className = "food-item";
