@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="log.css">
     <link rel="stylesheet" href="training.css">
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
 
@@ -69,117 +70,12 @@
 
 <script type="module" src="dashboard.js"></script>
 <script type="module" src="state.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("Service Worker Failed", err));
+}
+</script>
 </body>
 </html>
-    <!-- <div id="splash-screen" class="splash-overlay">
-        <div class="splash-content">
-            <div class="logo-emoji">🔥</div>
-            <h1>Fitness Flow</h1>
-            <p>Track. Progress. Achieve.</p>
-            <button class="btn-primary" onclick="openAuthModal()">Get Started</button>
-        </div>
-    </div>
-
-    <div id="authModal" class="modal-overlay modal-hidden">
-        <div class="modal-card">
-            <h2>Sign In</h2>
-            <div class="input-group">
-                <input type="email" id="authEmail" placeholder="Email">
-                <input type="password" id="authPassword" placeholder="Password">
-            </div>
-            <button class="btn-primary" onclick="handleAuth('login')">Login</button>
-            <button class="btn-text" onclick="handleAuth('signup')">Create Account</button>
-            <button class="btn-text" onclick="closeAuthModal()">Cancel</button>
-        </div>
-    </div>
-
-    <header class="app-header header-hidden">
-        <div class="header-top">
-            <div class="logo-area">🔥 <span>Fitness Flow</span></div>
-            <button class="btn-sensor" onclick="requestSensorPermission()">Sensors</button>
-        </div>
-
-        <div class="nav-wrapper">
-            <nav class="nav-bar">
-                <a href="index.html" class="nav-item active">
-                    <img src="dashboard.png" alt="home">
-                    <span>Home</span>
-                </a>
-                <a href="log.html" class="nav-item">
-                    <img src="diary.png" alt="diary">
-                    <span>Food</span>
-                </a>
-                <a href="training.html" class="nav-item">
-                    <img src="training.png" alt="gym">
-                    <span>Gym</span>
-                </a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="main-dashboard content-hidden">
-        <div class="dashboard-grid" id="mainGrid">
-            
-            <section class="card stat-card calorie-card">
-                <div class="flex-between">
-                    <h3 id="day-type-text">Rest Day</h3>
-                    <label class="switch">
-                        <input type="checkbox" placeholder="Training Toggle" id="trainingToggle" onchange="handleTrainingToggle()">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                
-                <div class="chart-box">
-                    <canvas id="calorieChart"></canvas>
-                    <div class="chart-center">
-                        <span id="displayRemaining">0</span>
-                        <small>kcal left</small>
-                    </div>
-                </div>
-
-                <div class="stats-row">
-                    <div class="stat-group">
-                        <small>Goal</small>
-                        <strong id="displayGoal">0</strong>
-                    </div>
-                    <div class="stat-group">
-                        <small>Food</small>
-                        <strong id="displayFood">0</strong>
-                    </div>
-                </div>
-            </section>
-
-            <div class="card action-tile" onclick="window.location.href='log.html'">
-                <div class="tile-icon">🍎</div>
-                <h4>Log Meal</h4>
-            </div>
-
-            <div class="card action-tile" onclick="window.location.href='training.html'">
-                <div class="tile-icon">🏋️‍♂️</div>
-                <h4>Gym</h4>
-            </div>
-
-            </div>
-
-        <button class="fab-add" onclick="addNewTile()">+</button>
-    </main>
-
-    <div id="addTileModal" class="modal-overlay modal-hidden">
-        <div class="modal-card">
-            <h3>Add Tracker</h3>
-            <select id="tileType" title="Tracker" class="custom-select">
-                <option value="water">Water Intake</option>
-                <option value="sleep">Sleep Hours</option>
-                <option value="gym">Gym Routine</option>
-            </select>
-            <div class="modal-actions">
-                <button class="btn-primary" onclick="saveNewTile()">Add</button>
-                <button class="btn-text" onclick="closeModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module" src="dashboard.js"></script>
-    <script type="module" src="state.js"></script>
-</body>
-</html> -->
