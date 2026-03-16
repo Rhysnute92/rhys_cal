@@ -2,7 +2,7 @@ const CACHE_NAME = 'fitness-pro-v3';
 
 const STATIC_ASSETS = [
     './',
-    './dashboard.html',
+    './index.html',
     './settings.html',
     './log.html',
     './training.html',
