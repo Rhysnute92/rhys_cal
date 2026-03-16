@@ -4,7 +4,7 @@ import {
     isTrainingDay, 
     todayKey, 
     getCurrentCalorieGoal, 
-    toggleTrainingDay 
+    toggleTrainingDay, 
     auth
 } from './state.js';
 
