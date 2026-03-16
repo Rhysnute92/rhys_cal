@@ -232,3 +232,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     animation: pulse 0.3s ease-in-out;
     display: inline-block;
 }
+
+.dashStrengthChart {
+    height: 150px;
+}

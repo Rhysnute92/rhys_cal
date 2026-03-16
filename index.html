@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="log.css">
     <link rel="stylesheet" href="training.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="rhys_logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
 
@@ -63,7 +65,7 @@
 
         <section class="card">
             <h3>Recent Strength</h3>
-            <canvas id="dashStrengthChart" style="height:150px;"></canvas>
+            <canvas id="dashStrengthChart"></canvas>
         </section>
     </div>
 </main>
@@ -72,7 +74,7 @@
 <script type="module" src="state.js"></script>
 <script>
     if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
+  navigator.serviceWorker.register('./sw.js')
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.log("Service Worker Failed", err));
 }
